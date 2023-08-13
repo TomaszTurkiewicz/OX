@@ -12,7 +12,19 @@ import androidx.annotation.RequiresApi
 class ScreenMetricsCompat {
     private val api: Api = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) ApiLevel30() else Api()
 
-    fun getScreenSize(context: Context): Size = api.getScreenSize(context)
+    fun getUnit(context:Context):Int{
+        val width = getScreenSize(context).width/10
+        val height = getScreenSize(context).height/20
+
+        return if(width>height)height else width
+    }
+
+    fun getWindowHeight(context: Context):Int{
+        return getScreenSize(context).height
+    }
+
+
+    private fun getScreenSize(context: Context): Size = api.getScreenSize(context)
 
     @Suppress("DEPRECATION")
     private open class Api{

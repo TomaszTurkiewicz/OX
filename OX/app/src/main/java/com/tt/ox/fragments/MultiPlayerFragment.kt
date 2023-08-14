@@ -5,12 +5,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.fragment.app.activityViewModels
+import com.tt.ox.NOTHING
+import com.tt.ox.O
 import com.tt.ox.R
+import com.tt.ox.X
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
 import com.tt.ox.drawables.MeshDrawable
+import com.tt.ox.drawables.ODrawable
+import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.viewModel.GameViewModel
+import com.tt.ox.viewModel.GameViewModelFactory
 
 
 class MultiPlayerFragment : Fragment() {
@@ -18,9 +27,14 @@ class MultiPlayerFragment : Fragment() {
     private var _binding: FragmentMultiPlayerBinding? = null
     private val binding get() = _binding!!
     private var unit =0
+
+    private val gameViewModel:GameViewModel by activityViewModels(){
+        GameViewModelFactory()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
+        gameViewModel.setMark(X)
 
     }
 
@@ -35,7 +49,81 @@ class MultiPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prepareUI()
+        setObserves()
+        clicks()
 
+    }
+
+    private fun clicks() {
+        binding.topLeftField.setOnClickListener {
+            gameViewModel.setTopLeft()
+        }
+        binding.topMidField.setOnClickListener {
+            gameViewModel.setTopMid()
+        }
+        binding.topRightField.setOnClickListener {
+            gameViewModel.setTopRight()
+        }
+
+        binding.midLeftField.setOnClickListener {
+            gameViewModel.setMidLeft()
+        }
+        binding.midMidField.setOnClickListener {
+            gameViewModel.setMidMid()
+        }
+        binding.midRightField.setOnClickListener {
+            gameViewModel.setMidRight()
+        }
+
+        binding.bottomLeftField.setOnClickListener {
+            gameViewModel.setBottomLeft()
+        }
+        binding.bottomMidField.setOnClickListener {
+            gameViewModel.setBottomMid()
+        }
+        binding.bottomRightField.setOnClickListener {
+            gameViewModel.setBottomRight()
+        }
+    }
+
+    private fun setObserves() {
+        gameViewModel.topLeft.observe(this.viewLifecycleOwner){
+            setMark(binding.topLeftField,it)
+        }
+        gameViewModel.topMid.observe(this.viewLifecycleOwner){
+            setMark(binding.topMidField,it)
+        }
+        gameViewModel.topRight.observe(this.viewLifecycleOwner){
+            setMark(binding.topRightField,it)
+        }
+
+        gameViewModel.midLeft.observe(this.viewLifecycleOwner){
+            setMark(binding.midLeftField,it)
+        }
+        gameViewModel.midMid.observe(this.viewLifecycleOwner){
+            setMark(binding.midMidField,it)
+        }
+        gameViewModel.midRight.observe(this.viewLifecycleOwner){
+            setMark(binding.midRightField,it)
+        }
+
+        gameViewModel.bottomLeft.observe(this.viewLifecycleOwner){
+            setMark(binding.bottomLeftField,it)
+        }
+        gameViewModel.bottomMid.observe(this.viewLifecycleOwner){
+            setMark(binding.bottomMidField,it)
+        }
+        gameViewModel.bottomRight.observe(this.viewLifecycleOwner){
+            setMark(binding.bottomRightField,it)
+        }
+    }
+
+    private fun setMark(view:ImageView, mark:Int){
+        when(mark){
+            NOTHING -> view.setImageDrawable(null)
+            X -> view.setImageDrawable(XDrawable(requireContext()))
+            O -> view.setImageDrawable(ODrawable(requireContext()))
+        }
     }
 
     private fun prepareUI() {

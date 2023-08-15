@@ -11,11 +11,11 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.activityViewModels
 import com.tt.ox.NOTHING
 import com.tt.ox.O
-import com.tt.ox.R
 import com.tt.ox.X
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
+import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
@@ -28,12 +28,13 @@ class MultiPlayerFragment : Fragment() {
     private val binding get() = _binding!!
     private var unit =0
 
-    private val gameViewModel:GameViewModel by activityViewModels(){
+    private val gameViewModel:GameViewModel by activityViewModels {
         GameViewModelFactory()
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
+        gameViewModel.initialize()
         gameViewModel.setMark(X)
 
     }
@@ -84,6 +85,10 @@ class MultiPlayerFragment : Fragment() {
         binding.bottomRightField.setOnClickListener {
             gameViewModel.setBottomRight()
         }
+
+        binding.reset.setOnClickListener {
+            gameViewModel.initialize()
+        }
     }
 
     private fun setObserves() {
@@ -116,6 +121,22 @@ class MultiPlayerFragment : Fragment() {
         gameViewModel.bottomRight.observe(this.viewLifecycleOwner){
             setMark(binding.bottomRightField,it)
         }
+        gameViewModel.play.observe(this.viewLifecycleOwner){
+            if(it){
+                binding.winLine.setImageDrawable(null)
+                binding.winLine.visibility = View.GONE
+                binding.reset.visibility = View.GONE
+            }else{
+                binding.winLine.visibility = View.VISIBLE
+                binding.reset.visibility = View.VISIBLE
+                binding.winLine.setImageDrawable(WinLineDrawable(requireContext(),
+                    gameViewModel.getHorizontalTop(),gameViewModel.getHorizontalMid(),
+                    gameViewModel.getHorizontalBottom(),gameViewModel.getVerticalLeft(),
+                    gameViewModel.getVerticalMid(),gameViewModel.getVerticalRight(),
+                    gameViewModel.getAngleUp(),gameViewModel.getAngleDown()))
+            }
+        }
+
     }
 
     private fun setMark(view:ImageView, mark:Int){
@@ -151,6 +172,10 @@ class MultiPlayerFragment : Fragment() {
         binding.bottomLeftField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.bottomMidField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.bottomRightField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
+
+        binding.winLine.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
+
+        binding.reset.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
     }
 
     private fun setConstraint() {
@@ -195,6 +220,17 @@ class MultiPlayerFragment : Fragment() {
 
         set.connect(binding.topLeftField.id,ConstraintSet.BOTTOM,binding.midMidField.id,ConstraintSet.TOP,0)
         set.connect(binding.topLeftField.id,ConstraintSet.RIGHT,binding.midMidField.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.winLine.id,ConstraintSet.TOP, binding.multiPlayerLayout.id,ConstraintSet.TOP,0)
+        set.connect(binding.winLine.id,ConstraintSet.BOTTOM, binding.multiPlayerLayout.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.winLine.id,ConstraintSet.LEFT, binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.winLine.id,ConstraintSet.RIGHT, binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
+
+
+        set.connect(binding.reset.id,ConstraintSet.BOTTOM, binding.multiPlayerLayout.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.reset.id,ConstraintSet.LEFT, binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.reset.id,ConstraintSet.RIGHT, binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
+
 
         set.applyTo(binding.multiPlayerLayout)
 

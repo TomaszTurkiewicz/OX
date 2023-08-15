@@ -12,8 +12,22 @@ import java.lang.IllegalArgumentException
 class GameViewModel : ViewModel(){
 
 
+    private val _horizontalTop = MutableLiveData<Boolean>()
+    private val _horizontalMid = MutableLiveData<Boolean>()
+    private val _horizontalBottom = MutableLiveData<Boolean>()
+    private val _verticalLeft = MutableLiveData<Boolean>()
+    private val _verticalMid = MutableLiveData<Boolean>()
+    private val _verticalRight = MutableLiveData<Boolean>()
+    private val _angleDown = MutableLiveData<Boolean>()
+    private val _angleUp = MutableLiveData<Boolean>()
+
+    private val _play = MutableLiveData<Boolean>()
+    val play :LiveData<Boolean> = _play
+
+
+
     private val _mark = MutableLiveData<Int>()
-    val mark:LiveData<Int> = _mark
+    private val mark:LiveData<Int> = _mark
     private val _topLeft = MutableLiveData<Int>()
     val topLeft: LiveData<Int> = _topLeft
     private val _topMid = MutableLiveData<Int>()
@@ -49,76 +63,163 @@ class GameViewModel : ViewModel(){
     }
 
     fun setBottomRight(){
-        this._bottomRight.value = mark.value
-        changeMark()
-    }
-    fun getBottomRight():Int{
-        return this.bottomRight.value!!
+        setField(_bottomRight)
     }
     fun setBottomMid(){
-        this._bottomMid.value = mark.value
-        changeMark()
-    }
-    fun getBottomMid():Int{
-        return this.bottomMid.value!!
+        setField(_bottomMid)
     }
     fun setBottomLeft(){
-        this._bottomLeft.value = mark.value
-        changeMark()
+        setField(_bottomLeft)
     }
-
-    fun getBottomLeft():Int{
-        return this.bottomLeft.value!!
-    }
-
-
     fun setMidRight(){
-        this._midRight.value = mark.value
-        changeMark()
-    }
-    fun getMidRight():Int{
-        return this.midRight.value!!
+        setField(_midRight)
     }
     fun setMidMid(){
-        this._midMid.value = mark.value
-        changeMark()
-    }
-    fun getMidMid():Int{
-        return this.midMid.value!!
+        setField(_midMid)
     }
     fun setMidLeft(){
-        this._midLeft.value = mark.value
-        changeMark()
+        setField(_midLeft)
     }
-
-    fun getMidLeft():Int{
-        return this.midLeft.value!!
-    }
-
     fun setTopRight(){
-        this._topRight.value = mark.value
-        changeMark()
-    }
-    fun getTopRight():Int{
-        return this.topRight.value!!
+        setField(_topRight)
     }
     fun setTopMid(){
-        this._topMid.value = mark.value
-        changeMark()
-    }
-    fun getTopMid():Int{
-        return this.topMid.value!!
+        setField(_topMid)
     }
     fun setTopLeft(){
-            this._topLeft.value = mark.value
-            changeMark()
+        setField(_topLeft)
+    }
+    fun getHorizontalTop():Boolean{
+        return this._horizontalTop.value!!
+    }
+    fun getHorizontalMid():Boolean{
+        return this._horizontalMid.value!!
+    }
+    fun getHorizontalBottom():Boolean{
+        return this._horizontalBottom.value!!
+    }
+    fun getVerticalLeft():Boolean{
+        return this._verticalLeft.value!!
+    }
+    fun getVerticalMid():Boolean{
+        return this._verticalMid.value!!
+    }
+    fun getVerticalRight():Boolean{
+        return this._verticalRight.value!!
+    }
+    fun getAngleUp():Boolean{
+        return this._angleUp.value!!
+    }
+    fun getAngleDown():Boolean{
+        return this._angleDown.value!!
+    }
+    private fun setField(field: MutableLiveData<Int>){
+        if(play.value==true){
+        if(field.value == NOTHING) {
+            field.value = mark.value
+            val endGame = checkLines()
+            if (endGame) {
+                _play.value = false
+            } else {
+                changeMark()
+            }
+        }
+        }
     }
 
-    fun getTopLeft():Int{
-        return this.topLeft.value!!
+    fun initialize(){
+        _topLeft.value = NOTHING
+        _topMid.value = NOTHING
+        _topRight.value = NOTHING
+
+        _midLeft.value = NOTHING
+        _midMid.value = NOTHING
+        _midRight.value = NOTHING
+
+        _bottomLeft.value = NOTHING
+        _bottomMid.value = NOTHING
+        _bottomRight.value = NOTHING
+
+        _play.value = true
+    }
+
+    private fun checkLines():Boolean{
+        _horizontalTop.value = checkLine(_topLeft,_topMid,_topRight)
+        _horizontalMid.value = checkLine(_midLeft,_midMid,_midRight)
+        _horizontalBottom.value = checkLine(_bottomLeft,_bottomMid,_bottomRight)
+        _verticalLeft.value = checkLine(_topLeft,_midLeft,_bottomLeft)
+        _verticalMid.value = checkLine(_topMid,_midMid,_bottomMid)
+        _verticalRight.value = checkLine(_topRight,_midRight,_bottomRight)
+        _angleDown.value = checkLine(_topLeft,_midMid,_bottomRight)
+        _angleUp.value = checkLine(_bottomLeft,_midMid,_topRight)
+        return checkWin()
+    }
+
+    private fun checkWin():Boolean{
+        return getHorizontalTop() or (
+            getHorizontalMid() or (
+                getHorizontalBottom() or (
+                    getVerticalLeft() or (
+                        getVerticalMid() or (
+                            getVerticalRight() or (
+                                getAngleUp() or (
+                                    getAngleDown() or (
+                                        getNoMovesAvailable()
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    }
+
+    private fun getNoMovesAvailable(): Boolean {
+        var endGame = false
+        if(_topLeft.value!= NOTHING){
+            if(_topMid.value!= NOTHING){
+                if(_topRight.value!= NOTHING){
+                    if(_midLeft.value!= NOTHING){
+                        if(_midMid.value!= NOTHING){
+                            if(_midRight.value!= NOTHING){
+                                if(_bottomLeft.value!= NOTHING){
+                                    if(_bottomMid.value!= NOTHING){
+                                        if(_bottomRight.value!= NOTHING){
+                                            endGame = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return endGame
+    }
+
+
+    private fun checkLine(fieldFirst:MutableLiveData<Int>,fieldSecond:MutableLiveData<Int>,fieldThird:MutableLiveData<Int>):Boolean{
+        var line = false
+        if(fieldFirst.value!= NOTHING){
+            if(fieldSecond.value!= NOTHING) {
+                if (fieldThird.value!= NOTHING){
+                    if(fieldFirst.value == fieldSecond.value){
+                        if(fieldFirst.value == fieldThird.value){
+                            line = true
+                        }
+                    }
+                }
+            }
+        }
+        return line
     }
 
 }
+
+// todo change mark to person live data
+// todo mark assigned to person
 
 class GameViewModelFactory : ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

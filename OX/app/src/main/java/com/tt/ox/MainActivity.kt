@@ -19,3 +19,5 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
+
+//todo add fragment with adding/choosing opponent multiplayer - database

@@ -7,11 +7,18 @@ import androidx.lifecycle.ViewModelProvider
 import com.tt.ox.NOTHING
 import com.tt.ox.O
 import com.tt.ox.X
+import com.tt.ox.helpers.Player
 import java.lang.IllegalArgumentException
 
 class GameViewModel : ViewModel(){
 
+    private val _buttonEnable = MutableLiveData<Boolean>()
+    val buttonEnable:LiveData<Boolean> = _buttonEnable
 
+    private val _mainPlayer = MutableLiveData<Player>()
+    val mainPlayer: LiveData<Player> = _mainPlayer
+    private val _opponentPlayer = MutableLiveData<Player>()
+    val opponentPlayer: LiveData<Player> = _opponentPlayer
     private val _horizontalTop = MutableLiveData<Boolean>()
     private val _horizontalMid = MutableLiveData<Boolean>()
     private val _horizontalBottom = MutableLiveData<Boolean>()
@@ -24,10 +31,6 @@ class GameViewModel : ViewModel(){
     private val _play = MutableLiveData<Boolean>()
     val play :LiveData<Boolean> = _play
 
-
-
-    private val _mark = MutableLiveData<Int>()
-    private val mark:LiveData<Int> = _mark
     private val _topLeft = MutableLiveData<Int>()
     val topLeft: LiveData<Int> = _topLeft
     private val _topMid = MutableLiveData<Int>()
@@ -50,16 +53,25 @@ class GameViewModel : ViewModel(){
     private val _bottomRight = MutableLiveData<Int>()
     val bottomRight: LiveData<Int> = _bottomRight
 
-    fun setMark(mark:Int){
-        this._mark.value = mark
+
+    private fun getMainPlayer():Player{
+        return this._mainPlayer.value!!
     }
 
-    private fun changeMark(){
-        if(this._mark.value==X){
-            setMark(O)
-        }else{
-            setMark(X)
-        }
+    private fun getOpponentPlayer():Player{
+        return this._opponentPlayer.value!!
+    }
+
+    fun getMainPlayerName():String{
+        return this.getMainPlayer().getName()
+    }
+    fun getOpponentPlayerName():String{
+        return this.getOpponentPlayer().getName()
+    }
+
+    private fun changePerson(){
+        _mainPlayer.value!!.changeTurn()
+        _opponentPlayer.value!!.changeTurn()
     }
 
     fun setBottomRight(){
@@ -113,19 +125,53 @@ class GameViewModel : ViewModel(){
     fun getAngleDown():Boolean{
         return this._angleDown.value!!
     }
+
+    private fun setButtonEnable(){
+        _buttonEnable.value = false
+        if(_topLeft.value == NOTHING){
+            if(_topMid.value == NOTHING){
+                if(_topRight.value == NOTHING){
+                    if(_midLeft.value == NOTHING){
+                        if(_midMid.value == NOTHING){
+                            if(_midRight.value == NOTHING){
+                                if(_bottomLeft.value == NOTHING){
+                                    if(_bottomMid.value == NOTHING){
+                                        if(_bottomRight.value == NOTHING){
+                                           _buttonEnable.value = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     private fun setField(field: MutableLiveData<Int>){
         if(play.value==true){
         if(field.value == NOTHING) {
-            field.value = mark.value
+            field.value = if(_mainPlayer.value!!.getTurn()) _mainPlayer.value!!.mark.value else _opponentPlayer.value!!.mark.value
             val endGame = checkLines()
             if (endGame) {
                 _play.value = false
             } else {
-                changeMark()
+                changePerson()
             }
+            setButtonEnable()
         }
         }
     }
+
+    fun switchMarks(){
+        val opponentPlayerMark = _opponentPlayer.value!!.mark.value!!
+        val mainPlayerMark = _mainPlayer.value!!.mark.value!!
+
+        _mainPlayer.value!!.setMark(opponentPlayerMark)
+        _opponentPlayer.value!!.setMark(mainPlayerMark)
+    }
+
+
 
     fun initialize(){
         _topLeft.value = NOTHING
@@ -141,6 +187,9 @@ class GameViewModel : ViewModel(){
         _bottomRight.value = NOTHING
 
         _play.value = true
+
+        setButtonEnable()
+
     }
 
     private fun checkLines():Boolean{
@@ -216,11 +265,17 @@ class GameViewModel : ViewModel(){
         return line
     }
 
+    fun initializeMainPlayer() {
+        _mainPlayer.value = Player(true)
+        _mainPlayer.value!!.setMark(X)
+    }
+    fun initializeOpponentPlayer(name:String?) {
+        _opponentPlayer.value = Player(false,name)
+        val mark = if(_mainPlayer.value!!.mark.value==X) O else X
+        _opponentPlayer.value!!.setMark(mark)
+    }
+
 }
-
-// todo change mark to person live data
-// todo mark assigned to person
-
 class GameViewModelFactory : ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass.isAssignableFrom(GameViewModel::class.java)){

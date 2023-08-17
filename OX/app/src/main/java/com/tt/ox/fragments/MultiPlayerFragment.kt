@@ -1,6 +1,8 @@
 package com.tt.ox.fragments
 
+
 import android.os.Bundle
+import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,9 +10,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.tt.ox.NOTHING
 import com.tt.ox.O
+import com.tt.ox.R
 import com.tt.ox.X
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
 import com.tt.ox.drawables.MeshDrawable
@@ -35,8 +39,8 @@ class MultiPlayerFragment : Fragment() {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
         gameViewModel.initialize()
-        gameViewModel.setMark(X)
-
+        gameViewModel.initializeMainPlayer()
+        gameViewModel.initializeOpponentPlayer("Julia")
     }
 
     override fun onCreateView(
@@ -89,6 +93,9 @@ class MultiPlayerFragment : Fragment() {
         binding.reset.setOnClickListener {
             gameViewModel.initialize()
         }
+        binding.switchMarks.setOnClickListener {
+            gameViewModel.switchMarks()
+        }
     }
 
     private fun setObserves() {
@@ -137,6 +144,48 @@ class MultiPlayerFragment : Fragment() {
             }
         }
 
+        gameViewModel.mainPlayer.value!!.mark.observe(this.viewLifecycleOwner){
+            if(it==X){
+                binding.mainPlayerMark.setImageDrawable(XDrawable(requireContext()))
+            } else{
+                binding.mainPlayerMark.setImageDrawable(ODrawable(requireContext()))
+            }
+        }
+
+        gameViewModel.opponentPlayer.value!!.mark.observe(this.viewLifecycleOwner){
+            if(it==X){
+                binding.opponentPlayerMark.setImageDrawable(XDrawable(requireContext()))
+            } else{
+                binding.opponentPlayerMark.setImageDrawable(ODrawable(requireContext()))
+            }
+
+        }
+        gameViewModel.opponentPlayer.value!!.turn.observe(this.viewLifecycleOwner){
+            if(it){
+                binding.opponentPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                    R.color.red))
+            }else{
+                binding.opponentPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                    R.color.white))
+            }
+        }
+        gameViewModel.mainPlayer.value!!.turn.observe(this.viewLifecycleOwner){
+            if(it){
+                binding.mainPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                    R.color.red))
+            }else{
+                binding.mainPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                    R.color.white))
+            }
+        }
+
+        gameViewModel.buttonEnable.observe(this.viewLifecycleOwner){
+            if(it){
+                binding.switchMarks.visibility = View.VISIBLE
+            }else{
+                binding.switchMarks.visibility = View.GONE
+            }
+        }
     }
 
     private fun setMark(view:ImageView, mark:Int){
@@ -150,7 +199,13 @@ class MultiPlayerFragment : Fragment() {
     private fun prepareUI() {
         setSizes()
         setDrawables()
+        setNames()
         setConstraint()
+    }
+
+    private fun setNames() {
+        binding.mainPlayerName.text = gameViewModel.getMainPlayerName()
+        binding.opponentPlayerName.text = gameViewModel.getOpponentPlayerName()
     }
 
     private fun setDrawables(){
@@ -176,6 +231,14 @@ class MultiPlayerFragment : Fragment() {
         binding.winLine.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
 
         binding.reset.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
+
+        binding.mainPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (fieldSize/3).toFloat())
+        binding.opponentPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (fieldSize/3).toFloat())
+
+        binding.mainPlayerMark.layoutParams = ConstraintLayout.LayoutParams(fieldSize/3,fieldSize/3)
+        binding.opponentPlayerMark.layoutParams = ConstraintLayout.LayoutParams(fieldSize/3,fieldSize/3)
+
+        binding.switchMarks.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize/3)
     }
 
     private fun setConstraint() {
@@ -231,6 +294,22 @@ class MultiPlayerFragment : Fragment() {
         set.connect(binding.reset.id,ConstraintSet.LEFT, binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
         set.connect(binding.reset.id,ConstraintSet.RIGHT, binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
 
+        set.connect(binding.mainPlayerName.id,ConstraintSet.TOP,binding.multiPlayerLayout.id,ConstraintSet.TOP,0)
+        set.connect(binding.mainPlayerName.id,ConstraintSet.LEFT,binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.opponentPlayerName.id,ConstraintSet.TOP,binding.multiPlayerLayout.id,ConstraintSet.TOP,0)
+        set.connect(binding.opponentPlayerName.id,ConstraintSet.RIGHT,binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.mainPlayerMark.id,ConstraintSet.LEFT,binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.mainPlayerMark.id,ConstraintSet.TOP,binding.mainPlayerName.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.opponentPlayerMark.id,ConstraintSet.RIGHT,binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.opponentPlayerMark.id,ConstraintSet.TOP,binding.opponentPlayerName.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.switchMarks.id,ConstraintSet.LEFT,binding.mainPlayerMark.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.switchMarks.id,ConstraintSet.TOP,binding.mainPlayerMark.id,ConstraintSet.TOP,0)
+        set.connect(binding.switchMarks.id,ConstraintSet.BOTTOM,binding.mainPlayerMark.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.switchMarks.id,ConstraintSet.RIGHT,binding.opponentPlayerMark.id,ConstraintSet.LEFT,0)
 
         set.applyTo(binding.multiPlayerLayout)
 

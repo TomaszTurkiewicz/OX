@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.tt.ox.NOTHING
 import com.tt.ox.O
+import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.X
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
@@ -33,7 +34,9 @@ class MultiPlayerFragment : Fragment() {
     private var unit =0
 
     private val gameViewModel:GameViewModel by activityViewModels {
-        GameViewModelFactory()
+        GameViewModelFactory(
+            (activity?.application as OXApplication).database.opponentDao()
+        )
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

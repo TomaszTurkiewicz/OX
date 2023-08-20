@@ -7,10 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.tt.ox.OXApplication
 import com.tt.ox.R
+import com.tt.ox.database.Opponent
+import com.tt.ox.database.OpponentDatabase
 import com.tt.ox.databinding.FragmentStartBinding
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.viewModel.GameViewModel
+import com.tt.ox.viewModel.GameViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 
 
 class StartFragment : Fragment() {
@@ -37,7 +45,6 @@ class StartFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        findNavController().navigate(StartFragmentDirections.actionStartFragmentToMultiPlayerFragment())
         prepareUI()
         clicks()
     }
@@ -49,7 +56,7 @@ class StartFragment : Fragment() {
                 findNavController().navigate(action)
             }
             it.multiPlayerButton.setOnClickListener {
-                val action = StartFragmentDirections.actionStartFragmentToMultiPlayerFragment()
+                val action = StartFragmentDirections.actionStartFragmentToChooseOpponentFragment()
                 findNavController().navigate(action)
             }
             it.optionsButton.setOnClickListener {

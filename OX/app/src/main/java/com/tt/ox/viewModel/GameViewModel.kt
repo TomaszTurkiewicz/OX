@@ -4,16 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.tt.ox.NOTHING
 import com.tt.ox.O
 import com.tt.ox.X
+import com.tt.ox.database.Opponent
+import com.tt.ox.database.OpponentDao
 import com.tt.ox.helpers.Player
+import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
-class GameViewModel : ViewModel(){
+class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
     private val _buttonEnable = MutableLiveData<Boolean>()
     val buttonEnable:LiveData<Boolean> = _buttonEnable
+
 
     private val _mainPlayer = MutableLiveData<Player>()
     val mainPlayer: LiveData<Player> = _mainPlayer
@@ -53,6 +59,26 @@ class GameViewModel : ViewModel(){
     private val _bottomRight = MutableLiveData<Int>()
     val bottomRight: LiveData<Int> = _bottomRight
 
+    val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
+
+    val a = 100
+    fun addNewOpponent(name:String){
+        val opponent = getNewOpponentEntity(name)
+        insertNewOpponent(opponent)
+    }
+    private fun getNewOpponentEntity(name:String):Opponent{
+        return Opponent(
+            opponentName = name,
+            opponentWin = 0,
+            mainPlayerWin = 0
+        )
+    }
+
+    private fun insertNewOpponent(opponent: Opponent){
+        viewModelScope.launch {
+            opponentDao.insert(opponent)
+        }
+    }
 
     private fun getMainPlayer():Player{
         return this._mainPlayer.value!!
@@ -276,11 +302,11 @@ class GameViewModel : ViewModel(){
     }
 
 }
-class GameViewModelFactory : ViewModelProvider.Factory{
+class GameViewModelFactory(private val opponentDao: OpponentDao) : ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass.isAssignableFrom(GameViewModel::class.java)){
             @Suppress("UNCHECKED_CAST")
-            return GameViewModel() as T
+            return GameViewModel(opponentDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -23,4 +23,6 @@ interface OpponentDao {
     @Query("Select * from opponent")
     fun getOpponents(): Flow<List<Opponent>>
 
+    @Query("Select * from opponent where id =:id")
+    fun getOpponent(id:Int): Flow<Opponent>
 }

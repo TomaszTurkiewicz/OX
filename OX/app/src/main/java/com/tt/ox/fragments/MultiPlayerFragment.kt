@@ -25,25 +25,34 @@ import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
+import androidx.navigation.fragment.navArgs
+import com.tt.ox.database.Opponent
+import com.tt.ox.database.OpponentDatabase
+import kotlinx.coroutines.launch
 
 
-class MultiPlayerFragment : Fragment() {
+class MultiPlayerFragment : FragmentCoroutine() {
 
     private var _binding: FragmentMultiPlayerBinding? = null
     private val binding get() = _binding!!
     private var unit =0
+
+    private val navArgs: MultiPlayerFragmentArgs by navArgs()
 
     private val gameViewModel:GameViewModel by activityViewModels {
         GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
+    private var id = 0
+
+    private var opponent = Opponent()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
-        gameViewModel.initialize()
-        gameViewModel.initializeMainPlayer()
-        gameViewModel.initializeOpponentPlayer("Julia")
+        id = navArgs.opponentId
+
+
     }
 
     override fun onCreateView(
@@ -56,9 +65,28 @@ class MultiPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        prepareUI()
-        setObserves()
-        clicks()
+
+        gameViewModel.initialize()
+        gameViewModel.initializeMainPlayer()
+        if(id>0){
+            gameViewModel.getOpponent(id).observe(this.viewLifecycleOwner){
+                    selectedOpponent -> opponent = selectedOpponent
+                gameViewModel.initializeOpponentPlayer(opponent.opponentName)
+                prepareUI()
+                setObserves()
+                clicks()
+            }
+        }
+
+
+
+
+
+//        gameViewModel.initializeOpponentPlayer(opponent.opponentName)
+
+//        launch {
+//            opponent = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponent(id)
+//        }
 
     }
 
@@ -102,6 +130,15 @@ class MultiPlayerFragment : Fragment() {
     }
 
     private fun setObserves() {
+
+        gameViewModel.mainPlayer.value!!.name.observe(this.viewLifecycleOwner){
+            binding.mainPlayerName.text = it
+        }
+
+        gameViewModel.opponentPlayer.value!!.name.observe(this.viewLifecycleOwner){
+            binding.opponentPlayerName.text = it
+        }
+
         gameViewModel.topLeft.observe(this.viewLifecycleOwner){
             setMark(binding.topLeftField,it)
         }
@@ -202,14 +239,11 @@ class MultiPlayerFragment : Fragment() {
     private fun prepareUI() {
         setSizes()
         setDrawables()
-        setNames()
         setConstraint()
     }
 
-    private fun setNames() {
-        binding.mainPlayerName.text = gameViewModel.getMainPlayerName()
-        binding.opponentPlayerName.text = gameViewModel.getOpponentPlayerName()
-    }
+
+
 
     private fun setDrawables(){
         binding.backgroundField.setImageDrawable(MeshDrawable(requireContext()))

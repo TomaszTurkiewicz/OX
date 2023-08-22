@@ -4,7 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tt.ox.X
 
-class Player(private var myTurn:Boolean, private val name:String? = "Tom") {
+class Player(private var myTurn:Boolean) {
+
+    private var _name = MutableLiveData<String>()
+    val name:LiveData<String> = _name
 
     private var _mark = MutableLiveData<Int>()
     val mark:LiveData<Int> = _mark
@@ -25,7 +28,11 @@ class Player(private var myTurn:Boolean, private val name:String? = "Tom") {
     }
 
     fun getName():String{
-        return name ?: ""
+        return this._name.value!!
+    }
+
+    fun setName(name:String){
+        this._name.value = name
     }
 
     fun setMark(mark:Int){

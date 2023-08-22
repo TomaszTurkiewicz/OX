@@ -1,5 +1,6 @@
 package com.tt.ox.viewModel
 
+import android.graphics.Path.Op
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -61,7 +62,9 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
     val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
 
-    val a = 100
+    fun getOpponent(id:Int): LiveData<Opponent>{
+        return opponentDao.getOpponent(id).asLiveData()
+    }
     fun addNewOpponent(name:String){
         val opponent = getNewOpponentEntity(name)
         insertNewOpponent(opponent)
@@ -69,8 +72,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
     private fun getNewOpponentEntity(name:String):Opponent{
         return Opponent(
             opponentName = name,
-            opponentWin = 0,
-            mainPlayerWin = 0
+            opponentWin = 0
         )
     }
 
@@ -294,9 +296,12 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
     fun initializeMainPlayer() {
         _mainPlayer.value = Player(true)
         _mainPlayer.value!!.setMark(X)
+        _mainPlayer.value!!.setName("Tom")
     }
-    fun initializeOpponentPlayer(name:String?) {
-        _opponentPlayer.value = Player(false,name)
+    fun initializeOpponentPlayer(name:String) {
+        val oPlayer = Player(false)
+        oPlayer.setName(name)
+        _opponentPlayer.value = oPlayer
         val mark = if(_mainPlayer.value!!.mark.value==X) O else X
         _opponentPlayer.value!!.setMark(mark)
     }

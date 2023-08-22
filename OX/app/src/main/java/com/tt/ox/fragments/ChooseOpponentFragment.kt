@@ -1,33 +1,27 @@
 package com.tt.ox.fragments
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.InputType
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tt.ox.OXApplication
-import com.tt.ox.R
 import com.tt.ox.adapters.ChooseOpponentAdapter
-import com.tt.ox.database.OpponentDatabase
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class ChooseOpponentFragment : Fragment() {
@@ -52,6 +46,11 @@ class ChooseOpponentFragment : Fragment() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        state = binding.recyclerView.layoutManager?.onSaveInstanceState()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -63,7 +62,10 @@ class ChooseOpponentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prepareUI()
-        val adapter = ChooseOpponentAdapter()
+        val adapter = ChooseOpponentAdapter(unit){
+            val action = ChooseOpponentFragmentDirections.actionChooseOpponentFragmentToMultiPlayerFragment(it.id)
+            findNavController().navigate(action)
+        }
         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)

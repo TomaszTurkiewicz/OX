@@ -1,5 +1,6 @@
 package com.tt.ox.viewModel
 
+import android.content.Context
 import android.graphics.Path.Op
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +14,7 @@ import com.tt.ox.X
 import com.tt.ox.database.Opponent
 import com.tt.ox.database.OpponentDao
 import com.tt.ox.helpers.Player
+import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
@@ -293,10 +295,10 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
         return line
     }
 
-    fun initializeMainPlayer() {
+    fun initializeMainPlayer(context: Context) {
         _mainPlayer.value = Player(true)
         _mainPlayer.value!!.setMark(X)
-        _mainPlayer.value!!.setName("Tom")
+        _mainPlayer.value!!.setName(SharedPreferences.readPlayerName(context))
     }
     fun initializeOpponentPlayer(name:String) {
         val oPlayer = Player(false)

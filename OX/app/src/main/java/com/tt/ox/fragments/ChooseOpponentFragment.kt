@@ -1,5 +1,6 @@
 package com.tt.ox.fragments
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Parcelable
@@ -59,6 +60,7 @@ class ChooseOpponentFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prepareUI()
@@ -85,9 +87,6 @@ class ChooseOpponentFragment : Fragment() {
                 }
         }
         }
-
-
-
     }
 
     private fun addNewOpponent() {

@@ -26,6 +26,8 @@ import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
 import androidx.navigation.fragment.navArgs
+import com.tt.ox.MAIN_PLAYER
+import com.tt.ox.OPPONENT
 import com.tt.ox.database.Opponent
 import com.tt.ox.database.OpponentDatabase
 import kotlinx.coroutines.launch
@@ -47,12 +49,11 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private var id = 0
 
     private var opponent = Opponent()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
         id = navArgs.opponentId
-
-
     }
 
     override fun onCreateView(
@@ -65,8 +66,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        gameViewModel.initialize()
+        gameViewModel.initialize(id)
         gameViewModel.initializeMainPlayer(requireContext())
         if(id>0){
             gameViewModel.getOpponent(id).observe(this.viewLifecycleOwner){
@@ -77,59 +77,93 @@ class MultiPlayerFragment : FragmentCoroutine() {
                 clicks()
             }
         }
-
-
-
-
-
-//        gameViewModel.initializeOpponentPlayer(opponent.opponentName)
-
-//        launch {
-//            opponent = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponent(id)
-//        }
-
     }
+
 
     private fun clicks() {
         binding.topLeftField.setOnClickListener {
             gameViewModel.setTopLeft()
+
         }
         binding.topMidField.setOnClickListener {
             gameViewModel.setTopMid()
+
         }
         binding.topRightField.setOnClickListener {
             gameViewModel.setTopRight()
+
         }
 
         binding.midLeftField.setOnClickListener {
             gameViewModel.setMidLeft()
+
         }
         binding.midMidField.setOnClickListener {
             gameViewModel.setMidMid()
+
         }
         binding.midRightField.setOnClickListener {
             gameViewModel.setMidRight()
+
         }
 
         binding.bottomLeftField.setOnClickListener {
             gameViewModel.setBottomLeft()
+
         }
         binding.bottomMidField.setOnClickListener {
             gameViewModel.setBottomMid()
+
         }
         binding.bottomRightField.setOnClickListener {
             gameViewModel.setBottomRight()
+
         }
 
         binding.reset.setOnClickListener {
-            gameViewModel.initialize()
+            gameViewModel.initialize(id)
         }
         binding.switchMarks.setOnClickListener {
             gameViewModel.switchMarks()
         }
     }
 
+    private fun updateWins(){
+        val winingPerson = gameViewModel.getWiningPerson()
+        var opponentDatabase = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponentNormal(id)
+        if (winingPerson == MAIN_PLAYER) {
+            gameViewModel.updateOpponent(
+                Opponent(
+                    id = opponentDatabase.id,
+                    opponentName = opponentDatabase.opponentName,
+                    mainPlayerWin = opponentDatabase.mainPlayerWin + 1,
+                    opponentWin = opponentDatabase.opponentWin
+                )
+            )
+        } else if (winingPerson == OPPONENT) {
+            gameViewModel.updateOpponent(
+                Opponent(
+                    id = opponentDatabase.id,
+                    opponentName = opponentDatabase.opponentName,
+                    mainPlayerWin = opponentDatabase.mainPlayerWin,
+                    opponentWin = opponentDatabase.opponentWin + 1
+                )
+            )
+        }
+    }
+
     private fun setObserves() {
+
+        gameViewModel.win.observe(this.viewLifecycleOwner){
+            if(it){
+                gameViewModel.resetWin()
+                    launch {
+                        updateWins()
+                    }
+
+
+            }
+        }
 
         gameViewModel.mainPlayer.value!!.name.observe(this.viewLifecycleOwner){
             binding.mainPlayerName.text = it
@@ -200,26 +234,21 @@ class MultiPlayerFragment : FragmentCoroutine() {
             }
 
         }
-        gameViewModel.opponentPlayer.value!!.turn.observe(this.viewLifecycleOwner){
-            if(it){
-                binding.opponentPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
-                    R.color.red))
-            }else{
-                binding.opponentPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
-                    R.color.white))
-            }
-        }
-        gameViewModel.mainPlayer.value!!.turn.observe(this.viewLifecycleOwner){
+        gameViewModel.turn.observe(this.viewLifecycleOwner){
             if(it){
                 binding.mainPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
                     R.color.red))
+                binding.opponentPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                    R.color.white))
             }else{
                 binding.mainPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
                     R.color.white))
+                binding.opponentPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                    R.color.red))
             }
         }
 
-        gameViewModel.buttonEnable.observe(this.viewLifecycleOwner){
+        gameViewModel.buttonSwitch.observe(this.viewLifecycleOwner){
             if(it){
                 binding.switchMarks.visibility = View.VISIBLE
             }else{
@@ -241,9 +270,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
         setDrawables()
         setConstraint()
     }
-
-
-
 
     private fun setDrawables(){
         binding.backgroundField.setImageDrawable(MeshDrawable(requireContext()))

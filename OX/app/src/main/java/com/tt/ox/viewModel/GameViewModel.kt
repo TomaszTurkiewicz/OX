@@ -1,15 +1,17 @@
 package com.tt.ox.viewModel
 
 import android.content.Context
-import android.graphics.Path.Op
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
+import com.tt.ox.NO_ONE
 import com.tt.ox.O
+import com.tt.ox.OPPONENT
 import com.tt.ox.X
 import com.tt.ox.database.Opponent
 import com.tt.ox.database.OpponentDao
@@ -20,8 +22,18 @@ import java.lang.IllegalArgumentException
 
 class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
-    private val _buttonEnable = MutableLiveData<Boolean>()
-    val buttonEnable:LiveData<Boolean> = _buttonEnable
+    private val _turn = MutableLiveData<Boolean>()
+    val turn:LiveData<Boolean> = _turn
+
+    private var winingMark = NOTHING
+    private var winingPerson = NO_ONE
+
+    private val _win = MutableLiveData<Boolean>()
+    val win:LiveData<Boolean> = _win
+
+    private var id = 0
+    private val _buttonSwitch = MutableLiveData<Boolean>()
+    val buttonSwitch:LiveData<Boolean> = _buttonSwitch
 
 
     private val _mainPlayer = MutableLiveData<Player>()
@@ -64,6 +76,14 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
     val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
 
+    fun getWiningPerson():Int{
+        return this.winingPerson
+    }
+
+    private fun resetWiningPerson(){
+        this.winingPerson = NO_ONE
+        resetWin()
+    }
     fun getOpponent(id:Int): LiveData<Opponent>{
         return opponentDao.getOpponent(id).asLiveData()
     }
@@ -78,30 +98,20 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
         )
     }
 
+    fun updateOpponent(opponent: Opponent){
+        viewModelScope.launch {
+            opponentDao.update(opponent)
+        }
+    }
+
     private fun insertNewOpponent(opponent: Opponent){
         viewModelScope.launch {
             opponentDao.insert(opponent)
         }
     }
 
-    private fun getMainPlayer():Player{
-        return this._mainPlayer.value!!
-    }
-
-    private fun getOpponentPlayer():Player{
-        return this._opponentPlayer.value!!
-    }
-
-    fun getMainPlayerName():String{
-        return this.getMainPlayer().getName()
-    }
-    fun getOpponentPlayerName():String{
-        return this.getOpponentPlayer().getName()
-    }
-
     private fun changePerson(){
-        _mainPlayer.value!!.changeTurn()
-        _opponentPlayer.value!!.changeTurn()
+        _turn.value = !_turn.value!!
     }
 
     fun setBottomRight(){
@@ -157,7 +167,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
     }
 
     private fun setButtonEnable(){
-        _buttonEnable.value = false
+        _buttonSwitch.value = false
         if(_topLeft.value == NOTHING){
             if(_topMid.value == NOTHING){
                 if(_topRight.value == NOTHING){
@@ -167,7 +177,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
                                 if(_bottomLeft.value == NOTHING){
                                     if(_bottomMid.value == NOTHING){
                                         if(_bottomRight.value == NOTHING){
-                                           _buttonEnable.value = true
+                                           _buttonSwitch.value = true
                                         }
                                     }
                                 }
@@ -178,13 +188,21 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
             }
         }
     }
+
     private fun setField(field: MutableLiveData<Int>){
         if(play.value==true){
         if(field.value == NOTHING) {
-            field.value = if(_mainPlayer.value!!.getTurn()) _mainPlayer.value!!.mark.value else _opponentPlayer.value!!.mark.value
+            field.value = if(turn.value!!) _mainPlayer.value!!.mark.value else _opponentPlayer.value!!.mark.value
             val endGame = checkLines()
+
             if (endGame) {
                 _play.value = false
+                when(winingMark){
+                    _mainPlayer.value!!.mark.value!! -> addWinToMainPlayer()
+                    _opponentPlayer.value!!.mark.value!! -> addWinToOpponent()
+                    else -> clearWinningMark()
+                }
+                _win.value = true
             } else {
                 changePerson()
             }
@@ -192,6 +210,26 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
         }
         }
     }
+
+    private fun addWinToOpponent() {
+        winingPerson = OPPONENT
+        winingMark = NOTHING
+    }
+
+    fun resetWin(){
+        _win.value = false
+    }
+
+    private fun addWinToMainPlayer() {
+        winingPerson = MAIN_PLAYER
+        winingMark = NOTHING
+    }
+
+
+    private fun clearWinningMark() {
+        winingMark = NOTHING
+    }
+
 
     fun switchMarks(){
         val opponentPlayerMark = _opponentPlayer.value!!.mark.value!!
@@ -203,7 +241,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
 
 
-    fun initialize(){
+    fun initialize(id:Int){
         _topLeft.value = NOTHING
         _topMid.value = NOTHING
         _topRight.value = NOTHING
@@ -218,19 +256,30 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
         _play.value = true
 
+        _win.value = false
+
+        this.id = id
+
+        _turn.value = true
+
         setButtonEnable()
+
+        resetWiningPerson()
+
+
 
     }
 
-    private fun checkLines():Boolean{
-        _horizontalTop.value = checkLine(_topLeft,_topMid,_topRight)
-        _horizontalMid.value = checkLine(_midLeft,_midMid,_midRight)
-        _horizontalBottom.value = checkLine(_bottomLeft,_bottomMid,_bottomRight)
-        _verticalLeft.value = checkLine(_topLeft,_midLeft,_bottomLeft)
-        _verticalMid.value = checkLine(_topMid,_midMid,_bottomMid)
-        _verticalRight.value = checkLine(_topRight,_midRight,_bottomRight)
-        _angleDown.value = checkLine(_topLeft,_midMid,_bottomRight)
-        _angleUp.value = checkLine(_bottomLeft,_midMid,_topRight)
+
+    private fun checkLines(): Boolean {
+        _horizontalTop.value = checkLine(_topLeft, _topMid, _topRight)
+        _horizontalMid.value = checkLine(_midLeft, _midMid, _midRight)
+        _horizontalBottom.value = checkLine(_bottomLeft, _bottomMid, _bottomRight)
+        _verticalLeft.value = checkLine(_topLeft, _midLeft, _bottomLeft)
+        _verticalMid.value = checkLine(_topMid, _midMid, _bottomMid)
+        _verticalRight.value = checkLine(_topRight, _midRight, _bottomRight)
+        _angleDown.value = checkLine(_topLeft, _midMid, _bottomRight)
+        _angleUp.value = checkLine(_bottomLeft, _midMid, _topRight)
         return checkWin()
     }
 
@@ -287,6 +336,8 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
                     if(fieldFirst.value == fieldSecond.value){
                         if(fieldFirst.value == fieldThird.value){
                             line = true
+                            winingMark = fieldFirst.value!!
+
                         }
                     }
                 }
@@ -296,12 +347,12 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
     }
 
     fun initializeMainPlayer(context: Context) {
-        _mainPlayer.value = Player(true)
+        _mainPlayer.value = Player()
         _mainPlayer.value!!.setMark(X)
         _mainPlayer.value!!.setName(SharedPreferences.readPlayerName(context))
     }
     fun initializeOpponentPlayer(name:String) {
-        val oPlayer = Player(false)
+        val oPlayer = Player()
         oPlayer.setName(name)
         _opponentPlayer.value = oPlayer
         val mark = if(_mainPlayer.value!!.mark.value==X) O else X

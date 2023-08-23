@@ -25,4 +25,7 @@ interface OpponentDao {
 
     @Query("Select * from opponent where id =:id")
     fun getOpponent(id:Int): Flow<Opponent>
+
+    @Query("Select * from opponent where id =:id")
+    fun getOpponentNormal(id:Int): Opponent
 }

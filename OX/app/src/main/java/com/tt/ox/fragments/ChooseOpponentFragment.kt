@@ -147,6 +147,3 @@ class ChooseOpponentFragment : Fragment() {
     }
 
 }
-
-//todo recyclerview size change and list item
-// todo list item onclick choose opponent and open multiplayer

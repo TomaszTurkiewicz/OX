@@ -39,6 +39,9 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private val binding get() = _binding!!
     private var unit =0
 
+    private var fPlay = false
+    private var fMoves = false
+
     private val navArgs: MultiPlayerFragmentArgs by navArgs()
 
     private val gameViewModel:GameViewModel by activityViewModels {
@@ -68,19 +71,29 @@ class MultiPlayerFragment : FragmentCoroutine() {
         super.onViewCreated(view, savedInstanceState)
         gameViewModel.initialize(id)
         gameViewModel.initializeMainPlayer(requireContext())
+        gameViewModel.initializeMoves()
         if(id>0){
             gameViewModel.getOpponent(id).observe(this.viewLifecycleOwner){
                     selectedOpponent -> opponent = selectedOpponent
                 gameViewModel.initializeOpponentPlayer(opponent.opponentName)
+
                 prepareUI()
                 setObserves()
                 clicks()
+
+//                //todo!!! change it - its only for test
+//                binding.addMoves.visibility = View.GONE
             }
         }
     }
 
 
     private fun clicks() {
+
+        binding.addMoves.setOnClickListener {
+            gameViewModel.addMoves()
+        }
+
         binding.topLeftField.setOnClickListener {
             gameViewModel.setTopLeft()
 
@@ -160,9 +173,11 @@ class MultiPlayerFragment : FragmentCoroutine() {
                     launch {
                         updateWins()
                     }
-
-
             }
+        }
+
+        gameViewModel.moves.observe(this.viewLifecycleOwner){
+            binding.moves.text = it.toString()
         }
 
         gameViewModel.mainPlayer.value!!.name.observe(this.viewLifecycleOwner){
@@ -203,19 +218,13 @@ class MultiPlayerFragment : FragmentCoroutine() {
             setMark(binding.bottomRightField,it)
         }
         gameViewModel.play.observe(this.viewLifecycleOwner){
-            if(it){
-                binding.winLine.setImageDrawable(null)
-                binding.winLine.visibility = View.GONE
-                binding.reset.visibility = View.GONE
-            }else{
-                binding.winLine.visibility = View.VISIBLE
-                binding.reset.visibility = View.VISIBLE
-                binding.winLine.setImageDrawable(WinLineDrawable(requireContext(),
-                    gameViewModel.getHorizontalTop(),gameViewModel.getHorizontalMid(),
-                    gameViewModel.getHorizontalBottom(),gameViewModel.getVerticalLeft(),
-                    gameViewModel.getVerticalMid(),gameViewModel.getVerticalRight(),
-                    gameViewModel.getAngleUp(),gameViewModel.getAngleDown()))
-            }
+            fPlay = it
+            displayUI()
+        }
+
+        gameViewModel.moves.observe(this.viewLifecycleOwner){
+            fMoves = it == 0
+            displayUI()
         }
 
         gameViewModel.mainPlayer.value!!.mark.observe(this.viewLifecycleOwner){
@@ -257,6 +266,29 @@ class MultiPlayerFragment : FragmentCoroutine() {
         }
     }
 
+    private fun displayUI(){
+        if(fPlay){
+            binding.winLine.setImageDrawable(null)
+            binding.winLine.visibility = View.GONE
+            binding.reset.visibility = View.GONE
+            binding.addMoves.visibility = View.GONE
+        }else{
+            binding.winLine.visibility = View.VISIBLE
+            binding.winLine.setImageDrawable(WinLineDrawable(requireContext(),
+                gameViewModel.getHorizontalTop(),gameViewModel.getHorizontalMid(),
+                gameViewModel.getHorizontalBottom(),gameViewModel.getVerticalLeft(),
+                gameViewModel.getVerticalMid(),gameViewModel.getVerticalRight(),
+                gameViewModel.getAngleUp(),gameViewModel.getAngleDown()))
+            if(fMoves){
+                binding.reset.visibility = View.GONE
+                binding.addMoves.visibility = View.VISIBLE
+            }else{
+                binding.reset.visibility = View.VISIBLE
+                binding.addMoves.visibility = View.GONE
+            }
+        }
+    }
+
     private fun setMark(view:ImageView, mark:Int){
         when(mark){
             NOTHING -> view.setImageDrawable(null)
@@ -294,6 +326,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         binding.winLine.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
 
         binding.reset.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
+        binding.addMoves.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
 
         binding.mainPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (fieldSize/3).toFloat())
         binding.opponentPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (fieldSize/3).toFloat())
@@ -302,6 +335,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
         binding.opponentPlayerMark.layoutParams = ConstraintLayout.LayoutParams(fieldSize/3,fieldSize/3)
 
         binding.switchMarks.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize/3)
+
+        binding.moves.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit.toFloat())
     }
 
     private fun setConstraint() {
@@ -357,6 +392,10 @@ class MultiPlayerFragment : FragmentCoroutine() {
         set.connect(binding.reset.id,ConstraintSet.LEFT, binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
         set.connect(binding.reset.id,ConstraintSet.RIGHT, binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
 
+        set.connect(binding.addMoves.id,ConstraintSet.BOTTOM, binding.multiPlayerLayout.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.addMoves.id,ConstraintSet.LEFT, binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.addMoves.id,ConstraintSet.RIGHT, binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
+
         set.connect(binding.mainPlayerName.id,ConstraintSet.TOP,binding.multiPlayerLayout.id,ConstraintSet.TOP,0)
         set.connect(binding.mainPlayerName.id,ConstraintSet.LEFT,binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
 
@@ -374,9 +413,15 @@ class MultiPlayerFragment : FragmentCoroutine() {
         set.connect(binding.switchMarks.id,ConstraintSet.BOTTOM,binding.mainPlayerMark.id,ConstraintSet.BOTTOM,0)
         set.connect(binding.switchMarks.id,ConstraintSet.RIGHT,binding.opponentPlayerMark.id,ConstraintSet.LEFT,0)
 
+        set.connect(binding.moves.id,ConstraintSet.TOP,binding.multiPlayerLayout.id,ConstraintSet.TOP,0)
+        set.connect(binding.moves.id,ConstraintSet.LEFT,binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.moves.id,ConstraintSet.RIGHT,binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
+
         set.applyTo(binding.multiPlayerLayout)
 
     }
 
 
 }
+
+//todo - game counter 10 to 1... then add moves

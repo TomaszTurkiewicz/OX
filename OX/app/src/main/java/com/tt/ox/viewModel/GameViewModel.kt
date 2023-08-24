@@ -22,6 +22,11 @@ import java.lang.IllegalArgumentException
 
 class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
+    private val _moves = MutableLiveData<Int>()
+    val moves:LiveData<Int> = _moves
+
+    private var movesDecreased = false
+
     private val _turn = MutableLiveData<Boolean>()
     val turn:LiveData<Boolean> = _turn
 
@@ -75,6 +80,25 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
     val bottomRight: LiveData<Int> = _bottomRight
 
     val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
+
+    fun initializeMoves(){
+        _moves.value = 2
+    }
+
+    fun addMoves(){
+        initializeMoves()
+    }
+
+
+    private fun decreaseMoves(){
+        if(!movesDecreased){
+            movesDecreased = true
+            if(_moves.value!!>0){
+                _moves.value = _moves.value!!-1
+            }
+        }
+
+    }
 
     fun getWiningPerson():Int{
         return this.winingPerson
@@ -192,6 +216,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
     private fun setField(field: MutableLiveData<Int>){
         if(play.value==true){
         if(field.value == NOTHING) {
+            decreaseMoves()
             field.value = if(turn.value!!) _mainPlayer.value!!.mark.value else _opponentPlayer.value!!.mark.value
             val endGame = checkLines()
 
@@ -266,8 +291,14 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
         resetWiningPerson()
 
+        resetMovesDecreased()
 
 
+
+    }
+
+    private fun resetMovesDecreased() {
+        this.movesDecreased = false
     }
 
 

@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -71,10 +72,7 @@ class ChooseOpponentFragment : Fragment() {
         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
-        binding.floatingAddButton.setOnClickListener {
-            addNewOpponent()
-        }
-
+        click()
         state?.let {
             binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
         }
@@ -115,35 +113,45 @@ class ChooseOpponentFragment : Fragment() {
         setSizes()
         setDrawables()
         setConstraint()
+
+    }
+
+    private fun click() {
+        binding.addOpponent.setOnClickListener {
+            addNewOpponent()
+        }
     }
 
     private fun setConstraint() {
         val set = ConstraintSet()
         set.clone(binding.chooseOpponentFragmentLayout)
+
+        set.connect(binding.topBar.id,ConstraintSet.LEFT,binding.chooseOpponentFragmentLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.topBar.id,ConstraintSet.RIGHT,binding.chooseOpponentFragmentLayout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.topBar.id,ConstraintSet.TOP,binding.chooseOpponentFragmentLayout.id,ConstraintSet.TOP,0)
         set.connect(binding.recyclerView.id,
-            ConstraintSet.TOP,binding.chooseOpponentFragmentLayout.id,
-            ConstraintSet.TOP,0)
+            ConstraintSet.TOP,binding.topBar.id,
+            ConstraintSet.BOTTOM,0)
         set.connect(binding.recyclerView.id,
             ConstraintSet.LEFT,binding.chooseOpponentFragmentLayout.id,
             ConstraintSet.LEFT,0)
         set.connect(binding.recyclerView.id,
             ConstraintSet.RIGHT,binding.chooseOpponentFragmentLayout.id,
             ConstraintSet.RIGHT,0)
-        set.connect(binding.floatingAddButton.id,
+        set.connect(binding.recyclerView.id,
             ConstraintSet.BOTTOM,binding.chooseOpponentFragmentLayout.id,
-            ConstraintSet.BOTTOM,unit)
-        set.connect(binding.floatingAddButton.id,
-            ConstraintSet.RIGHT,binding.chooseOpponentFragmentLayout.id,
-            ConstraintSet.RIGHT,unit)
+            ConstraintSet.BOTTOM,0)
         set.applyTo(binding.chooseOpponentFragmentLayout)
     }
 
     private fun setDrawables() {
-        binding.floatingAddButton.setImageDrawable(XDrawable(requireContext()))
+
     }
 
     private fun setSizes() {
-        binding.floatingAddButton.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        val topBarHeight = 3*unit
+        binding.topBar.layoutParams = ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT,topBarHeight)
+
     }
 
 }

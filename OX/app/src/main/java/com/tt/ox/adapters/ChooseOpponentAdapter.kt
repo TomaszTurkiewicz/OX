@@ -38,7 +38,9 @@ class ChooseOpponentAdapter(
             onOpponentClicked(current)
         }
         holder.delete.setOnClickListener {
-            onDeleteOpponentClicked(current)
+            if(deletable) {
+                onDeleteOpponentClicked(current)
+            }
         }
 
         if(deletable){

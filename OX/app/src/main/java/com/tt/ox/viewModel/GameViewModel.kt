@@ -19,8 +19,12 @@ import com.tt.ox.helpers.Player
 import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
+import kotlin.random.Random
 
 class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
+
+    private var firstGame = true
+    private var mainPlayerStarted = true
 
     private val _moves = MutableLiveData<Int>()
     val moves:LiveData<Int> = _moves
@@ -81,20 +85,31 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
     val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
 
-    fun initializeMoves(){
-        _moves.value = 2
+    fun initializeMoves(context: Context){
+        _moves.value = SharedPreferences.readMoves(context)
+
     }
 
-    fun addMoves(){
-        initializeMoves()
+    private fun resetMoves(context: Context){
+        _moves.value = 10
+        saveMovesToSharedPreferences(context)
+    }
+
+    private fun saveMovesToSharedPreferences(context: Context){
+        SharedPreferences.saveMoves(context,_moves.value!!)
+    }
+
+    fun addMoves(context: Context){
+        resetMoves(context)
     }
 
 
-    private fun decreaseMoves(){
+    private fun decreaseMoves(context: Context){
         if(!movesDecreased){
             movesDecreased = true
             if(_moves.value!!>0){
                 _moves.value = _moves.value!!-1
+                saveMovesToSharedPreferences(context)
             }
         }
 
@@ -144,32 +159,32 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
         _turn.value = !_turn.value!!
     }
 
-    fun setBottomRight(){
-        setField(_bottomRight)
+    fun setBottomRight(context: Context){
+        setField(context,_bottomRight)
     }
-    fun setBottomMid(){
-        setField(_bottomMid)
+    fun setBottomMid(context: Context){
+        setField(context,_bottomMid)
     }
-    fun setBottomLeft(){
-        setField(_bottomLeft)
+    fun setBottomLeft(context: Context){
+        setField(context,_bottomLeft)
     }
-    fun setMidRight(){
-        setField(_midRight)
+    fun setMidRight(context: Context){
+        setField(context,_midRight)
     }
-    fun setMidMid(){
-        setField(_midMid)
+    fun setMidMid(context: Context){
+        setField(context,_midMid)
     }
-    fun setMidLeft(){
-        setField(_midLeft)
+    fun setMidLeft(context: Context){
+        setField(context,_midLeft)
     }
-    fun setTopRight(){
-        setField(_topRight)
+    fun setTopRight(context: Context){
+        setField(context,_topRight)
     }
-    fun setTopMid(){
-        setField(_topMid)
+    fun setTopMid(context: Context){
+        setField(context,_topMid)
     }
-    fun setTopLeft(){
-        setField(_topLeft)
+    fun setTopLeft(context: Context){
+        setField(context,_topLeft)
     }
     fun getHorizontalTop():Boolean{
         return this._horizontalTop.value!!
@@ -219,10 +234,10 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
         }
     }
 
-    private fun setField(field: MutableLiveData<Int>){
+    private fun setField(context: Context,field: MutableLiveData<Int>){
         if(play.value==true){
         if(field.value == NOTHING) {
-            decreaseMoves()
+            decreaseMoves(context)
             field.value = if(turn.value!!) _mainPlayer.value!!.mark.value else _opponentPlayer.value!!.mark.value
             val endGame = checkLines()
 
@@ -291,16 +306,34 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
         this.id = id
 
-        _turn.value = true
+        setStartingTurn()
 
         setButtonEnable()
 
         resetWiningPerson()
 
         resetMovesDecreased()
+    }
 
+    private fun setStartingTurn(){
+        if(firstGame){
+            firstGame = false
+            setFirstStartingTurn()
+        }else{
+            setAnotherStartingTurn()
+        }
+//        _turn.value = true
+    }
 
+    private fun setFirstStartingTurn(){
+        val random = Random.nextBoolean()
+        mainPlayerStarted = random
+        _turn.value = random
+    }
 
+    private fun setAnotherStartingTurn(){
+        mainPlayerStarted = !mainPlayerStarted
+        _turn.value = mainPlayerStarted
     }
 
     private fun resetMovesDecreased() {

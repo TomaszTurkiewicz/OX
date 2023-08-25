@@ -31,5 +31,23 @@ class SharedPreferences {
             }
             return name
         }
+
+        fun saveMoves(context: Context,moves:Int){
+            context.let {
+                val sharedPreferences = it.getSharedPreferences("Moves",Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putInt("moves",moves)
+                editor.apply()
+            }
+        }
+
+        fun readMoves(context: Context):Int{
+            var moves = 0
+            context.let {
+                val sharedPreferences = it.getSharedPreferences("Moves",Context.MODE_PRIVATE)
+                moves = sharedPreferences.getInt("moves",0)
+            }
+            return moves
+        }
     }
 }

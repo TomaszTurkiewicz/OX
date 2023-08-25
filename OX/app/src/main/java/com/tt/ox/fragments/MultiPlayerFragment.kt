@@ -71,7 +71,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         super.onViewCreated(view, savedInstanceState)
         gameViewModel.initialize(id)
         gameViewModel.initializeMainPlayer(requireContext())
-        gameViewModel.initializeMoves()
+        gameViewModel.initializeMoves(requireContext())
         if(id>0){
             gameViewModel.getOpponent(id).observe(this.viewLifecycleOwner){
                     selectedOpponent -> opponent = selectedOpponent
@@ -80,9 +80,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
                 prepareUI()
                 setObserves()
                 clicks()
-
-//                //todo!!! change it - its only for test
-//                binding.addMoves.visibility = View.GONE
             }
         }
     }
@@ -91,45 +88,45 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private fun clicks() {
 
         binding.addMoves.setOnClickListener {
-            gameViewModel.addMoves()
+            gameViewModel.addMoves(requireContext())
         }
 
         binding.topLeftField.setOnClickListener {
-            gameViewModel.setTopLeft()
+            gameViewModel.setTopLeft(requireContext())
 
         }
         binding.topMidField.setOnClickListener {
-            gameViewModel.setTopMid()
+            gameViewModel.setTopMid(requireContext())
 
         }
         binding.topRightField.setOnClickListener {
-            gameViewModel.setTopRight()
+            gameViewModel.setTopRight(requireContext())
 
         }
 
         binding.midLeftField.setOnClickListener {
-            gameViewModel.setMidLeft()
+            gameViewModel.setMidLeft(requireContext())
 
         }
         binding.midMidField.setOnClickListener {
-            gameViewModel.setMidMid()
+            gameViewModel.setMidMid(requireContext())
 
         }
         binding.midRightField.setOnClickListener {
-            gameViewModel.setMidRight()
+            gameViewModel.setMidRight(requireContext())
 
         }
 
         binding.bottomLeftField.setOnClickListener {
-            gameViewModel.setBottomLeft()
+            gameViewModel.setBottomLeft(requireContext())
 
         }
         binding.bottomMidField.setOnClickListener {
-            gameViewModel.setBottomMid()
+            gameViewModel.setBottomMid(requireContext())
 
         }
         binding.bottomRightField.setOnClickListener {
-            gameViewModel.setBottomRight()
+            gameViewModel.setBottomRight(requireContext())
 
         }
 
@@ -423,5 +420,3 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
 
 }
-
-//todo - game counter 10 to 1... then add moves

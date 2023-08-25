@@ -128,6 +128,12 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
         }
     }
 
+    fun deleteOpponent(opponent: Opponent){
+        viewModelScope.launch {
+            opponentDao.delete(opponent)
+        }
+    }
+
     private fun insertNewOpponent(opponent: Opponent){
         viewModelScope.launch {
             opponentDao.insert(opponent)

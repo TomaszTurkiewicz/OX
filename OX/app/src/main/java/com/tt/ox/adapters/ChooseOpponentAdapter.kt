@@ -1,6 +1,7 @@
 package com.tt.ox.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
@@ -11,9 +12,11 @@ import com.tt.ox.databinding.ChooseOpponentListItemBinding
 
 class ChooseOpponentAdapter(
     private val unit:Int,
+    private val onDeleteOpponentClicked: (Opponent) -> Unit,
     private val onOpponentClicked: (Opponent)-> Unit) :
     ListAdapter<Opponent, ChooseOpponentAdapter.ChooseOpponentViewHolder>(DiffCallback) {
 
+    private var deletable = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChooseOpponentViewHolder {
         return ChooseOpponentViewHolder(
             ChooseOpponentListItemBinding.inflate(
@@ -34,6 +37,20 @@ class ChooseOpponentAdapter(
         holder.opponentName.setOnClickListener{
             onOpponentClicked(current)
         }
+        holder.delete.setOnClickListener {
+            onDeleteOpponentClicked(current)
+        }
+
+        if(deletable){
+            holder.delete.visibility = View.VISIBLE
+        }else{
+            holder.delete.visibility = View.GONE
+        }
+
+    }
+
+    fun delete(){
+        deletable = !deletable
     }
 
     class ChooseOpponentViewHolder(binding: ChooseOpponentListItemBinding): RecyclerView.ViewHolder(binding.root){
@@ -42,6 +59,7 @@ class ChooseOpponentAdapter(
         val playerWin = binding.playerWin
         val underScore = binding.underScore
         val opponentWin = binding.opponentWin
+        val delete = binding.deleteItem
     }
 
     companion object{

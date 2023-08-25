@@ -14,11 +14,14 @@ import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tt.ox.OXApplication
 import com.tt.ox.adapters.ChooseOpponentAdapter
+import com.tt.ox.database.Opponent
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
@@ -35,6 +38,8 @@ class ChooseOpponentFragment : Fragment() {
 
     private var state: Parcelable? = null
 
+    private lateinit var adapter: ChooseOpponentAdapter
+
     private val gameViewModel: GameViewModel by activityViewModels {
         GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
@@ -45,7 +50,6 @@ class ChooseOpponentFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
-
     }
 
     override fun onPause() {
@@ -65,21 +69,26 @@ class ChooseOpponentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prepareUI()
-        val adapter = ChooseOpponentAdapter(unit){
+        click()
+
+        adapter = ChooseOpponentAdapter(unit,
+            {
+                gameViewModel.deleteOpponent(it)
+            }){
             val action = ChooseOpponentFragmentDirections.actionChooseOpponentFragmentToMultiPlayerFragment(it.id)
             findNavController().navigate(action)
         }
         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
-        click()
+
         state?.let {
             binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
         }
         gameViewModel.listOfOpponents.observe(this.viewLifecycleOwner){
-            opponent -> opponent.let {
+            opponent -> opponent.let {list ->
             state = binding.recyclerView.layoutManager?.onSaveInstanceState()
-                adapter.submitList(it)
+                adapter.submitList(list)
                 {
                     binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
                 }
@@ -119,6 +128,14 @@ class ChooseOpponentFragment : Fragment() {
     private fun click() {
         binding.addOpponent.setOnClickListener {
             addNewOpponent()
+        }
+        binding.deleteOpponent.setOnClickListener {
+            state = binding.recyclerView.layoutManager?.onSaveInstanceState()
+            adapter.delete()
+            binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
+            binding.recyclerView.adapter = adapter
+            binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
+
         }
     }
 

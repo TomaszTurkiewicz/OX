@@ -1,6 +1,8 @@
 package com.tt.ox.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -36,6 +38,9 @@ class SinglePlayerFragment : Fragment() {
 
     private var fPlay = false
     private var fMoves = false
+    private var fTurn = false
+
+    private val handler = Handler(Looper.getMainLooper())
 
     private val gameViewModel:SinglePlayerGameViewModel by activityViewModels {
         SinglePlayerGameViewModelFactory()
@@ -65,6 +70,90 @@ class SinglePlayerFragment : Fragment() {
 
         prepareUI()
         setObserves()
+        click()
+
+        gameLoop().run()
+    }
+
+    private fun gameLoop():Runnable = Runnable {
+        if(fTurn){
+            handler.removeCallbacksAndMessages(null)
+            // wait for click
+        }else{
+                gameViewModel.playPhone(requireContext())
+        }
+    }
+
+    private fun click() {
+
+        binding.addMoves.setOnClickListener {
+            gameViewModel.addMoves(requireContext())
+        }
+
+        binding.topLeftField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setTopLeft(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+        binding.topMidField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setTopMid(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+        binding.topRightField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setTopRight(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+
+        binding.midLeftField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setMidLeft(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+        binding.midMidField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setMidMid(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+        binding.midRightField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setMidRight(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+
+        binding.bottomLeftField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setBottomLeft(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+        binding.bottomMidField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setBottomMid(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+        binding.bottomRightField.setOnClickListener {
+            if(fTurn) {
+                gameViewModel.setBottomRight(requireContext())
+                handler.postDelayed(gameLoop(),1000)
+            }
+        }
+
+        binding.reset.setOnClickListener {
+            gameViewModel.initialize(false)
+        }
+        binding.switchMarks.setOnClickListener {
+            gameViewModel.switchMarks()
+        }
+
     }
 
     private fun setObserves() {
@@ -145,6 +234,7 @@ class SinglePlayerFragment : Fragment() {
 
         }
         gameViewModel.turn.observe(this.viewLifecycleOwner){
+            fTurn = it
             if(it){
                 binding.mainPlayerName.setBackgroundColor(
                     ContextCompat.getColor(requireContext(),
@@ -160,6 +250,7 @@ class SinglePlayerFragment : Fragment() {
                     ContextCompat.getColor(requireContext(),
                     R.color.red))
             }
+            handler.postDelayed(gameLoop(),1000)
         }
 
         gameViewModel.buttonSwitch.observe(this.viewLifecycleOwner){

@@ -130,8 +130,7 @@ class MultiplayerGameViewModel(private val opponentDao: OpponentDao) : ViewModel
     }
     private fun getNewOpponentEntity(name:String):Opponent{
         return Opponent(
-            opponentName = name,
-            opponentWin = 0
+            name = name
         )
     }
 

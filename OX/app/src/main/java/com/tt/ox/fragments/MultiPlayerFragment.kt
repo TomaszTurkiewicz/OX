@@ -75,7 +75,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         if(id>0){
             gameViewModel.getOpponent(id).observe(this.viewLifecycleOwner){
                     selectedOpponent -> opponent = selectedOpponent
-                gameViewModel.initializeOpponentPlayer(opponent.opponentName)
+                gameViewModel.initializeOpponentPlayer(opponent.name)
 
                 prepareUI()
                 setObserves()
@@ -145,18 +145,18 @@ class MultiPlayerFragment : FragmentCoroutine() {
             gameViewModel.updateOpponent(
                 Opponent(
                     id = opponentDatabase.id,
-                    opponentName = opponentDatabase.opponentName,
-                    mainPlayerWin = opponentDatabase.mainPlayerWin + 1,
-                    opponentWin = opponentDatabase.opponentWin
+                    name = opponentDatabase.name,
+                    wins = opponentDatabase.wins + 1,
+                    loses = opponentDatabase.loses
                 )
             )
         } else if (winingPerson == OPPONENT) {
             gameViewModel.updateOpponent(
                 Opponent(
                     id = opponentDatabase.id,
-                    opponentName = opponentDatabase.opponentName,
-                    mainPlayerWin = opponentDatabase.mainPlayerWin,
-                    opponentWin = opponentDatabase.opponentWin + 1
+                    name = opponentDatabase.name,
+                    wins = opponentDatabase.wins,
+                    loses = opponentDatabase.loses + 1
                 )
             )
         }

@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class Opponent(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val opponentName:String = "",
-    val mainPlayerWin:Int = 0,
-    val opponentWin:Int = 0
+    val name:String = "",
+    val wins:Int = 0,
+    val loses:Int = 0
 )

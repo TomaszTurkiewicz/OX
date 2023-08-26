@@ -15,7 +15,7 @@ import com.tt.ox.helpers.Player
 import com.tt.ox.helpers.SharedPreferences
 import kotlin.random.Random
 
-class SinglePlayerGameViewModel() : ViewModel() {
+class SinglePlayerGameViewModel : ViewModel() {
 
     private var mainPlayerStarted = true
 
@@ -421,7 +421,7 @@ class SinglePlayerGameViewModel() : ViewModel() {
     }
 }
 
-class SinglePlayerGameViewModelFactory() : ViewModelProvider.Factory{
+class SinglePlayerGameViewModelFactory : ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass.isAssignableFrom(SinglePlayerGameViewModel::class.java)){
             @Suppress("UNCHECKED_CAST")

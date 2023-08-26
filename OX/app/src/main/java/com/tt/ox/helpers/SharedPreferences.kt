@@ -10,8 +10,8 @@ class SharedPreferences {
                 val editor = sharedPreferences.edit()
                 editor.putString("player_name",player.name.value!!)
                 editor.putBoolean("player_name_set_up",true)
-                editor.putInt("wins",0)
-                editor.putInt("loses",0)
+                editor.putInt("wins",player.wins.value!!)
+                editor.putInt("loses",player.loses.value!!)
                 editor.apply()
             }
         }

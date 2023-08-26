@@ -72,15 +72,17 @@ class SinglePlayerFragment : Fragment() {
         setObserves()
         click()
 
-        gameLoop().run()
+        handler.postDelayed(gameLoop,1000)
+
+
     }
 
-    private fun gameLoop():Runnable = Runnable {
+    private val gameLoop:Runnable = Runnable {
+
         if(fTurn){
-            handler.removeCallbacksAndMessages(null)
             // wait for click
         }else{
-                gameViewModel.playPhone(requireContext())
+            gameViewModel.playPhone(requireContext())
         }
     }
 
@@ -93,67 +95,73 @@ class SinglePlayerFragment : Fragment() {
         binding.topLeftField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setTopLeft(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
         binding.topMidField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setTopMid(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
         binding.topRightField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setTopRight(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
 
         binding.midLeftField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setMidLeft(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
         binding.midMidField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setMidMid(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
         binding.midRightField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setMidRight(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
 
         binding.bottomLeftField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setBottomLeft(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
         binding.bottomMidField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setBottomMid(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
         binding.bottomRightField.setOnClickListener {
             if(fTurn) {
                 gameViewModel.setBottomRight(requireContext())
-                handler.postDelayed(gameLoop(),1000)
+                handler.postDelayed(gameLoop,1000)
             }
         }
 
         binding.reset.setOnClickListener {
             gameViewModel.initialize(false)
+            handler.postDelayed(gameLoop,1000)
         }
         binding.switchMarks.setOnClickListener {
             gameViewModel.switchMarks()
         }
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacks(gameLoop)
     }
 
     private fun setObserves() {
@@ -250,7 +258,7 @@ class SinglePlayerFragment : Fragment() {
                     ContextCompat.getColor(requireContext(),
                     R.color.red))
             }
-            handler.postDelayed(gameLoop(),1000)
+//            handler.postDelayed(gameLoop(),1000)
         }
 
         gameViewModel.buttonSwitch.observe(this.viewLifecycleOwner){

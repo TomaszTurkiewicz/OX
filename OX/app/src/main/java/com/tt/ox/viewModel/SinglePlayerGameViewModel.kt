@@ -150,10 +150,12 @@ class SinglePlayerGameViewModel() : ViewModel() {
         _angleUp.value = false
         _angleDown.value = false
 
+        _win.value = false
+
         if(_moves.value!!>0) {
             _play.value = true
         }
-        _win.value = false
+
 
         setStartingTurn(firstGame)
 
@@ -184,10 +186,6 @@ class SinglePlayerGameViewModel() : ViewModel() {
             }
         }
 
-    }
-
-    fun checkPhoneWin(){
-        checkLines()
     }
 
     private fun saveMovesToSharedPreferences(context: Context){

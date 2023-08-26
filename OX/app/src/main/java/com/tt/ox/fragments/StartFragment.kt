@@ -51,6 +51,9 @@ class StartFragment : Fragment() {
             createAlertDialog()
         }
 
+        val mainPlayer = SharedPreferences.readPlayer(requireContext())
+        binding.singlePlayerScore.text = "score: "+mainPlayer.wins.value!!+ " - " +mainPlayer.loses.value!!
+
     }
 
     private fun createAlertDialog() {

@@ -69,9 +69,10 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        gameViewModel.initializeMoves(requireContext())
         gameViewModel.initialize(id)
         gameViewModel.initializeMainPlayer(requireContext())
-        gameViewModel.initializeMoves(requireContext())
+
         if(id>0){
             gameViewModel.getOpponent(id).observe(this.viewLifecycleOwner){
                     selectedOpponent -> opponent = selectedOpponent

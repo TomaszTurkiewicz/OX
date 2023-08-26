@@ -300,8 +300,18 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
         _bottomMid.value = NOTHING
         _bottomRight.value = NOTHING
 
-        _play.value = true
+        _horizontalTop.value = false
+        _horizontalMid.value = false
+        _horizontalBottom.value = false
+        _verticalLeft.value = false
+        _verticalMid.value = false
+        _verticalRight.value = false
+        _angleUp.value = false
+        _angleDown.value = false
 
+        if(_moves.value!!>0) {
+            _play.value = true
+        }
         _win.value = false
 
         this.id = id

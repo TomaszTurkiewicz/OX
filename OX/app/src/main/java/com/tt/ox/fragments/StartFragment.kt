@@ -3,27 +3,18 @@ package com.tt.ox.fragments
 import android.app.AlertDialog
 import android.os.Bundle
 import android.text.InputType
-import android.text.TextUtils
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.tt.ox.OXApplication
-import com.tt.ox.R
-import com.tt.ox.database.Opponent
-import com.tt.ox.database.OpponentDatabase
 import com.tt.ox.databinding.FragmentStartBinding
+import com.tt.ox.helpers.Player
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
-import com.tt.ox.viewModel.GameViewModel
-import com.tt.ox.viewModel.GameViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 
 
 class StartFragment : Fragment() {
@@ -73,28 +64,17 @@ class StartFragment : Fragment() {
         alertDialog.setCancelable(false)
         alertDialog.create()
 
-        var dialog = alertDialog.create()
+        val dialog = alertDialog.create()
         dialog.show()
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if(inputName.text.toString().trim().isNotBlank()){
-                        SharedPreferences.saveMainPlayerName(requireContext(),inputName.text.toString())
+                val player = Player()
+                player.setName(inputName.text.toString())
+                        SharedPreferences.saveMainPlayer(requireContext(),player)
                         clicks()
                 dialog.dismiss()
             }
         }
-
-//        {
-//                alertDialog, _ ->
-//                    if(inputName.text.toString().trim().isNotEmpty()){
-//                        SharedPreferences.saveMainPlayerName(requireContext(),inputName.text.toString())
-//                        clicks()
-//                    }else{
-//                        alertDialog.dismiss()
-//                    }
-//
-//
-//        }
-
     }
 
     private fun clicks() {

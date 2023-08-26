@@ -18,12 +18,10 @@ import com.tt.ox.database.OpponentDao
 import com.tt.ox.helpers.Player
 import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
 import kotlin.random.Random
 
-class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
+class MultiplayerGameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
-    private var firstGame = true
     private var mainPlayerStarted = true
 
     private val _moves = MutableLiveData<Int>()
@@ -287,7 +285,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
 
 
-    fun initialize(id:Int){
+    fun initialize(id:Int, firstGame:Boolean){
         _topLeft.value = NOTHING
         _topMid.value = NOTHING
         _topRight.value = NOTHING
@@ -316,7 +314,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
         this.id = id
 
-        setStartingTurn()
+        setStartingTurn(firstGame)
 
         setButtonEnable()
 
@@ -325,9 +323,8 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
         resetMovesDecreased()
     }
 
-    private fun setStartingTurn(){
+    private fun setStartingTurn(firstGame:Boolean){
         if(firstGame){
-            firstGame = false
             setFirstStartingTurn()
         }else{
             setAnotherStartingTurn()
@@ -428,8 +425,9 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
 
     fun initializeMainPlayer(context: Context) {
         _mainPlayer.value = Player()
-        _mainPlayer.value!!.setMark(X)
-        _mainPlayer.value!!.setName(SharedPreferences.readPlayerName(context))
+        val player = SharedPreferences.readPlayer(context)
+        _mainPlayer.value!!.setMark(player.mark.value!!)
+        _mainPlayer.value!!.setName(player.name.value!!)
     }
     fun initializeOpponentPlayer(name:String) {
         val oPlayer = Player()
@@ -440,11 +438,11 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel(){
     }
 
 }
-class GameViewModelFactory(private val opponentDao: OpponentDao) : ViewModelProvider.Factory{
+class MultiplayerGameViewModelFactory(private val opponentDao: OpponentDao) : ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if(modelClass.isAssignableFrom(GameViewModel::class.java)){
+        if(modelClass.isAssignableFrom(MultiplayerGameViewModel::class.java)){
             @Suppress("UNCHECKED_CAST")
-            return GameViewModel(opponentDao) as T
+            return MultiplayerGameViewModel(opponentDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

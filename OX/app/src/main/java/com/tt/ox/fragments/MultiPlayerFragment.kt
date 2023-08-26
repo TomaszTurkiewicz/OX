@@ -3,7 +3,6 @@ package com.tt.ox.fragments
 
 import android.os.Bundle
 import android.util.TypedValue
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,24 +11,24 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.navArgs
+import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
 import com.tt.ox.O
+import com.tt.ox.OPPONENT
 import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.X
+import com.tt.ox.database.Opponent
+import com.tt.ox.database.OpponentDatabase
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
-import com.tt.ox.viewModel.GameViewModel
-import com.tt.ox.viewModel.GameViewModelFactory
-import androidx.navigation.fragment.navArgs
-import com.tt.ox.MAIN_PLAYER
-import com.tt.ox.OPPONENT
-import com.tt.ox.database.Opponent
-import com.tt.ox.database.OpponentDatabase
+import com.tt.ox.viewModel.MultiplayerGameViewModel
+import com.tt.ox.viewModel.MultiplayerGameViewModelFactory
 import kotlinx.coroutines.launch
 
 
@@ -44,8 +43,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     private val navArgs: MultiPlayerFragmentArgs by navArgs()
 
-    private val gameViewModel:GameViewModel by activityViewModels {
-        GameViewModelFactory(
+    private val gameViewModel: MultiplayerGameViewModel by activityViewModels {
+        MultiplayerGameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
@@ -70,7 +69,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         gameViewModel.initializeMoves(requireContext())
-        gameViewModel.initialize(id)
+        gameViewModel.initialize(id,true)
         gameViewModel.initializeMainPlayer(requireContext())
 
         if(id>0){
@@ -132,7 +131,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         }
 
         binding.reset.setOnClickListener {
-            gameViewModel.initialize(id)
+            gameViewModel.initialize(id,false)
         }
         binding.switchMarks.setOnClickListener {
             gameViewModel.switchMarks()
@@ -141,7 +140,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     private fun updateWins(){
         val winingPerson = gameViewModel.getWiningPerson()
-        var opponentDatabase = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponentNormal(id)
+        val opponentDatabase = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponentNormal(id)
         if (winingPerson == MAIN_PLAYER) {
             gameViewModel.updateOpponent(
                 Opponent(
@@ -421,3 +420,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
 
 }
+
+// todo remember players marks!!!
+// todo customize player marks

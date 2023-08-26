@@ -9,24 +9,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tt.ox.OXApplication
 import com.tt.ox.adapters.ChooseOpponentAdapter
-import com.tt.ox.database.Opponent
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
-import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
-import com.tt.ox.viewModel.GameViewModel
-import com.tt.ox.viewModel.GameViewModelFactory
+import com.tt.ox.viewModel.MultiplayerGameViewModel
+import com.tt.ox.viewModel.MultiplayerGameViewModelFactory
 
 
 class ChooseOpponentFragment : Fragment() {
@@ -40,8 +35,8 @@ class ChooseOpponentFragment : Fragment() {
 
     private lateinit var adapter: ChooseOpponentAdapter
 
-    private val gameViewModel: GameViewModel by activityViewModels {
-        GameViewModelFactory(
+    private val gameViewModel: MultiplayerGameViewModel by activityViewModels {
+        MultiplayerGameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
@@ -167,7 +162,7 @@ class ChooseOpponentFragment : Fragment() {
 
     private fun setSizes() {
         val topBarHeight = 3*unit
-        binding.topBar.layoutParams = ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT,topBarHeight)
+        binding.topBar.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT,topBarHeight)
 
     }
 

@@ -4,12 +4,14 @@ import android.content.Context
 
 class SharedPreferences {
     companion object {
-        fun saveMainPlayerName(context:Context,name:String){
+        fun saveMainPlayer(context:Context,player: Player){
             context.let {
                 val sharedPreferences = it.getSharedPreferences("Player_Name", Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
-                editor.putString("player_name",name)
+                editor.putString("player_name",player.name.value!!)
                 editor.putBoolean("player_name_set_up",true)
+                editor.putInt("wins",0)
+                editor.putInt("loses",0)
                 editor.apply()
             }
         }
@@ -23,13 +25,19 @@ class SharedPreferences {
             return boolean
         }
 
-        fun readPlayerName(context: Context):String {
-            var name:String = "_"
+        fun readPlayer(context: Context):Player {
+            val player = Player()
             context.let {
                 val sharedPreferences = it.getSharedPreferences("Player_Name", Context.MODE_PRIVATE)
-                name = sharedPreferences.getString("player_name","_").toString()
+                val name = sharedPreferences.getString("player_name","_").toString()
+                val wins = sharedPreferences.getInt("wins",0)
+                val loses = sharedPreferences.getInt("loses",0)
+
+                player.setName(name)
+                player.setWins(wins)
+                player.setLoses(loses)
             }
-            return name
+            return player
         }
 
         fun saveMoves(context: Context,moves:Int){

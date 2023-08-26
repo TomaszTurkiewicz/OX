@@ -115,7 +115,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/addMoves"
@@ -126,7 +127,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:background="@color/purple_200"/>
+        android:background="@color/purple_200"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/mainPlayerName"

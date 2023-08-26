@@ -1,7 +1,7 @@
 package com.tt.ox
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.tt.ox.databinding.ActivityMainBinding
 
 const val NOTHING = 0
@@ -23,5 +23,3 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
-
-//todo add fragment with adding/choosing opponent multiplayer - database

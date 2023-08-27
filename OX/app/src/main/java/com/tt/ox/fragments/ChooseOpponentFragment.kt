@@ -20,8 +20,8 @@ import com.tt.ox.OXApplication
 import com.tt.ox.adapters.ChooseOpponentAdapter
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
 import com.tt.ox.helpers.ScreenMetricsCompat
-import com.tt.ox.viewModel.MultiplayerGameViewModel
-import com.tt.ox.viewModel.MultiplayerGameViewModelFactory
+import com.tt.ox.viewModel.GameViewModel
+import com.tt.ox.viewModel.GameViewModelFactory
 
 
 class ChooseOpponentFragment : Fragment() {
@@ -35,8 +35,8 @@ class ChooseOpponentFragment : Fragment() {
 
     private lateinit var adapter: ChooseOpponentAdapter
 
-    private val gameViewModel: MultiplayerGameViewModel by activityViewModels {
-        MultiplayerGameViewModelFactory(
+    private val gameViewModel: GameViewModel by activityViewModels {
+        GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
@@ -68,7 +68,7 @@ class ChooseOpponentFragment : Fragment() {
 
         adapter = ChooseOpponentAdapter(unit,
             {
-                gameViewModel.deleteOpponent(it)
+                gameViewModel.deleteOpponentMultiPlayer(it)
             }){
             val action = ChooseOpponentFragmentDirections.actionChooseOpponentFragmentToMultiPlayerFragment(it.id)
             findNavController().navigate(action)
@@ -107,7 +107,7 @@ class ChooseOpponentFragment : Fragment() {
 
         alertDialog.setPositiveButton("SAVE"){
                 _, _ ->
-                gameViewModel.addNewOpponent(inputName.text.toString())
+                gameViewModel.addNewOpponentMultiPlayer(inputName.text.toString())
         }
 
         alertDialog.show()

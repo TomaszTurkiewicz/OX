@@ -71,6 +71,7 @@ class StartFragment : Fragment() {
         dialog.show()
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if(inputName.text.toString().trim().isNotBlank()){
+
                 val player = Player()
                 player.setName(inputName.text.toString())
                         SharedPreferences.saveMainPlayer(requireContext(),player)

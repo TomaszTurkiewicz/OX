@@ -27,8 +27,8 @@ import com.tt.ox.drawables.ODrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
-import com.tt.ox.viewModel.MultiplayerGameViewModel
-import com.tt.ox.viewModel.MultiplayerGameViewModelFactory
+import com.tt.ox.viewModel.GameViewModel
+import com.tt.ox.viewModel.GameViewModelFactory
 import kotlinx.coroutines.launch
 
 
@@ -43,8 +43,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     private val navArgs: MultiPlayerFragmentArgs by navArgs()
 
-    private val gameViewModel: MultiplayerGameViewModel by activityViewModels {
-        MultiplayerGameViewModelFactory(
+    private val gameViewModel: GameViewModel by activityViewModels {
+        GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
@@ -69,13 +69,13 @@ class MultiPlayerFragment : FragmentCoroutine() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         gameViewModel.initializeMoves(requireContext())
-        gameViewModel.initialize(id,true)
+        gameViewModel.initialize(true)
         gameViewModel.initializeMainPlayer(requireContext())
 
         if(id>0){
-            gameViewModel.getOpponent(id).observe(this.viewLifecycleOwner){
+            gameViewModel.getOpponentMultiPlayer(id).observe(this.viewLifecycleOwner){
                     selectedOpponent -> opponent = selectedOpponent
-                gameViewModel.initializeOpponentPlayer(opponent.name)
+                gameViewModel.initializeOpponentPlayerMultiPlayer(opponent.name)
 
                 prepareUI()
                 setObserves()
@@ -131,7 +131,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         }
 
         binding.reset.setOnClickListener {
-            gameViewModel.initialize(id,false)
+            gameViewModel.initialize(false)
         }
         binding.switchMarks.setOnClickListener {
             gameViewModel.switchMarks()
@@ -142,7 +142,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         val winingPerson = gameViewModel.getWiningPerson()
         val opponentDatabase = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponentNormal(id)
         if (winingPerson == MAIN_PLAYER) {
-            gameViewModel.updateOpponent(
+            gameViewModel.updateOpponentMultiPlayer(
                 Opponent(
                     id = opponentDatabase.id,
                     name = opponentDatabase.name,
@@ -151,7 +151,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
                 )
             )
         } else if (winingPerson == OPPONENT) {
-            gameViewModel.updateOpponent(
+            gameViewModel.updateOpponentMultiPlayer(
                 Opponent(
                     id = opponentDatabase.id,
                     name = opponentDatabase.name,
@@ -422,4 +422,4 @@ class MultiPlayerFragment : FragmentCoroutine() {
 }
 
 // todo remember players marks!!!
-// todo customize player marks
+// todo customize players marks

@@ -5,17 +5,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
 import com.tt.ox.NO_ONE
 import com.tt.ox.O
 import com.tt.ox.OPPONENT
 import com.tt.ox.X
+import com.tt.ox.database.Opponent
+import com.tt.ox.database.OpponentDao
 import com.tt.ox.helpers.Player
 import com.tt.ox.helpers.SharedPreferences
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class SinglePlayerGameViewModel : ViewModel() {
+class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
     private var mainPlayerStarted = true
 
@@ -77,6 +82,8 @@ class SinglePlayerGameViewModel : ViewModel() {
     private val _bottomRight = MutableLiveData<Int>()
     val bottomRight: LiveData<Int> = _bottomRight
 
+    val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
+
     fun initializeMainPlayer(context: Context) {
         _mainPlayer.value = Player()
         val player = SharedPreferences.readPlayer(context)
@@ -84,11 +91,19 @@ class SinglePlayerGameViewModel : ViewModel() {
         _mainPlayer.value!!.setName(player.name.value!!)
     }
 
-    fun initializeOpponentPlayer() {
+    fun initializeOpponentPlayerSinglePlayer() {
         val oPlayer = Player()
         oPlayer.setName("ROBOT")
         _opponentPlayer.value = oPlayer
         val mark = if(_mainPlayer.value!!.mark.value== X) O else X
+        _opponentPlayer.value!!.setMark(mark)
+    }
+
+    fun initializeOpponentPlayerMultiPlayer(name:String) {
+        val oPlayer = Player()
+        oPlayer.setName(name)
+        _opponentPlayer.value = oPlayer
+        val mark = if(_mainPlayer.value!!.mark.value==X) O else X
         _opponentPlayer.value!!.setMark(mark)
     }
 
@@ -419,13 +434,49 @@ class SinglePlayerGameViewModel : ViewModel() {
     fun initializeMoves(context: Context) {
         _moves.value = SharedPreferences.readMoves(context)
     }
+
+    fun getOpponentMultiPlayer(id:Int): LiveData<Opponent>{
+        return opponentDao.getOpponent(id).asLiveData()
+    }
+    fun addNewOpponentMultiPlayer(name:String){
+        val opponent = getNewOpponentEntity(name)
+        insertNewOpponent(opponent)
+    }
+
+    private fun getNewOpponentEntity(name:String):Opponent{
+        return Opponent(
+            name = name
+        )
+    }
+
+    fun updateOpponentMultiPlayer(opponent: Opponent){
+        viewModelScope.launch {
+            opponentDao.update(opponent)
+        }
+    }
+
+    fun deleteOpponentMultiPlayer(opponent: Opponent){
+        viewModelScope.launch {
+            opponentDao.delete(opponent)
+        }
+    }
+
+    private fun insertNewOpponent(opponent: Opponent){
+        viewModelScope.launch {
+            opponentDao.insert(opponent)
+        }
+    }
+
+
+
+
 }
 
-class SinglePlayerGameViewModelFactory : ViewModelProvider.Factory{
+class GameViewModelFactory(private val opponentDao: OpponentDao) : ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if(modelClass.isAssignableFrom(SinglePlayerGameViewModel::class.java)){
+        if(modelClass.isAssignableFrom(GameViewModel::class.java)){
             @Suppress("UNCHECKED_CAST")
-            return SinglePlayerGameViewModel() as T
+            return GameViewModel(opponentDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

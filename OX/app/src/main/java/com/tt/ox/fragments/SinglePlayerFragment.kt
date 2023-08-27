@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
 import com.tt.ox.O
+import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.X
 import com.tt.ox.databinding.FragmentSinglePlayerBinding
@@ -25,14 +26,13 @@ import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
-import com.tt.ox.viewModel.SinglePlayerGameViewModel
-import com.tt.ox.viewModel.SinglePlayerGameViewModelFactory
+import com.tt.ox.viewModel.GameViewModel
+import com.tt.ox.viewModel.GameViewModelFactory
 
 
 class SinglePlayerFragment : Fragment() {
 
     private var _binding:FragmentSinglePlayerBinding? = null
-
     private val binding get() = _binding!!
     private var unit = 0
 
@@ -42,8 +42,10 @@ class SinglePlayerFragment : Fragment() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private val gameViewModel:SinglePlayerGameViewModel by activityViewModels {
-        SinglePlayerGameViewModelFactory()
+    private val gameViewModel: GameViewModel by activityViewModels {
+        GameViewModelFactory(
+            (activity?.application as OXApplication).database.opponentDao()
+        )
     }
 
 
@@ -65,7 +67,7 @@ class SinglePlayerFragment : Fragment() {
         gameViewModel.initializeMoves(requireContext())
         gameViewModel.initialize(true)
         gameViewModel.initializeMainPlayer(requireContext())
-        gameViewModel.initializeOpponentPlayer()
+        gameViewModel.initializeOpponentPlayerSinglePlayer()
 
 
         prepareUI()
@@ -550,5 +552,7 @@ class SinglePlayerFragment : Fragment() {
 
     }
 }
-//todo finish clicks -> when robot's turn block clicks and run runnable
-//todo singleplayer and multiplayer layout combine in one
+
+
+// todo one game view model for both games
+// todo single player as a first record in database

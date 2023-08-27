@@ -10,11 +10,14 @@ import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.tt.ox.OXApplication
 import com.tt.ox.databinding.FragmentStartBinding
-import com.tt.ox.helpers.Player
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
+import com.tt.ox.viewModel.GameViewModel
+import com.tt.ox.viewModel.GameViewModelFactory
 
 
 class StartFragment : Fragment() {
@@ -24,6 +27,12 @@ class StartFragment : Fragment() {
 
     private var unit = 0
     private var windowHeight = 0
+
+    private val gameViewModel: GameViewModel by activityViewModels {
+        GameViewModelFactory(
+            (activity?.application as OXApplication).database.opponentDao()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,8 +60,8 @@ class StartFragment : Fragment() {
             createAlertDialog()
         }
 
-        val mainPlayer = SharedPreferences.readPlayer(requireContext())
-        binding.singlePlayerScore.text = "score: "+mainPlayer.wins.value!!+ " - " +mainPlayer.loses.value!!
+//        val mainPlayer = SharedPreferences.readPlayer(requireContext())
+//        binding.singlePlayerScore.text = "score: "+mainPlayer.wins.value!!+ " - " +mainPlayer.loses.value!!
 
     }
 
@@ -72,9 +81,10 @@ class StartFragment : Fragment() {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if(inputName.text.toString().trim().isNotBlank()){
 
-                val player = Player()
-                player.setName(inputName.text.toString())
-                        SharedPreferences.saveMainPlayer(requireContext(),player)
+                gameViewModel.addNewOpponent(inputName.text.toString())
+//                val player = Player()
+//                player.setName(inputName.text.toString())
+                        SharedPreferences.saveMainPlayer(requireContext())
                         clicks()
                 dialog.dismiss()
             }

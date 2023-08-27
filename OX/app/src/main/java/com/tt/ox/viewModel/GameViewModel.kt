@@ -84,11 +84,18 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
     val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
 
-    fun initializeMainPlayer(context: Context) {
-        _mainPlayer.value = Player()
-        val player = SharedPreferences.readPlayer(context)
-        _mainPlayer.value!!.setMark(player.mark.value!!)
-        _mainPlayer.value!!.setName(player.name.value!!)
+//    fun initializeMainPlayer(context: Context) {
+//        _mainPlayer.value = Player()
+//        val player = SharedPreferences.readPlayer(context)
+//        _mainPlayer.value!!.setMark(player.mark.value!!)
+//        _mainPlayer.value!!.setName(player.name.value!!)
+//    }
+
+    fun initializeMainPlayerDatabase(name:String) {
+        val mPlayer = Player()
+        mPlayer.setName(name)
+        _mainPlayer.value = mPlayer
+        _mainPlayer.value!!.setMark(mPlayer.mark.value!!)
     }
 
     fun initializeOpponentPlayerSinglePlayer() {
@@ -438,7 +445,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     fun getOpponentMultiPlayer(id:Int): LiveData<Opponent>{
         return opponentDao.getOpponent(id).asLiveData()
     }
-    fun addNewOpponentMultiPlayer(name:String){
+    fun addNewOpponent(name:String){
         val opponent = getNewOpponentEntity(name)
         insertNewOpponent(opponent)
     }
@@ -449,7 +456,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         )
     }
 
-    fun updateOpponentMultiPlayer(opponent: Opponent){
+    fun updateOpponent(opponent: Opponent){
         viewModelScope.launch {
             opponentDao.update(opponent)
         }
@@ -481,3 +488,5 @@ class GameViewModelFactory(private val opponentDao: OpponentDao) : ViewModelProv
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+//todo better phone moves

@@ -51,6 +51,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private var id = 0
 
     private var opponent = Opponent()
+    private var main = Opponent()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,9 +71,13 @@ class MultiPlayerFragment : FragmentCoroutine() {
         super.onViewCreated(view, savedInstanceState)
         gameViewModel.initializeMoves(requireContext())
         gameViewModel.initialize(true)
-        gameViewModel.initializeMainPlayer(requireContext())
+//        gameViewModel.initializeMainPlayer(requireContext())
 
         if(id>0){
+            gameViewModel.getOpponentMultiPlayer(1).observe(this.viewLifecycleOwner){
+                mainPlayer -> main = mainPlayer
+                gameViewModel.initializeMainPlayerDatabase(main.name)
+            }
             gameViewModel.getOpponentMultiPlayer(id).observe(this.viewLifecycleOwner){
                     selectedOpponent -> opponent = selectedOpponent
                 gameViewModel.initializeOpponentPlayerMultiPlayer(opponent.name)
@@ -142,7 +147,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         val winingPerson = gameViewModel.getWiningPerson()
         val opponentDatabase = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponentNormal(id)
         if (winingPerson == MAIN_PLAYER) {
-            gameViewModel.updateOpponentMultiPlayer(
+            gameViewModel.updateOpponent(
                 Opponent(
                     id = opponentDatabase.id,
                     name = opponentDatabase.name,
@@ -151,7 +156,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
                 )
             )
         } else if (winingPerson == OPPONENT) {
-            gameViewModel.updateOpponentMultiPlayer(
+            gameViewModel.updateOpponent(
                 Opponent(
                     id = opponentDatabase.id,
                     name = opponentDatabase.name,

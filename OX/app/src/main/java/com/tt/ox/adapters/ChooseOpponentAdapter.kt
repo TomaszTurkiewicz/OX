@@ -30,24 +30,27 @@ class ChooseOpponentAdapter(
 
     override fun onBindViewHolder(holder: ChooseOpponentViewHolder, position: Int) {
         val current = getItem(position)
-        holder.layout.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,2*unit)
-        holder.opponentName.text = current.name
-        holder.opponentWin.text = current.loses.toString()
-        holder.playerWin.text = current.wins.toString()
-        holder.opponentName.setOnClickListener{
-            onOpponentClicked(current)
-        }
-        holder.delete.setOnClickListener {
-            if(deletable) {
-                onDeleteOpponentClicked(current)
+            holder.layout.visibility = View.VISIBLE
+            holder.layout.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,2*unit)
+            holder.opponentName.text = ""+current.id+" "+current.name
+            holder.opponentWin.text = current.loses.toString()
+            holder.playerWin.text = current.wins.toString()
+            holder.opponentName.setOnClickListener{
+                onOpponentClicked(current)
             }
+            holder.delete.setOnClickListener {
+                if(deletable) {
+                    onDeleteOpponentClicked(current)
+                }
+            }
+
+            if(deletable){
+                holder.delete.visibility = View.VISIBLE
+            }else{
+                holder.delete.visibility = View.GONE
+
         }
 
-        if(deletable){
-            holder.delete.visibility = View.VISIBLE
-        }else{
-            holder.delete.visibility = View.GONE
-        }
 
     }
 

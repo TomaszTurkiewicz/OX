@@ -11,26 +11,28 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
 import com.tt.ox.O
+import com.tt.ox.OPPONENT
 import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.X
+import com.tt.ox.database.Opponent
+import com.tt.ox.database.OpponentDatabase
 import com.tt.ox.databinding.FragmentSinglePlayerBinding
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
-import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
+import kotlinx.coroutines.launch
 
 
-class SinglePlayerFragment : Fragment() {
+class SinglePlayerFragment : FragmentCoroutine() {
 
     private var _binding:FragmentSinglePlayerBinding? = null
     private val binding get() = _binding!!
@@ -47,6 +49,8 @@ class SinglePlayerFragment : Fragment() {
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
+
+    private var main = Opponent()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,26 +70,38 @@ class SinglePlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         gameViewModel.initializeMoves(requireContext())
         gameViewModel.initialize(true)
-        gameViewModel.initializeMainPlayer(requireContext())
-        gameViewModel.initializeOpponentPlayerSinglePlayer()
+//        gameViewModel.initializeMainPlayer(requireContext())
+//        gameViewModel.initializeOpponentPlayerSinglePlayer()
 
+        gameViewModel.getOpponentMultiPlayer(1).observe(this.viewLifecycleOwner){
+                mainPlayer -> main = mainPlayer
+            gameViewModel.initializeMainPlayerDatabase(main.name)
+            gameViewModel.initializeOpponentPlayerSinglePlayer()
 
-        prepareUI()
-        setObserves()
-        click()
+            prepareUI()
+            setObserves()
+            click()
 
-        handler.postDelayed(gameLoop,1000)
+            handler.postDelayed(gameLoop,1000)
+        }
+
+//        prepareUI()
+//        setObserves()
+//        click()
+//
+//        handler.postDelayed(gameLoop,1000)
 
 
     }
 
     private val gameLoop:Runnable = Runnable {
-
-        if(fTurn){
-            // wait for click
-        }else{
-            gameViewModel.playPhone(requireContext())
-        }
+    if(fPlay) {
+        if (fTurn) {
+             // wait for click
+        } else {
+             gameViewModel.playPhone(requireContext())
+         }
+     }
     }
 
     private fun click() {
@@ -171,8 +187,9 @@ class SinglePlayerFragment : Fragment() {
         gameViewModel.win.observe(this.viewLifecycleOwner){
             if(it){
                 gameViewModel.resetWin()
-                updateWins()
-
+                launch {
+                    updateWins()
+                }
             }
         }
 
@@ -274,18 +291,40 @@ class SinglePlayerFragment : Fragment() {
 
     private fun updateWins() {
         val winningPerson = gameViewModel.getWiningPerson()
-        val player = SharedPreferences.readPlayer(requireContext())
-        if(winningPerson == MAIN_PLAYER){
-            var wins = player.wins.value!!
-            wins +=1
-            player.setWins(wins)
-            SharedPreferences.saveMainPlayer(requireContext(),player)
-        }else{
-            var loses = player.loses.value!!
-            loses +=1
-            player.setLoses(loses)
-            SharedPreferences.saveMainPlayer(requireContext(),player)
+        val opponentDatabase = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponentNormal(1)
+        if (winningPerson == MAIN_PLAYER) {
+            gameViewModel.updateOpponent(
+                Opponent(
+                    id = opponentDatabase.id,
+                    name = opponentDatabase.name,
+                    wins = opponentDatabase.wins + 1,
+                    loses = opponentDatabase.loses
+                )
+            )
+        } else if (winningPerson == OPPONENT) {
+            gameViewModel.updateOpponent(
+                Opponent(
+                    id = opponentDatabase.id,
+                    name = opponentDatabase.name,
+                    wins = opponentDatabase.wins,
+                    loses = opponentDatabase.loses + 1
+                )
+            )
         }
+
+
+//        val player = SharedPreferences.readPlayer(requireContext())
+//        if(winningPerson == MAIN_PLAYER){
+//            var wins = player.wins.value!!
+//            wins +=1
+//            player.setWins(wins)
+//            SharedPreferences.saveMainPlayer(requireContext(),player)
+//        }else{
+//            var loses = player.loses.value!!
+//            loses +=1
+//            player.setLoses(loses)
+//            SharedPreferences.saveMainPlayer(requireContext(),player)
+//        }
     }
 
     private fun displayUI(){
@@ -552,7 +591,3 @@ class SinglePlayerFragment : Fragment() {
 
     }
 }
-
-
-// todo one game view model for both games
-// todo single player as a first record in database

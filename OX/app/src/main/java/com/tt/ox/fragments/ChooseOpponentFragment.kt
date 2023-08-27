@@ -82,8 +82,9 @@ class ChooseOpponentFragment : Fragment() {
         }
         gameViewModel.listOfOpponents.observe(this.viewLifecycleOwner){
             opponent -> opponent.let {list ->
+            val filteredList = list.filter{opponent -> opponent.id != 1 }
             state = binding.recyclerView.layoutManager?.onSaveInstanceState()
-                adapter.submitList(list)
+                adapter.submitList(filteredList)
                 {
                     binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
                 }
@@ -107,7 +108,7 @@ class ChooseOpponentFragment : Fragment() {
 
         alertDialog.setPositiveButton("SAVE"){
                 _, _ ->
-                gameViewModel.addNewOpponentMultiPlayer(inputName.text.toString())
+                gameViewModel.addNewOpponent(inputName.text.toString())
         }
 
         alertDialog.show()

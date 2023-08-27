@@ -45,42 +45,20 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     private val _game = MutableLiveData<Game>()
     val game:LiveData<Game> = _game
 
-    private val _horizontalTop = MutableLiveData<Boolean>()
-    private val _horizontalMid = MutableLiveData<Boolean>()
-    private val _horizontalBottom = MutableLiveData<Boolean>()
-    private val _verticalLeft = MutableLiveData<Boolean>()
-    private val _verticalMid = MutableLiveData<Boolean>()
-    private val _verticalRight = MutableLiveData<Boolean>()
-    private val _angleDown = MutableLiveData<Boolean>()
-    private val _angleUp = MutableLiveData<Boolean>()
+//    private val _horizontalTop = MutableLiveData<Boolean>()
+//    private val _horizontalMid = MutableLiveData<Boolean>()
+//    private val _horizontalBottom = MutableLiveData<Boolean>()
+//    private val _verticalLeft = MutableLiveData<Boolean>()
+//    private val _verticalMid = MutableLiveData<Boolean>()
+//    private val _verticalRight = MutableLiveData<Boolean>()
+//    private val _angleDown = MutableLiveData<Boolean>()
+//    private val _angleUp = MutableLiveData<Boolean>()
 
     private val _play = MutableLiveData<Boolean>()
     val play :LiveData<Boolean> = _play
 
-    private val _topLeft = MutableLiveData<Int>()
-    val topLeft: LiveData<Int> = _topLeft
-    private val _topMid = MutableLiveData<Int>()
-    val topMid: LiveData<Int> = _topMid
-    private val _topRight = MutableLiveData<Int>()
-    val topRight: LiveData<Int> = _topRight
 
-    private val _midLeft = MutableLiveData<Int>()
-    val midLeft: LiveData<Int> = _midLeft
-    private val _midMid = MutableLiveData<Int>()
-    val midMid: LiveData<Int> = _midMid
-    private val _midRight = MutableLiveData<Int>()
-    val midRight: LiveData<Int> = _midRight
-
-
-    private val _bottomLeft = MutableLiveData<Int>()
-    val bottomLeft: LiveData<Int> = _bottomLeft
-    private val _bottomMid = MutableLiveData<Int>()
-    val bottomMid: LiveData<Int> = _bottomMid
-    private val _bottomRight = MutableLiveData<Int>()
-    val bottomRight: LiveData<Int> = _bottomRight
-
-    private val _board = MutableLiveData<Board>()
-    val board:LiveData<Board> = _board
+    val board = Board()
 
     val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
 
@@ -94,54 +72,54 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     }
 
     fun getHorizontalTop():Boolean{
-        return this._horizontalTop.value!!
+        return this.board.getHorizontalTop()
     }
     fun getHorizontalMid():Boolean{
-        return this._horizontalMid.value!!
+        return this.board.getHorizontalMid()
     }
     fun getHorizontalBottom():Boolean{
-        return this._horizontalBottom.value!!
+        return this.board.getHorizontalBottom()
     }
     fun getVerticalLeft():Boolean{
-        return this._verticalLeft.value!!
+        return this.board.getVerticalLeft()
     }
     fun getVerticalMid():Boolean{
-        return this._verticalMid.value!!
+        return this.board.getVerticalMid()
     }
     fun getVerticalRight():Boolean{
-        return this._verticalRight.value!!
+        return this.board.getVerticalRight()
     }
     fun getAngleUp():Boolean{
-        return this._angleUp.value!!
+        return this.board.getAngleUp()
     }
     fun getAngleDown():Boolean{
-        return this._angleDown.value!!
+        return this.board.getAngleDown()
     }
     fun switchMarks(){
         game.value!!.switchMarks()
     }
 
     fun initialize(firstGame:Boolean){
-        _topLeft.value = NOTHING
-        _topMid.value = NOTHING
-        _topRight.value = NOTHING
+//        _topLeft.value = NOTHING
+//        _topMid.value = NOTHING
+//        _topRight.value = NOTHING
+//
+//        _midLeft.value = NOTHING
+//        _midMid.value = NOTHING
+//        _midRight.value = NOTHING
+//
+//        _bottomLeft.value = NOTHING
+//        _bottomMid.value = NOTHING
+//        _bottomRight.value = NOTHING
 
-        _midLeft.value = NOTHING
-        _midMid.value = NOTHING
-        _midRight.value = NOTHING
-
-        _bottomLeft.value = NOTHING
-        _bottomMid.value = NOTHING
-        _bottomRight.value = NOTHING
-
-        _horizontalTop.value = false
-        _horizontalMid.value = false
-        _horizontalBottom.value = false
-        _verticalLeft.value = false
-        _verticalMid.value = false
-        _verticalRight.value = false
-        _angleUp.value = false
-        _angleDown.value = false
+//        _horizontalTop.value = false
+//        _horizontalMid.value = false
+//        _horizontalBottom.value = false
+//        _verticalLeft.value = false
+//        _verticalMid.value = false
+//        _verticalRight.value = false
+//        _angleUp.value = false
+//        _angleDown.value = false
 
         _win.value = false
 
@@ -149,12 +127,13 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
             _play.value = true
         }
 
-        _board.value!!.initialize()
+        board.initialize()
 
 
         setStartingTurn(firstGame)
 
-        setButtonEnable()
+        _buttonSwitch.value = board.setSwitchButtonEnable()
+//        setButtonEnable()
 
         resetWiningPerson()
 
@@ -188,106 +167,48 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     }
 
     private fun checkLines(): Boolean {
-        _horizontalTop.value = checkLine(_topLeft, _topMid, _topRight)
-        _horizontalMid.value = checkLine(_midLeft, _midMid, _midRight)
-        _horizontalBottom.value = checkLine(_bottomLeft, _bottomMid, _bottomRight)
-        _verticalLeft.value = checkLine(_topLeft, _midLeft, _bottomLeft)
-        _verticalMid.value = checkLine(_topMid, _midMid, _bottomMid)
-        _verticalRight.value = checkLine(_topRight, _midRight, _bottomRight)
-        _angleDown.value = checkLine(_topLeft, _midMid, _bottomRight)
-        _angleUp.value = checkLine(_bottomLeft, _midMid, _topRight)
-        return checkWin()
+        board.checkWin()
+        val win = board.getWin()
+        val noMoves = board.checkMovesNotAvailable()
+//        board.set_horizontalTop = checkLine(board.getTopLeft(), board.getTopMid(), board.getTopRight())
+//        board.set_horizontalMid = checkLine(board.getMidLeft(), board.getMidMid(), board.getMidRight())
+//        board.set_horizontalBottom = checkLine(board.getBottomLeft(), board.getBottomMid(), board.getBottomRight())
+//        board.set_verticalLeft = checkLine(board.getTopLeft(), board.getMidLeft(), board.getBottomLeft())
+//        board.set_verticalMid = checkLine(board.getTopMid(), board.getMidMid(), board.getBottomMid())
+//        board.set_verticalRight = checkLine(board.getTopRight(), board.getMidRight(), board.getBottomRight())
+//        board.set_angleDown = checkLine(board.getTopLeft(), board.getMidMid(), board.getBottomRight())
+//        board.set_angleUp = checkLine(board.getBottomLeft(), board.getMidMid(), board.getTopRight())
+        return win or (noMoves)
     }
 
     fun setBottomRight(context: Context){
-        setField(context,_bottomRight)
+        setField(context,board.getBottomRight())
     }
     fun setBottomMid(context: Context){
-        setField(context,_bottomMid)
+        setField(context,board.getBottomMid())
     }
     fun setBottomLeft(context: Context){
-        setField(context,_bottomLeft)
+        setField(context,board.getBottomLeft())
     }
     fun setMidRight(context: Context){
-        setField(context,_midRight)
+        setField(context,board.getMidRight())
     }
     fun setMidMid(context: Context){
-        setField(context,_midMid)
+        setField(context,board.getMidMid())
     }
     fun setMidLeft(context: Context){
-        setField(context,_midLeft)
+        setField(context,board.getMidLeft())
     }
     fun setTopRight(context: Context){
-        setField(context,_topRight)
+        setField(context,board.getTopRight())
     }
     fun setTopMid(context: Context){
-        setField(context,_topMid)
+        setField(context,board.getTopMid())
     }
     fun setTopLeft(context: Context){
-        setField(context,_topLeft)
+        setField(context,board.getTopLeft())
     }
 
-    private fun checkLine(fieldFirst:MutableLiveData<Int>,fieldSecond:MutableLiveData<Int>,fieldThird:MutableLiveData<Int>):Boolean{
-        var line = false
-        if(fieldFirst.value!= NOTHING){
-            if(fieldSecond.value!= NOTHING) {
-                if (fieldThird.value!= NOTHING){
-                    if(fieldFirst.value == fieldSecond.value){
-                        if(fieldFirst.value == fieldThird.value){
-                            line = true
-                            winingMark = fieldFirst.value!!
-
-                        }
-                    }
-                }
-            }
-        }
-        return line
-    }
-
-    private fun getNoMovesAvailable(): Boolean {
-        var endGame = false
-        if(_topLeft.value!= NOTHING){
-            if(_topMid.value!= NOTHING){
-                if(_topRight.value!= NOTHING){
-                    if(_midLeft.value!= NOTHING){
-                        if(_midMid.value!= NOTHING){
-                            if(_midRight.value!= NOTHING){
-                                if(_bottomLeft.value!= NOTHING){
-                                    if(_bottomMid.value!= NOTHING){
-                                        if(_bottomRight.value!= NOTHING){
-                                            endGame = true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return endGame
-    }
-
-    private fun checkWin():Boolean{
-        return getHorizontalTop() or (
-                getHorizontalMid() or (
-                        getHorizontalBottom() or (
-                                getVerticalLeft() or (
-                                        getVerticalMid() or (
-                                                getVerticalRight() or (
-                                                        getAngleUp() or (
-                                                                getAngleDown() or (
-                                                                        getNoMovesAvailable()
-                                                                        )
-                                                                )
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                )
-    }
 
     fun playPhone(context: Context){
             phoneMakeMove(context)
@@ -314,15 +235,15 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
     private fun phoneMakeMove(context:Context) {
         when(number){
-            0 -> setFieldPhone(context,_topLeft)
-            1 -> setFieldPhone(context,_topMid)
-            2 -> setFieldPhone(context,_topRight)
-            3 -> setFieldPhone(context,_midLeft)
-            4 -> setFieldPhone(context,_midMid)
-            5 -> setFieldPhone(context,_midRight)
-            6 -> setFieldPhone(context,_bottomLeft)
-            7 -> setFieldPhone(context,_bottomMid)
-            8 -> setFieldPhone(context,_bottomRight)
+            0 -> setFieldPhone(context,board.getTopLeft())
+            1 -> setFieldPhone(context,board.getTopMid())
+            2 -> setFieldPhone(context,board.getTopRight())
+            3 -> setFieldPhone(context,board.getMidLeft())
+            4 -> setFieldPhone(context,board.getMidMid())
+            5 -> setFieldPhone(context,board.getMidRight())
+            6 -> setFieldPhone(context,board.getBottomLeft())
+            7 -> setFieldPhone(context,board.getBottomMid())
+            8 -> setFieldPhone(context,board.getBottomRight())
             else -> phoneMakeMove(context)
 
         }
@@ -330,12 +251,15 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
     private fun setField(context: Context,field: MutableLiveData<Int>){
         if(play.value==true){
-            if(field.value == NOTHING) {
+            val marked = board.setField(
+                if(turn.value!!) _game.value!!.getMainPlayerMark() else _game.value!!.getOpponentMark(),
+                field
+            )
+            if(marked){
                 decreaseMoves(context)
-                field.value = if(turn.value!!) _game.value!!.getMainPlayerMark() else _game.value!!.getOpponentMark()
                 val endGame = checkLines()
-
                 if (endGame) {
+                    winingMark = board.getWinningMark()
                     _play.value = false
                     when(winingMark){
                         _game.value!!.getMainPlayerMark() -> addWinToMainPlayer()
@@ -346,7 +270,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
                 } else {
                     changePerson()
                 }
-                setButtonEnable()
+                _buttonSwitch.value = board.setSwitchButtonEnable()
             }
         }
     }
@@ -369,36 +293,12 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         winingMark = NOTHING
     }
 
-    private fun setButtonEnable(){
-        _buttonSwitch.value = false
-        if(_topLeft.value == NOTHING){
-            if(_topMid.value == NOTHING){
-                if(_topRight.value == NOTHING){
-                    if(_midLeft.value == NOTHING){
-                        if(_midMid.value == NOTHING){
-                            if(_midRight.value == NOTHING){
-                                if(_bottomLeft.value == NOTHING){
-                                    if(_bottomMid.value == NOTHING){
-                                        if(_bottomRight.value == NOTHING){
-                                            _buttonSwitch.value = true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private fun setStartingTurn(firstGame:Boolean){
         if(firstGame){
             setFirstStartingTurn()
         }else{
             setAnotherStartingTurn()
         }
-//        _turn.value = true
     }
 
     private fun setFirstStartingTurn(){

@@ -156,6 +156,35 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     private fun setObserves() {
 
+        gameViewModel.board.topLeft.observe(this.viewLifecycleOwner){
+            setMark(binding.topLeftField,it)
+        }
+        gameViewModel.board.topMid.observe(this.viewLifecycleOwner){
+            setMark(binding.topMidField,it)
+        }
+        gameViewModel.board.topRight.observe(this.viewLifecycleOwner){
+            setMark(binding.topRightField,it)
+        }
+        gameViewModel.board.midLeft.observe(this.viewLifecycleOwner){
+            setMark(binding.midLeftField,it)
+        }
+        gameViewModel.board.midMid.observe(this.viewLifecycleOwner){
+            setMark(binding.midMidField,it)
+        }
+        gameViewModel.board.midRight.observe(this.viewLifecycleOwner){
+            setMark(binding.midRightField,it)
+        }
+        gameViewModel.board.bottomLeft.observe(this.viewLifecycleOwner){
+            setMark(binding.bottomLeftField,it)
+        }
+        gameViewModel.board.bottomMid.observe(this.viewLifecycleOwner){
+            setMark(binding.bottomMidField,it)
+        }
+        gameViewModel.board.bottomRight.observe(this.viewLifecycleOwner){
+            setMark(binding.bottomRightField,it)
+        }
+
+
         gameViewModel.win.observe(this.viewLifecycleOwner){
             if(it){
                 gameViewModel.resetWin()
@@ -192,35 +221,35 @@ class MultiPlayerFragment : FragmentCoroutine() {
             )
         }
 
-        gameViewModel.topLeft.observe(this.viewLifecycleOwner){
-            setMark(binding.topLeftField,it)
-        }
-        gameViewModel.topMid.observe(this.viewLifecycleOwner){
-            setMark(binding.topMidField,it)
-        }
-        gameViewModel.topRight.observe(this.viewLifecycleOwner){
-            setMark(binding.topRightField,it)
-        }
-
-        gameViewModel.midLeft.observe(this.viewLifecycleOwner){
-            setMark(binding.midLeftField,it)
-        }
-        gameViewModel.midMid.observe(this.viewLifecycleOwner){
-            setMark(binding.midMidField,it)
-        }
-        gameViewModel.midRight.observe(this.viewLifecycleOwner){
-            setMark(binding.midRightField,it)
-        }
-
-        gameViewModel.bottomLeft.observe(this.viewLifecycleOwner){
-            setMark(binding.bottomLeftField,it)
-        }
-        gameViewModel.bottomMid.observe(this.viewLifecycleOwner){
-            setMark(binding.bottomMidField,it)
-        }
-        gameViewModel.bottomRight.observe(this.viewLifecycleOwner){
-            setMark(binding.bottomRightField,it)
-        }
+//        gameViewModel.topLeft.observe(this.viewLifecycleOwner){
+//            setMark(binding.topLeftField,it)
+//        }
+//        gameViewModel.topMid.observe(this.viewLifecycleOwner){
+//            setMark(binding.topMidField,it)
+//        }
+//        gameViewModel.topRight.observe(this.viewLifecycleOwner){
+//            setMark(binding.topRightField,it)
+//        }
+//
+//        gameViewModel.midLeft.observe(this.viewLifecycleOwner){
+//            setMark(binding.midLeftField,it)
+//        }
+//        gameViewModel.midMid.observe(this.viewLifecycleOwner){
+//            setMark(binding.midMidField,it)
+//        }
+//        gameViewModel.midRight.observe(this.viewLifecycleOwner){
+//            setMark(binding.midRightField,it)
+//        }
+//
+//        gameViewModel.bottomLeft.observe(this.viewLifecycleOwner){
+//            setMark(binding.bottomLeftField,it)
+//        }
+//        gameViewModel.bottomMid.observe(this.viewLifecycleOwner){
+//            setMark(binding.bottomMidField,it)
+//        }
+//        gameViewModel.bottomRight.observe(this.viewLifecycleOwner){
+//            setMark(binding.bottomRightField,it)
+//        }
         gameViewModel.play.observe(this.viewLifecycleOwner){
             fPlay = it
             displayUI()

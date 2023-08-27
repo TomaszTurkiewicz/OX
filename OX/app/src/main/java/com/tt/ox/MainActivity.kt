@@ -12,6 +12,16 @@ const val NO_ONE = 0
 const val MAIN_PLAYER = 1
 const val OPPONENT = 2
 
+const val TOP_LEFT = 1
+const val TOP_MID = 2
+const val TOP_RIGHT = 3
+const val MID_LEFT = 4
+const val MID_MID = 5
+const val MID_RIGHT = 6
+const val BOTTOM_LEFT = 7
+const val BOTTOM_MID = 8
+const val BOTTOM_RIGHT = 9
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

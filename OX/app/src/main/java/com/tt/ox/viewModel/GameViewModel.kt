@@ -7,14 +7,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.tt.ox.BOTTOM_LEFT
+import com.tt.ox.BOTTOM_MID
+import com.tt.ox.BOTTOM_RIGHT
 import com.tt.ox.MAIN_PLAYER
+import com.tt.ox.MID_LEFT
+import com.tt.ox.MID_MID
+import com.tt.ox.MID_RIGHT
 import com.tt.ox.NOTHING
 import com.tt.ox.NO_ONE
 import com.tt.ox.OPPONENT
+import com.tt.ox.TOP_LEFT
+import com.tt.ox.TOP_MID
+import com.tt.ox.TOP_RIGHT
 import com.tt.ox.database.Opponent
 import com.tt.ox.database.OpponentDao
 import com.tt.ox.helpers.Board
 import com.tt.ox.helpers.Game
+import com.tt.ox.helpers.PhoneMoveEasy
 import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -234,16 +244,16 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     }
 
     private fun phoneMakeMove(context:Context) {
-        when(number){
-            0 -> setFieldPhone(context,board.getTopLeft())
-            1 -> setFieldPhone(context,board.getTopMid())
-            2 -> setFieldPhone(context,board.getTopRight())
-            3 -> setFieldPhone(context,board.getMidLeft())
-            4 -> setFieldPhone(context,board.getMidMid())
-            5 -> setFieldPhone(context,board.getMidRight())
-            6 -> setFieldPhone(context,board.getBottomLeft())
-            7 -> setFieldPhone(context,board.getBottomMid())
-            8 -> setFieldPhone(context,board.getBottomRight())
+        when(PhoneMoveEasy(board).makeMove()){
+            TOP_LEFT -> setFieldPhone(context,board.getTopLeft())
+            TOP_MID -> setFieldPhone(context,board.getTopMid())
+            TOP_RIGHT -> setFieldPhone(context,board.getTopRight())
+            MID_LEFT -> setFieldPhone(context,board.getMidLeft())
+            MID_MID -> setFieldPhone(context,board.getMidMid())
+            MID_RIGHT -> setFieldPhone(context,board.getMidRight())
+            BOTTOM_LEFT -> setFieldPhone(context,board.getBottomLeft())
+            BOTTOM_MID -> setFieldPhone(context,board.getBottomMid())
+            BOTTOM_RIGHT -> setFieldPhone(context,board.getBottomRight())
             else -> phoneMakeMove(context)
 
         }

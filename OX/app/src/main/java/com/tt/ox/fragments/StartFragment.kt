@@ -81,11 +81,9 @@ class StartFragment : Fragment() {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if(inputName.text.toString().trim().isNotBlank()){
 
-                gameViewModel.addNewOpponent(inputName.text.toString())
-//                val player = Player()
-//                player.setName(inputName.text.toString())
-                        SharedPreferences.saveMainPlayer(requireContext())
-                        clicks()
+                gameViewModel.addNewOpponent("ROBOT")
+                SharedPreferences.saveMainPlayer(requireContext(),inputName.text.toString())
+                clicks()
                 dialog.dismiss()
             }
         }

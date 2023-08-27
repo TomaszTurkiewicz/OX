@@ -10,12 +10,10 @@ import androidx.lifecycle.viewModelScope
 import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
 import com.tt.ox.NO_ONE
-import com.tt.ox.O
 import com.tt.ox.OPPONENT
-import com.tt.ox.X
 import com.tt.ox.database.Opponent
 import com.tt.ox.database.OpponentDao
-import com.tt.ox.helpers.Player
+import com.tt.ox.helpers.Game
 import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -43,11 +41,14 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     private val _buttonSwitch = MutableLiveData<Boolean>()
     val buttonSwitch:LiveData<Boolean> = _buttonSwitch
 
+    private val _game = MutableLiveData<Game>()
+    val game:LiveData<Game> = _game
 
-    private val _mainPlayer = MutableLiveData<Player>()
-    val mainPlayer: LiveData<Player> = _mainPlayer
-    private val _opponentPlayer = MutableLiveData<Player>()
-    val opponentPlayer: LiveData<Player> = _opponentPlayer
+//    private val _mainPlayer = MutableLiveData<Player>()
+//    val mainPlayer: LiveData<Player> = _mainPlayer
+//    private val _opponentPlayer = MutableLiveData<Player>()
+//    val opponentPlayer: LiveData<Player> = _opponentPlayer
+
     private val _horizontalTop = MutableLiveData<Boolean>()
     private val _horizontalMid = MutableLiveData<Boolean>()
     private val _horizontalBottom = MutableLiveData<Boolean>()
@@ -84,35 +85,33 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
     val listOfOpponents:LiveData<List<Opponent>> = opponentDao.getOpponents().asLiveData()
 
-//    fun initializeMainPlayer(context: Context) {
-//        _mainPlayer.value = Player()
-//        val player = SharedPreferences.readPlayer(context)
-//        _mainPlayer.value!!.setMark(player.mark.value!!)
-//        _mainPlayer.value!!.setName(player.name.value!!)
+
+    fun initializeGame(context: Context, opponent: Opponent){
+        _game.value = Game(context,opponent)
+    }
+
+//    fun initializeMainPlayerDatabase(name:String) {
+//        val mPlayer = Player()
+//        mPlayer.setName(name)
+//        _mainPlayer.value = mPlayer
+//        _mainPlayer.value!!.setMark(mPlayer.mark.value!!)
 //    }
 
-    fun initializeMainPlayerDatabase(name:String) {
-        val mPlayer = Player()
-        mPlayer.setName(name)
-        _mainPlayer.value = mPlayer
-        _mainPlayer.value!!.setMark(mPlayer.mark.value!!)
-    }
+//    fun initializeOpponentPlayerSinglePlayer() {
+//        val oPlayer = Player()
+//        oPlayer.setName("ROBOT")
+//        _opponentPlayer.value = oPlayer
+//        val mark = if(_mainPlayer.value!!.mark.value== X) O else X
+//        _opponentPlayer.value!!.setMark(mark)
+//    }
 
-    fun initializeOpponentPlayerSinglePlayer() {
-        val oPlayer = Player()
-        oPlayer.setName("ROBOT")
-        _opponentPlayer.value = oPlayer
-        val mark = if(_mainPlayer.value!!.mark.value== X) O else X
-        _opponentPlayer.value!!.setMark(mark)
-    }
-
-    fun initializeOpponentPlayerMultiPlayer(name:String) {
-        val oPlayer = Player()
-        oPlayer.setName(name)
-        _opponentPlayer.value = oPlayer
-        val mark = if(_mainPlayer.value!!.mark.value==X) O else X
-        _opponentPlayer.value!!.setMark(mark)
-    }
+//    fun initializeOpponentPlayerMultiPlayer(name:String) {
+//        val oPlayer = Player()
+//        oPlayer.setName(name)
+//        _opponentPlayer.value = oPlayer
+//        val mark = if(_mainPlayer.value!!.mark.value==X) O else X
+//        _opponentPlayer.value!!.setMark(mark)
+//    }
 
     fun getWiningPerson():Int{
         return this.winingPerson
@@ -143,11 +142,12 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         return this._angleDown.value!!
     }
     fun switchMarks(){
-        val opponentPlayerMark = _opponentPlayer.value!!.mark.value!!
-        val mainPlayerMark = _mainPlayer.value!!.mark.value!!
-
-        _mainPlayer.value!!.setMark(opponentPlayerMark)
-        _opponentPlayer.value!!.setMark(mainPlayerMark)
+        game.value!!.switchMarks()
+//        val opponentPlayerMark = _opponentPlayer.value!!.mark.value!!
+//        val mainPlayerMark = _mainPlayer.value!!.mark.value!!
+//
+//        _mainPlayer.value!!.setMark(opponentPlayerMark)
+//        _opponentPlayer.value!!.setMark(mainPlayerMark)
     }
 
     fun initialize(firstGame:Boolean){
@@ -359,14 +359,14 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         if(play.value==true){
             if(field.value == NOTHING) {
                 decreaseMoves(context)
-                field.value = if(turn.value!!) _mainPlayer.value!!.mark.value else _opponentPlayer.value!!.mark.value
+                field.value = if(turn.value!!) _game.value!!.getMainPlayerMark() else _game.value!!.getOpponentMark()
                 val endGame = checkLines()
 
                 if (endGame) {
                     _play.value = false
                     when(winingMark){
-                        _mainPlayer.value!!.mark.value!! -> addWinToMainPlayer()
-                        _opponentPlayer.value!!.mark.value!! -> addWinToOpponent()
+                        _game.value!!.getMainPlayerMark() -> addWinToMainPlayer()
+                        _game.value!!.getOpponentMark() -> addWinToOpponent()
                         else -> clearWinningMark()
                     }
                     _win.value = true

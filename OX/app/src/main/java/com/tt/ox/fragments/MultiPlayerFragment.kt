@@ -19,8 +19,6 @@ import com.tt.ox.OPPONENT
 import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.X
-import com.tt.ox.database.Opponent
-import com.tt.ox.database.OpponentDatabase
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
@@ -37,21 +35,15 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private var _binding: FragmentMultiPlayerBinding? = null
     private val binding get() = _binding!!
     private var unit =0
-
     private var fPlay = false
     private var fMoves = false
-
     private val navArgs: MultiPlayerFragmentArgs by navArgs()
-
     private val gameViewModel: GameViewModel by activityViewModels {
         GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
     private var id = 0
-
-    private var opponent = Opponent()
-    private var main = Opponent()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,17 +63,11 @@ class MultiPlayerFragment : FragmentCoroutine() {
         super.onViewCreated(view, savedInstanceState)
         gameViewModel.initializeMoves(requireContext())
         gameViewModel.initialize(true)
-//        gameViewModel.initializeMainPlayer(requireContext())
 
         if(id>0){
-            gameViewModel.getOpponentMultiPlayer(1).observe(this.viewLifecycleOwner){
-                mainPlayer -> main = mainPlayer
-                gameViewModel.initializeMainPlayerDatabase(main.name)
-            }
             gameViewModel.getOpponentMultiPlayer(id).observe(this.viewLifecycleOwner){
-                    selectedOpponent -> opponent = selectedOpponent
-                gameViewModel.initializeOpponentPlayerMultiPlayer(opponent.name)
-
+                    selectedOpponent ->
+                gameViewModel.initializeGame(requireContext(), selectedOpponent)
                 prepareUI()
                 setObserves()
                 clicks()
@@ -140,40 +126,35 @@ class MultiPlayerFragment : FragmentCoroutine() {
         }
         binding.switchMarks.setOnClickListener {
             gameViewModel.switchMarks()
+            launch {
+                gameViewModel.updateOpponent(
+                    gameViewModel.game.value!!.getOpponent()
+                )
+            }
         }
     }
 
     private fun updateWins(){
-        val winingPerson = gameViewModel.getWiningPerson()
-        val opponentDatabase = OpponentDatabase.getDatabase(requireContext()).opponentDao().getOpponentNormal(id)
-        if (winingPerson == MAIN_PLAYER) {
-            gameViewModel.updateOpponent(
-                Opponent(
-                    id = opponentDatabase.id,
-                    name = opponentDatabase.name,
-                    wins = opponentDatabase.wins + 1,
-                    loses = opponentDatabase.loses
+        val winningPerson = gameViewModel.getWiningPerson()
+        if (winningPerson == MAIN_PLAYER) {
+            gameViewModel.game.value!!.addWin()
+            launch {
+                gameViewModel.updateOpponent(
+                    gameViewModel.game.value!!.getOpponent()
                 )
-            )
-        } else if (winingPerson == OPPONENT) {
-            gameViewModel.updateOpponent(
-                Opponent(
-                    id = opponentDatabase.id,
-                    name = opponentDatabase.name,
-                    wins = opponentDatabase.wins,
-                    loses = opponentDatabase.loses + 1
+            }
+
+        } else if (winningPerson == OPPONENT) {
+            gameViewModel.game.value!!.addLose()
+            launch {
+                gameViewModel.updateOpponent(
+                    gameViewModel.game.value!!.getOpponent()
                 )
-            )
+            }
         }
     }
 
     private fun setObserves() {
-
-        gameViewModel.listOfOpponents.observe(this.viewLifecycleOwner){
-            val op:Opponent = it.single { opponent -> opponent.id == id }
-            binding.mainPlayerWins.text = op.wins.toString()
-            binding.opponentPlayerWins.text = op.loses.toString()
-        }
 
         gameViewModel.win.observe(this.viewLifecycleOwner){
             if(it){
@@ -186,14 +167,29 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
         gameViewModel.moves.observe(this.viewLifecycleOwner){
             binding.moves.text = it.toString()
+            fMoves = it == 0
+            displayUI()
         }
 
-        gameViewModel.mainPlayer.value!!.name.observe(this.viewLifecycleOwner){
-            binding.mainPlayerName.text = it
-        }
-
-        gameViewModel.opponentPlayer.value!!.name.observe(this.viewLifecycleOwner){
-            binding.opponentPlayerName.text = it
+        gameViewModel.game.observe(this.viewLifecycleOwner){
+            binding.mainPlayerName.text = it.getMainPlayerName()
+            binding.opponentPlayerName.text = it.getOpponentName()
+            binding.mainPlayerWins.text = it.getWins().toString()
+            binding.opponentPlayerWins.text = it.getLoses().toString()
+            binding.opponentPlayerMark.setImageDrawable(
+                if(it.getOpponentMark()==X){
+                    XDrawable(requireContext())
+                }else{
+                    ODrawable(requireContext())
+                }
+            )
+            binding.mainPlayerMark.setImageDrawable(
+                if(it.getMainPlayerMark()==X){
+                    XDrawable(requireContext())
+                }else{
+                    ODrawable(requireContext())
+                }
+            )
         }
 
         gameViewModel.topLeft.observe(this.viewLifecycleOwner){
@@ -230,27 +226,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
             displayUI()
         }
 
-        gameViewModel.moves.observe(this.viewLifecycleOwner){
-            fMoves = it == 0
-            displayUI()
-        }
-
-        gameViewModel.mainPlayer.value!!.mark.observe(this.viewLifecycleOwner){
-            if(it==X){
-                binding.mainPlayerMark.setImageDrawable(XDrawable(requireContext()))
-            } else{
-                binding.mainPlayerMark.setImageDrawable(ODrawable(requireContext()))
-            }
-        }
-
-        gameViewModel.opponentPlayer.value!!.mark.observe(this.viewLifecycleOwner){
-            if(it==X){
-                binding.opponentPlayerMark.setImageDrawable(XDrawable(requireContext()))
-            } else{
-                binding.opponentPlayerMark.setImageDrawable(ODrawable(requireContext()))
-            }
-
-        }
         gameViewModel.turn.observe(this.viewLifecycleOwner){
             if(it){
                 binding.mainPlayerName.setBackgroundColor(ContextCompat.getColor(requireContext(),
@@ -454,5 +429,4 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
 }
 
-// todo remember players marks!!!
 // todo customize players marks

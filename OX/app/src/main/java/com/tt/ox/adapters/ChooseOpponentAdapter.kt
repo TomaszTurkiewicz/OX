@@ -31,9 +31,9 @@ class ChooseOpponentAdapter(
     override fun onBindViewHolder(holder: ChooseOpponentViewHolder, position: Int) {
         val current = getItem(position)
             holder.layout.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,2*unit)
-            holder.opponentName.text = current.name
-            holder.opponentWin.text = current.loses.toString()
-            holder.playerWin.text = current.wins.toString()
+            holder.opponentName.text = current.getName()
+            holder.opponentWin.text = current.getLoses().toString()
+            holder.playerWin.text = current.getWins().toString()
             holder.opponentName.setOnClickListener{
                 onOpponentClicked(current)
             }
@@ -42,15 +42,11 @@ class ChooseOpponentAdapter(
                     onDeleteOpponentClicked(current)
                 }
             }
-
             if(deletable){
                 holder.delete.visibility = View.VISIBLE
             }else{
                 holder.delete.visibility = View.GONE
-
         }
-
-
     }
 
     fun delete(){
@@ -73,9 +69,8 @@ class ChooseOpponentAdapter(
             }
 
             override fun areContentsTheSame(oldItem: Opponent, newItem: Opponent): Boolean {
-                return oldItem.name == newItem.name
+                return oldItem.getName() == newItem.getName()
             }
         }
     }
-
 }

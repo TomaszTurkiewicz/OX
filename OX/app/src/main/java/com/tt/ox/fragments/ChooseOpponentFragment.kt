@@ -28,30 +28,23 @@ class ChooseOpponentFragment : Fragment() {
 
     private var _binding: FragmentChooseOpponentBinding? = null
     private val binding get() = _binding!!
-
     private var unit = 0
-
     private var state: Parcelable? = null
-
     private lateinit var adapter: ChooseOpponentAdapter
-
     private val gameViewModel: GameViewModel by activityViewModels {
         GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
     }
-
     override fun onPause() {
         super.onPause()
         state = binding.recyclerView.layoutManager?.onSaveInstanceState()
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -70,7 +63,7 @@ class ChooseOpponentFragment : Fragment() {
             {
                 gameViewModel.deleteOpponentMultiPlayer(it)
             }){
-            val action = ChooseOpponentFragmentDirections.actionChooseOpponentFragmentToMultiPlayerFragment(it.id)
+            val action = ChooseOpponentFragmentDirections.actionChooseOpponentFragmentToMultiPlayerFragment(it.getId())
             findNavController().navigate(action)
         }
         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -82,7 +75,7 @@ class ChooseOpponentFragment : Fragment() {
         }
         gameViewModel.listOfOpponents.observe(this.viewLifecycleOwner){
             opponent -> opponent.let {list ->
-            val filteredList = list.filter{opponent -> opponent.id != 1 }
+            val filteredList = list.filter{opponent -> opponent.getId() != 1 }
             state = binding.recyclerView.layoutManager?.onSaveInstanceState()
                 adapter.submitList(filteredList)
                 {

@@ -193,6 +193,12 @@ class SinglePlayerFragment : FragmentCoroutine() {
             }
         }
 
+        gameViewModel.listOfOpponents.observe(this.viewLifecycleOwner){
+            val op:Opponent = it.single { opponent -> opponent.id == 1 }
+            binding.mainPlayerWins.text = op.wins.toString()
+            binding.opponentPlayerWins.text = op.loses.toString()
+        }
+
         gameViewModel.moves.observe(this.viewLifecycleOwner){
             binding.moves.text = it.toString()
         }
@@ -536,16 +542,30 @@ class SinglePlayerFragment : FragmentCoroutine() {
             ConstraintSet.RIGHT, binding.singlePlayerLayout.id,
             ConstraintSet.RIGHT,0)
 
-        set.connect(binding.mainPlayerName.id,
+        set.connect(binding.mainPlayerWins.id,
             ConstraintSet.TOP,binding.singlePlayerLayout.id,
             ConstraintSet.TOP,0)
+        set.connect(binding.mainPlayerWins.id,
+            ConstraintSet.LEFT,binding.singlePlayerLayout.id,
+            ConstraintSet.LEFT,0)
+
+        set.connect(binding.opponentPlayerWins.id,
+            ConstraintSet.TOP,binding.singlePlayerLayout.id,
+            ConstraintSet.TOP,0)
+        set.connect(binding.opponentPlayerWins.id,
+            ConstraintSet.RIGHT,binding.singlePlayerLayout.id,
+            ConstraintSet.RIGHT,0)
+
+        set.connect(binding.mainPlayerName.id,
+            ConstraintSet.TOP,binding.mainPlayerWins.id,
+            ConstraintSet.BOTTOM,0)
         set.connect(binding.mainPlayerName.id,
             ConstraintSet.LEFT,binding.singlePlayerLayout.id,
             ConstraintSet.LEFT,0)
 
         set.connect(binding.opponentPlayerName.id,
-            ConstraintSet.TOP,binding.singlePlayerLayout.id,
-            ConstraintSet.TOP,0)
+            ConstraintSet.TOP,binding.opponentPlayerWins.id,
+            ConstraintSet.BOTTOM,0)
         set.connect(binding.opponentPlayerName.id,
             ConstraintSet.RIGHT,binding.singlePlayerLayout.id,
             ConstraintSet.RIGHT,0)

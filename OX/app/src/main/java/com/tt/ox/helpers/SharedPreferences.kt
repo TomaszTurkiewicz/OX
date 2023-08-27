@@ -22,21 +22,6 @@ class SharedPreferences {
             return boolean
         }
 
-        fun readPlayer(context: Context):Player {
-            val player = Player()
-            context.let {
-                val sharedPreferences = it.getSharedPreferences("Player_Name", Context.MODE_PRIVATE)
-                val name = sharedPreferences.getString("player_name","_").toString()
-                val wins = sharedPreferences.getInt("wins",0)
-                val loses = sharedPreferences.getInt("loses",0)
-
-                player.setName(name)
-                player.setWins(wins)
-                player.setLoses(loses)
-            }
-            return player
-        }
-
         fun saveMoves(context: Context,moves:Int){
             context.let {
                 val sharedPreferences = it.getSharedPreferences("Moves",Context.MODE_PRIVATE)

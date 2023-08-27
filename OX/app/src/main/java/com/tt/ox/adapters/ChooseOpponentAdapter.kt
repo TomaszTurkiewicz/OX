@@ -30,9 +30,8 @@ class ChooseOpponentAdapter(
 
     override fun onBindViewHolder(holder: ChooseOpponentViewHolder, position: Int) {
         val current = getItem(position)
-            holder.layout.visibility = View.VISIBLE
             holder.layout.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,2*unit)
-            holder.opponentName.text = ""+current.id+" "+current.name
+            holder.opponentName.text = current.name
             holder.opponentWin.text = current.loses.toString()
             holder.playerWin.text = current.wins.toString()
             holder.opponentName.setOnClickListener{

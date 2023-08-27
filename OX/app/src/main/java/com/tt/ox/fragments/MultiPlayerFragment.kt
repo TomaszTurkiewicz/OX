@@ -169,6 +169,12 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     private fun setObserves() {
 
+        gameViewModel.listOfOpponents.observe(this.viewLifecycleOwner){
+            val op:Opponent = it.single { opponent -> opponent.id == id }
+            binding.mainPlayerWins.text = op.wins.toString()
+            binding.opponentPlayerWins.text = op.loses.toString()
+        }
+
         gameViewModel.win.observe(this.viewLifecycleOwner){
             if(it){
                 gameViewModel.resetWin()
@@ -398,11 +404,33 @@ class MultiPlayerFragment : FragmentCoroutine() {
         set.connect(binding.addMoves.id,ConstraintSet.LEFT, binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
         set.connect(binding.addMoves.id,ConstraintSet.RIGHT, binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
 
-        set.connect(binding.mainPlayerName.id,ConstraintSet.TOP,binding.multiPlayerLayout.id,ConstraintSet.TOP,0)
-        set.connect(binding.mainPlayerName.id,ConstraintSet.LEFT,binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.mainPlayerWins.id,
+            ConstraintSet.TOP,binding.multiPlayerLayout.id,
+            ConstraintSet.TOP,0)
+        set.connect(binding.mainPlayerWins.id,
+            ConstraintSet.LEFT,binding.multiPlayerLayout.id,
+            ConstraintSet.LEFT,0)
 
-        set.connect(binding.opponentPlayerName.id,ConstraintSet.TOP,binding.multiPlayerLayout.id,ConstraintSet.TOP,0)
-        set.connect(binding.opponentPlayerName.id,ConstraintSet.RIGHT,binding.multiPlayerLayout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.opponentPlayerWins.id,
+            ConstraintSet.TOP,binding.multiPlayerLayout.id,
+            ConstraintSet.TOP,0)
+        set.connect(binding.opponentPlayerWins.id,
+            ConstraintSet.RIGHT,binding.multiPlayerLayout.id,
+            ConstraintSet.RIGHT,0)
+
+        set.connect(binding.mainPlayerName.id,
+            ConstraintSet.TOP,binding.mainPlayerWins.id,
+            ConstraintSet.BOTTOM,0)
+        set.connect(binding.mainPlayerName.id,
+            ConstraintSet.LEFT,binding.multiPlayerLayout.id,
+            ConstraintSet.LEFT,0)
+
+        set.connect(binding.opponentPlayerName.id,
+            ConstraintSet.TOP,binding.opponentPlayerWins.id,
+            ConstraintSet.BOTTOM,0)
+        set.connect(binding.opponentPlayerName.id,
+            ConstraintSet.RIGHT,binding.multiPlayerLayout.id,
+            ConstraintSet.RIGHT,0)
 
         set.connect(binding.mainPlayerMark.id,ConstraintSet.LEFT,binding.multiPlayerLayout.id,ConstraintSet.LEFT,0)
         set.connect(binding.mainPlayerMark.id,ConstraintSet.TOP,binding.mainPlayerName.id,ConstraintSet.BOTTOM,0)

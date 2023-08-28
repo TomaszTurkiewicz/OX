@@ -13,11 +13,11 @@ import com.tt.ox.TOP_MID
 import com.tt.ox.TOP_RIGHT
 import kotlin.random.Random
 
-class PhoneMoveEasy(private val board:Board) {
+class PhoneMoveEasy(private val board:Board):MakeMove {
 
     private val newBoard = arrayListOf<Int>()
 
-    fun makeMove(): Int {
+    override fun makeMove(): Int {
         newBoard.clear()
         addToNewBoard(board.getTopLeft(), TOP_LEFT)
         addToNewBoard(board.getTopMid(), TOP_MID)

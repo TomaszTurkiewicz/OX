@@ -10,7 +10,9 @@ class Game(context: Context,private val opponent: Opponent) {
     private var wins:Int
     private var loses:Int
     private var mainPlayerMark:Int
+    private var mainPlayerMarkColor:Int
     private var opponentMark:Int
+    private var opponentMarkColor:Int
 
     init {
         this.mainPlayerName = SharedPreferences.readPlayerName(context)
@@ -18,7 +20,9 @@ class Game(context: Context,private val opponent: Opponent) {
         this.wins = opponent.getWins()
         this.loses = opponent.getLoses()
         this.mainPlayerMark = opponent.getMainPlayerMark()
+        this.mainPlayerMarkColor = opponent.getMainPlayerMarkColor()
         this.opponentMark = opponent.getOpponentMark()
+        this.opponentMarkColor = opponent.getOpponentMarkColor()
     }
 
     fun addWin(){
@@ -36,7 +40,9 @@ class Game(context: Context,private val opponent: Opponent) {
             wins = wins,
             loses = loses,
             mainPlayerMark = mainPlayerMark,
-            opponentMark = opponentMark
+            mainPlayerMarkColor = mainPlayerMarkColor,
+            opponentMark = opponentMark,
+            opponentMarkColor = opponentMarkColor
         )
     }
 
@@ -68,5 +74,21 @@ class Game(context: Context,private val opponent: Opponent) {
 
     fun getOpponentMark():Int{
         return this.opponentMark
+    }
+
+    fun getMainPlayerMarkColor():Int{
+        return this.mainPlayerMarkColor
+    }
+
+    fun getOpponentMarkColor():Int{
+        return this.opponentMarkColor
+    }
+
+    fun setOpponentMarkColor(color:Int){
+        this.opponentMarkColor = color
+    }
+
+    fun setPlayerMarkColor(color:Int){
+        this.mainPlayerMarkColor = color
     }
 }

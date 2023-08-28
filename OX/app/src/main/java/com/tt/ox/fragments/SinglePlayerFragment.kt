@@ -24,6 +24,7 @@ import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
+import com.tt.ox.helpers.COLOR_BLACK
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
@@ -214,14 +215,14 @@ class SinglePlayerFragment : FragmentCoroutine() {
             binding.mainPlayerWins.text = it.getWins().toString()
             binding.opponentPlayerWins.text = it.getLoses().toString()
             if(it.getOpponentMark()==X){
-                binding.opponentPlayerMark.setImageDrawable(XDrawable(requireContext()))
+                binding.opponentPlayerMark.setImageDrawable(XDrawable(requireContext(),it.getOpponentMarkColor()))
             } else{
-                binding.opponentPlayerMark.setImageDrawable(ODrawable(requireContext()))
+                binding.opponentPlayerMark.setImageDrawable(ODrawable(requireContext(),it.getOpponentMarkColor()))
             }
             if(it.getMainPlayerMark()==X){
-                binding.mainPlayerMark.setImageDrawable(XDrawable(requireContext()))
+                binding.mainPlayerMark.setImageDrawable(XDrawable(requireContext(),it.getMainPlayerMarkColor()))
             } else{
-                binding.mainPlayerMark.setImageDrawable(ODrawable(requireContext()))
+                binding.mainPlayerMark.setImageDrawable(ODrawable(requireContext(),it.getMainPlayerMarkColor()))
             }
         }
 
@@ -307,8 +308,8 @@ class SinglePlayerFragment : FragmentCoroutine() {
     private fun setMark(view: ImageView, mark:Int){
         when(mark){
             NOTHING -> view.setImageDrawable(null)
-            X -> view.setImageDrawable(XDrawable(requireContext()))
-            O -> view.setImageDrawable(ODrawable(requireContext()))
+            X -> view.setImageDrawable(XDrawable(requireContext(), COLOR_BLACK))
+            O -> view.setImageDrawable(ODrawable(requireContext(), COLOR_BLACK))
         }
     }
 

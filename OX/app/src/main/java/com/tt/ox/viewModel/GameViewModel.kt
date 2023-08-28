@@ -109,6 +109,14 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         game.value!!.switchMarks()
     }
 
+    fun setOpponentMarkColor(color:Int){
+        game.value!!.setOpponentMarkColor(color)
+    }
+
+    fun setMainPlayerMarkColor(color:Int){
+        game.value!!.setPlayerMarkColor(color)
+    }
+
     fun initialize(firstGame:Boolean){
 //        _topLeft.value = NOTHING
 //        _topMid.value = NOTHING
@@ -255,7 +263,6 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
             BOTTOM_MID -> setFieldPhone(context,board.getBottomMid())
             BOTTOM_RIGHT -> setFieldPhone(context,board.getBottomRight())
             else -> phoneMakeMove(context)
-
         }
     }
 

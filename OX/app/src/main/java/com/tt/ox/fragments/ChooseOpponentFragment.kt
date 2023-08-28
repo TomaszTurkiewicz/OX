@@ -161,3 +161,4 @@ class ChooseOpponentFragment : Fragment() {
     }
 
 }
+// todo show main player name, marks

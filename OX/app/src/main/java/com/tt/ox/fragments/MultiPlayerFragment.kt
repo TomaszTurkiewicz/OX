@@ -17,7 +17,9 @@ import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
 import com.tt.ox.O
 import com.tt.ox.OPPONENT
+import com.tt.ox.OPPONENT_MARK_PRESSED
 import com.tt.ox.OXApplication
+import com.tt.ox.PLAYER_MARK_PRESSED
 import com.tt.ox.R
 import com.tt.ox.X
 import com.tt.ox.database.Opponent
@@ -36,8 +38,7 @@ import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
 import kotlinx.coroutines.launch
 
-const val PLAYER_MARK_PRESSED = 1
-const val OPPONENT_MARK_PRESSED = 2
+
 
 class MultiPlayerFragment : FragmentCoroutine() {
 
@@ -164,7 +165,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
         val colors = MarkColors()
 
         displayAlertDialogUI(alertDialog,mark,opponent)
-        // todo logic here
 
         builder.setView(alertDialog.root)
         val dialog = builder.create()

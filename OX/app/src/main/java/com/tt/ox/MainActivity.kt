@@ -22,6 +22,9 @@ const val BOTTOM_LEFT = 7
 const val BOTTOM_MID = 8
 const val BOTTOM_RIGHT = 9
 
+const val PLAYER_MARK_PRESSED = 1
+const val OPPONENT_MARK_PRESSED = 2
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

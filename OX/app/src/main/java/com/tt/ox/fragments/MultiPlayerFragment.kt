@@ -161,8 +161,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
         val opponent = gameViewModel.game.value!!.getOpponent()
         val builder = AlertDialog.Builder(requireContext())
         val alertDialog = AlertDialogChangeMarkColorBinding.inflate(layoutInflater)
-        var pointer = 0
-        val colors = MarkColors()
+        val currentColor = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
+        val colors = MarkColors(currentColor)
 
         displayAlertDialogUI(alertDialog,mark,opponent)
 
@@ -174,12 +174,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
         }
 
         alertDialog.arrowLeft.setOnClickListener {
-            if(pointer==0){
-                pointer = colors.colors.size-1
-            }else{
-                pointer-=1
-            }
-            val color = colors.colors[pointer]
+            colors.decreasePointer()
+            val color = colors.getColor()
             if(mark== MAIN_PLAYER){
                 opponent.setPlayerColor(color)
             }else{
@@ -190,8 +186,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
         }
 
         alertDialog.arrowRight.setOnClickListener {
-            pointer = (pointer+1).mod(colors.colors.size)
-            val color = colors.colors[pointer]
+            colors.increasePointer()
+            val color = colors.getColor()
             if(mark== MAIN_PLAYER){
                 opponent.setPlayerColor(color)
             }else{
@@ -592,5 +588,3 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
 
 }
-
-// todo customize players marks

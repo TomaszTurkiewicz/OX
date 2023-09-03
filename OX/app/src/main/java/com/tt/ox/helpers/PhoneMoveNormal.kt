@@ -11,8 +11,13 @@ import com.tt.ox.NOTHING
 import com.tt.ox.TOP_LEFT
 import com.tt.ox.TOP_MID
 import com.tt.ox.TOP_RIGHT
+import kotlin.random.Random
 
 class PhoneMoveNormal(private val board:Board,private val mMark:Int,private val oMark:Int):MakeMove {
+
+    private val secondMarkBoard = arrayListOf<Int>()
+
+    private val firstMarkCorners = arrayListOf<Int>()
 
     private val horizontalTopCounters = LineMarkCounters()
     private val horizontalMidCounters = LineMarkCounters()
@@ -23,8 +28,12 @@ class PhoneMoveNormal(private val board:Board,private val mMark:Int,private val 
     private val angleUpCounters = LineMarkCounters()
     private val angleDownCounters = LineMarkCounters()
     override fun makeMove(): Int {
+        secondMarkBoard.clear()
+        firstMarkCorners.clear()
+
         setCounters()
 
+        // make winning move
         if(horizontalTopCounters.getWinningCounter()){
             return getWinningField(board.getTopLeft(), board.getTopMid(), board.getTopRight(), TOP_LEFT, TOP_MID, TOP_RIGHT)
         }
@@ -51,8 +60,79 @@ class PhoneMoveNormal(private val board:Board,private val mMark:Int,private val 
         }
 
 
+        // try to put second mark the best way
+        if(horizontalTopCounters.getSecondMark()){
+            addSecondMark(board.getTopLeft(), board.getTopMid(), board.getTopRight(), TOP_LEFT, TOP_MID, TOP_RIGHT)
+        }
+        if(horizontalMidCounters.getSecondMark()){
+            addSecondMark(board.getMidLeft(),board.getMidMid(),board.getMidRight(), MID_LEFT, MID_MID, MID_RIGHT)
+        }
+        if(horizontalBottomCounters.getSecondMark()){
+            addSecondMark(board.getBottomLeft(),board.getBottomMid(),board.getBottomRight(), BOTTOM_LEFT, BOTTOM_MID, BOTTOM_RIGHT)
+        }
+        if(verticalLeftCounters.getSecondMark()){
+            addSecondMark(board.getTopLeft(),board.getMidLeft(),board.getBottomLeft(), TOP_LEFT, MID_LEFT, BOTTOM_LEFT)
+        }
+        if(verticalMidCounters.getSecondMark()){
+            addSecondMark(board.getTopMid(), board.getMidMid(),board.getBottomMid(), TOP_MID, MID_MID, BOTTOM_MID)
+        }
+        if(verticalRightCounters.getSecondMark()){
+            addSecondMark(board.getTopRight(), board.getMidRight(), board.getBottomRight(), TOP_RIGHT, MID_RIGHT, BOTTOM_RIGHT)
+        }
+        if(angleUpCounters.getSecondMark()){
+            addSecondMark(board.getBottomLeft(),board.getMidMid(),board.getTopRight(), BOTTOM_LEFT, MID_MID, TOP_RIGHT)
+        }
+        if(angleDownCounters.getSecondMark()){
+            addSecondMark(board.getTopLeft(),board.getMidMid(),board.getBottomRight(), TOP_LEFT, MID_MID, BOTTOM_RIGHT)
+        }
+
+        if(secondMarkBoard.size > 0){
+
+            // TODO change this to compare with empty rows and get best common field
+
+            val size = secondMarkBoard.size
+            val random = Random.nextInt(size)
+            return secondMarkBoard[random]
+        }
+
+        // put first mark the best way
+        if(board.getMidMid().value!! == NOTHING){
+            return MID_MID
+        }
+
+        if(board.getTopLeft().value!! == NOTHING){
+            firstMarkCorners.add(TOP_LEFT)
+        }
+        if(board.getTopRight().value!! == NOTHING){
+            firstMarkCorners.add(TOP_RIGHT)
+        }
+        if(board.getBottomLeft().value!! == NOTHING){
+            firstMarkCorners.add(BOTTOM_LEFT)
+        }
+        if(board.getBottomRight().value!! == NOTHING){
+            firstMarkCorners.add(BOTTOM_RIGHT)
+        }
+
+        if(firstMarkCorners.size>0){
+            val size = firstMarkCorners.size
+            val random = Random.nextInt(size)
+
+            return firstMarkCorners[random]
+        }
 
         return PhoneMoveEasy(board).makeMove()
+    }
+
+    private fun addSecondMark(mark1:MutableLiveData<Int>,mark2:MutableLiveData<Int>, mark3:MutableLiveData<Int>, field1:Int, field2:Int, field3:Int){
+        if(mark1.value!! == NOTHING){
+            secondMarkBoard.add(field1)
+        }
+        if(mark2.value!! == NOTHING){
+            secondMarkBoard.add(field2)
+        }
+        if(mark3.value!! == NOTHING){
+            secondMarkBoard.add(field3)
+        }
     }
 
     private fun getWinningField(mark1:MutableLiveData<Int>,mark2:MutableLiveData<Int>, mark3:MutableLiveData<Int>, field1:Int, field2:Int, field3:Int):Int{

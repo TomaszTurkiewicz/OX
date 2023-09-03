@@ -24,4 +24,14 @@ class LineMarkCounters {
         }
         return boolean
     }
+
+    fun getSecondMark():Boolean{
+        var boolean = false
+        if(opponentMarkCounter == 1){
+            if(nothingCounter == 2){
+                boolean = true
+            }
+        }
+        return boolean
+    }
 }

@@ -10,10 +10,12 @@ import androidx.lifecycle.viewModelScope
 import com.tt.ox.BOTTOM_LEFT
 import com.tt.ox.BOTTOM_MID
 import com.tt.ox.BOTTOM_RIGHT
+import com.tt.ox.EASY_GAME
 import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.MID_LEFT
 import com.tt.ox.MID_MID
 import com.tt.ox.MID_RIGHT
+import com.tt.ox.NORMAL_GAME
 import com.tt.ox.NOTHING
 import com.tt.ox.NO_ONE
 import com.tt.ox.OPPONENT
@@ -25,18 +27,19 @@ import com.tt.ox.database.OpponentDao
 import com.tt.ox.helpers.Board
 import com.tt.ox.helpers.Game
 import com.tt.ox.helpers.PhoneMoveEasy
+import com.tt.ox.helpers.PhoneMoveNormal
 import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
+    private val mode = NORMAL_GAME
+
     private var mainPlayerStarted = true
 
     private val _moves = MutableLiveData<Int>()
     val moves:LiveData<Int> = _moves
-
-    private var number = 0
 
     private var movesDecreased = false
 
@@ -54,15 +57,6 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
     private val _game = MutableLiveData<Game>()
     val game:LiveData<Game> = _game
-
-//    private val _horizontalTop = MutableLiveData<Boolean>()
-//    private val _horizontalMid = MutableLiveData<Boolean>()
-//    private val _horizontalBottom = MutableLiveData<Boolean>()
-//    private val _verticalLeft = MutableLiveData<Boolean>()
-//    private val _verticalMid = MutableLiveData<Boolean>()
-//    private val _verticalRight = MutableLiveData<Boolean>()
-//    private val _angleDown = MutableLiveData<Boolean>()
-//    private val _angleUp = MutableLiveData<Boolean>()
 
     private val _play = MutableLiveData<Boolean>()
     val play :LiveData<Boolean> = _play
@@ -141,9 +135,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
         _win.value = false
 
-        if(_moves.value!!>0) {
-            _play.value = true
-        }
+        _play.value = _moves.value!!>0
 
         board.initialize()
 
@@ -236,8 +228,6 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         if(field.value!! == NOTHING){
             setField(context,field)
         }else{
-            number+=1
-            number %= 9
             phoneMakeMove(context)
         }
     }
@@ -252,7 +242,16 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     }
 
     private fun phoneMakeMove(context:Context) {
-        when(PhoneMoveEasy(board).makeMove()){
+
+        when (mode){
+            EASY_GAME -> move(context,PhoneMoveEasy(board).makeMove())
+            NORMAL_GAME -> move(context, PhoneMoveNormal(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove())
+        }
+
+    }
+
+    private fun move(context: Context, move:Int){
+        when(move){
             TOP_LEFT -> setFieldPhone(context,board.getTopLeft())
             TOP_MID -> setFieldPhone(context,board.getTopMid())
             TOP_RIGHT -> setFieldPhone(context,board.getTopRight())

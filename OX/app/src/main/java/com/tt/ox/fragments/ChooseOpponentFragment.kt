@@ -59,7 +59,7 @@ class ChooseOpponentFragment : Fragment() {
         prepareUI()
         click()
 
-        adapter = ChooseOpponentAdapter(unit,
+        adapter = ChooseOpponentAdapter(requireContext(),unit,
             {
                 gameViewModel.deleteOpponentMultiPlayer(it)
             }){

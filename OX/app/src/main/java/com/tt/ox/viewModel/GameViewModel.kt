@@ -11,6 +11,7 @@ import com.tt.ox.BOTTOM_LEFT
 import com.tt.ox.BOTTOM_MID
 import com.tt.ox.BOTTOM_RIGHT
 import com.tt.ox.EASY_GAME
+import com.tt.ox.HARD_GAME
 import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.MID_LEFT
 import com.tt.ox.MID_MID
@@ -27,6 +28,7 @@ import com.tt.ox.database.OpponentDao
 import com.tt.ox.helpers.Board
 import com.tt.ox.helpers.Game
 import com.tt.ox.helpers.PhoneMoveEasy
+import com.tt.ox.helpers.PhoneMoveHard
 import com.tt.ox.helpers.PhoneMoveNormal
 import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.launch
@@ -34,7 +36,7 @@ import kotlin.random.Random
 
 class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
-    private val mode = NORMAL_GAME
+    private val mode = HARD_GAME
 
     private var mainPlayerStarted = true
 
@@ -246,6 +248,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         when (mode){
             EASY_GAME -> move(context,PhoneMoveEasy(board).makeMove())
             NORMAL_GAME -> move(context, PhoneMoveNormal(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove())
+            HARD_GAME -> move(context, PhoneMoveHard(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove())
         }
 
     }

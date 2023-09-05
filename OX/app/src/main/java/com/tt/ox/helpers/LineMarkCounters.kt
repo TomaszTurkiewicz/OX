@@ -15,6 +15,17 @@ class LineMarkCounters {
         this.opponentMarkCounter +=1
     }
 
+    fun getLosingCounter():Boolean{
+        var boolean = false
+        if(mainMarkCounter == 2){
+            if(nothingCounter == 1){
+                boolean = true
+            }
+        }
+        return boolean
+
+    }
+
     fun getWinningCounter():Boolean{
         var boolean = false
         if(opponentMarkCounter == 2){

@@ -19,6 +19,8 @@ class PhoneMoveNormal(private val board:Board,private val mMark:Int,private val 
 
     private val firstMarkCorners = arrayListOf<Int>()
 
+    private val emptyRowBoard = arrayListOf<Int>()
+
     private val horizontalTopCounters = LineMarkCounters()
     private val horizontalMidCounters = LineMarkCounters()
     private val horizontalBottomCounters = LineMarkCounters()
@@ -30,6 +32,7 @@ class PhoneMoveNormal(private val board:Board,private val mMark:Int,private val 
     override fun makeMove(): Int {
         secondMarkBoard.clear()
         firstMarkCorners.clear()
+        emptyRowBoard.clear()
 
         setCounters()
 
@@ -86,13 +89,73 @@ class PhoneMoveNormal(private val board:Board,private val mMark:Int,private val 
             addSecondMark(board.getTopLeft(),board.getMidMid(),board.getBottomRight(), TOP_LEFT, MID_MID, BOTTOM_RIGHT)
         }
 
+        val a = 100
+
         if(secondMarkBoard.size > 0){
+            //add mid-mid
+            if(horizontalMidCounters.getEmptyRow() or (
+                verticalMidCounters.getEmptyRow() or(
+                    angleDownCounters.getEmptyRow() or(
+                        angleUpCounters.getEmptyRow()
+                    )
+                )
+            )){
+                emptyRowBoard.add(MID_MID)
+            }
 
-            // TODO change this to compare with empty rows and get best common field
+            //add corners to empty board
+            if(horizontalTopCounters.getEmptyRow() or(
+                verticalLeftCounters.getEmptyRow() or(
+                    angleDownCounters.getEmptyRow()
+                )
+            )){
+                emptyRowBoard.add(TOP_LEFT)
+            }
+            if(horizontalTopCounters.getEmptyRow() or(
+                        verticalRightCounters.getEmptyRow() or(
+                                angleUpCounters.getEmptyRow()
+                                )
+                        )){
+                emptyRowBoard.add(TOP_RIGHT)
+            }
+            if(horizontalBottomCounters.getEmptyRow() or(
+                        verticalLeftCounters.getEmptyRow() or(
+                                angleUpCounters.getEmptyRow()
+                                )
+                        )){
+                emptyRowBoard.add(BOTTOM_LEFT)
+            }
+            if(horizontalBottomCounters.getEmptyRow() or(
+                        verticalRightCounters.getEmptyRow() or(
+                                angleDownCounters.getEmptyRow()
+                                )
+                        )){
+                emptyRowBoard.add(BOTTOM_RIGHT)
+            }
 
-            val size = secondMarkBoard.size
-            val random = Random.nextInt(size)
-            return secondMarkBoard[random]
+            if(!secondMarkBoard.contains(MID_MID)){
+                val a = 100
+                emptyRowBoard.remove(MID_MID)
+            }else{
+                return MID_MID
+            }
+            if(!secondMarkBoard.contains(TOP_LEFT)){
+                emptyRowBoard.remove(TOP_LEFT)
+            }
+            if(!secondMarkBoard.contains(TOP_RIGHT)){
+                emptyRowBoard.remove(TOP_RIGHT)
+            }
+            if(!secondMarkBoard.contains(BOTTOM_LEFT)){
+                emptyRowBoard.remove(BOTTOM_LEFT)
+            }
+            if(!secondMarkBoard.contains(BOTTOM_RIGHT)){
+                emptyRowBoard.remove(BOTTOM_RIGHT)
+            }
+            val size = emptyRowBoard.size
+            if(size>0){
+                val random = Random.nextInt(size)
+                return emptyRowBoard[random]
+            }
         }
 
         // put first mark the best way

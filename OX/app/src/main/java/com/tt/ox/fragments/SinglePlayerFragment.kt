@@ -13,7 +13,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import com.tt.ox.EASY_GAME
+import com.tt.ox.HARD_GAME
 import com.tt.ox.MAIN_PLAYER
+import com.tt.ox.NORMAL_GAME
 import com.tt.ox.NOTHING
 import com.tt.ox.O
 import com.tt.ox.OPPONENT
@@ -54,6 +57,8 @@ class SinglePlayerFragment : FragmentCoroutine() {
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
+
+    private var mode = EASY_GAME
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
@@ -86,7 +91,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
         if (fTurn) {
              // wait for click
         } else {
-             gameViewModel.playPhone(requireContext())
+             gameViewModel.playPhone(requireContext(),mode)
          }
      }
     }
@@ -348,6 +353,20 @@ class SinglePlayerFragment : FragmentCoroutine() {
             } else{
                 binding.mainPlayerMark.setImageDrawable(ODrawable(requireContext(),it.getMainPlayerMarkColor()))
             }
+
+            val dif = it.getWins()-it.getLoses()
+
+            if(dif<10){
+                mode = EASY_GAME
+                displayMode()
+            }
+            else if(dif>30){
+                mode = HARD_GAME
+                displayMode()
+            }else{
+                mode = NORMAL_GAME
+                displayMode()
+            }
         }
 
         gameViewModel.play.observe(this.viewLifecycleOwner){
@@ -381,6 +400,14 @@ class SinglePlayerFragment : FragmentCoroutine() {
             }else{
                 binding.switchMarks.visibility = View.GONE
             }
+        }
+    }
+
+    private fun displayMode() {
+        binding.mode.text = when(mode){
+            EASY_GAME -> "EASY MODE"
+            NORMAL_GAME -> "NORMAL MODE"
+            else -> "HARD MODE"
         }
     }
 

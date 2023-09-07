@@ -36,8 +36,6 @@ import kotlin.random.Random
 
 class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
-    private val mode = HARD_GAME
-
     private var mainPlayerStarted = true
 
     private val _moves = MutableLiveData<Int>()
@@ -71,6 +69,8 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
 
     fun initializeGame(context: Context, opponent: Opponent){
         _game.value = Game(context,opponent)
+
+
     }
 
     fun getWiningPerson():Int{
@@ -150,6 +150,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         resetWiningPerson()
 
         resetMovesDecreased()
+
     }
     private fun resetWiningPerson(){
         this.winingPerson = NO_ONE
@@ -222,15 +223,15 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     }
 
 
-    fun playPhone(context: Context){
-            phoneMakeMove(context)
+    fun playPhone(context: Context, mode:Int){
+            phoneMakeMove(context,mode)
     }
 
-    private fun setFieldPhone(context: Context, field:MutableLiveData<Int>){
+    private fun setFieldPhone(context: Context, field:MutableLiveData<Int>,mode:Int){
         if(field.value!! == NOTHING){
             setField(context,field)
         }else{
-            phoneMakeMove(context)
+            phoneMakeMove(context,mode)
         }
     }
 
@@ -243,28 +244,28 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         saveMovesToSharedPreferences(context)
     }
 
-    private fun phoneMakeMove(context:Context) {
+    private fun phoneMakeMove(context:Context, mode:Int) {
 
         when (mode){
-            EASY_GAME -> move(context,PhoneMoveEasy(board).makeMove())
-            NORMAL_GAME -> move(context, PhoneMoveNormal(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove())
-            HARD_GAME -> move(context, PhoneMoveHard(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove())
+            EASY_GAME -> move(context,PhoneMoveEasy(board).makeMove(),mode)
+            NORMAL_GAME -> move(context, PhoneMoveNormal(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove(),mode)
+            HARD_GAME -> move(context, PhoneMoveHard(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove(),mode)
         }
 
     }
 
-    private fun move(context: Context, move:Int){
+    private fun move(context: Context, move:Int,mode:Int){
         when(move){
-            TOP_LEFT -> setFieldPhone(context,board.getTopLeft())
-            TOP_MID -> setFieldPhone(context,board.getTopMid())
-            TOP_RIGHT -> setFieldPhone(context,board.getTopRight())
-            MID_LEFT -> setFieldPhone(context,board.getMidLeft())
-            MID_MID -> setFieldPhone(context,board.getMidMid())
-            MID_RIGHT -> setFieldPhone(context,board.getMidRight())
-            BOTTOM_LEFT -> setFieldPhone(context,board.getBottomLeft())
-            BOTTOM_MID -> setFieldPhone(context,board.getBottomMid())
-            BOTTOM_RIGHT -> setFieldPhone(context,board.getBottomRight())
-            else -> phoneMakeMove(context)
+            TOP_LEFT -> setFieldPhone(context,board.getTopLeft(),mode)
+            TOP_MID -> setFieldPhone(context,board.getTopMid(),mode)
+            TOP_RIGHT -> setFieldPhone(context,board.getTopRight(),mode)
+            MID_LEFT -> setFieldPhone(context,board.getMidLeft(),mode)
+            MID_MID -> setFieldPhone(context,board.getMidMid(),mode)
+            MID_RIGHT -> setFieldPhone(context,board.getMidRight(),mode)
+            BOTTOM_LEFT -> setFieldPhone(context,board.getBottomLeft(),mode)
+            BOTTOM_MID -> setFieldPhone(context,board.getBottomMid(),mode)
+            BOTTOM_RIGHT -> setFieldPhone(context,board.getBottomRight(),mode)
+            else -> phoneMakeMove(context,mode)
         }
     }
 
@@ -365,10 +366,6 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
             opponentDao.insert(opponent)
         }
     }
-
-
-
-
 }
 
 class GameViewModelFactory(private val opponentDao: OpponentDao) : ViewModelProvider.Factory{
@@ -380,5 +377,3 @@ class GameViewModelFactory(private val opponentDao: OpponentDao) : ViewModelProv
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
-//todo better phone moves

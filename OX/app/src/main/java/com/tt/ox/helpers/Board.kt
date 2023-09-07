@@ -70,6 +70,7 @@ class Board {
         return this.angleDown
     }
     fun initialize(){
+
         this.horizontalTop = false
         this.horizontalMid = false
         this.horizontalBottom = false

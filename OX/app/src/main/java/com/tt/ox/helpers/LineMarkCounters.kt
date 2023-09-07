@@ -48,7 +48,7 @@ class LineMarkCounters {
 
     fun getEmptyRow():Boolean{
         var boolean = false
-            if(nothingCounter == 3){
+        if(nothingCounter == 3){
                 boolean = true
         }
         return boolean

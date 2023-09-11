@@ -1,10 +1,10 @@
 package com.tt.ox.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.tt.ox.R
 
 
@@ -25,6 +25,10 @@ class OptionsFragment : Fragment() {
 
 }
 
-// todo settings -> to another fragment
-//todo send game
-// todo other games
+/*todo
+*  settings:
+*  dark mode
+*  sounds?
+*  clear statistic singleplayer
+*  send game
+*  other games */

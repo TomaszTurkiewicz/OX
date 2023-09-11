@@ -114,43 +114,13 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     }
 
     fun initialize(firstGame:Boolean){
-//        _topLeft.value = NOTHING
-//        _topMid.value = NOTHING
-//        _topRight.value = NOTHING
-//
-//        _midLeft.value = NOTHING
-//        _midMid.value = NOTHING
-//        _midRight.value = NOTHING
-//
-//        _bottomLeft.value = NOTHING
-//        _bottomMid.value = NOTHING
-//        _bottomRight.value = NOTHING
-
-//        _horizontalTop.value = false
-//        _horizontalMid.value = false
-//        _horizontalBottom.value = false
-//        _verticalLeft.value = false
-//        _verticalMid.value = false
-//        _verticalRight.value = false
-//        _angleUp.value = false
-//        _angleDown.value = false
-
         _win.value = false
-
         _play.value = _moves.value!!>0
-
         board.initialize()
-
-
         setStartingTurn(firstGame)
-
         _buttonSwitch.value = board.setSwitchButtonEnable()
-//        setButtonEnable()
-
         resetWiningPerson()
-
         resetMovesDecreased()
-
     }
     private fun resetWiningPerson(){
         this.winingPerson = NO_ONE

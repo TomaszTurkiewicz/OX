@@ -39,6 +39,7 @@ import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 
 
@@ -52,6 +53,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
     private var fTurn = false
     private var fSwitch = false
     private val handler = Handler(Looper.getMainLooper())
+    private val resetHandler = Handler(Looper.getMainLooper())
     private val gameViewModel: GameViewModel by activityViewModels {
         GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
@@ -96,10 +98,22 @@ class SinglePlayerFragment : FragmentCoroutine() {
      }
     }
 
+    private val resetLoop:Runnable = Runnable {
+        resetHandler.removeCallbacksAndMessages(null)
+        if(fMoves){
+            binding.reset.visibility = View.GONE
+            binding.addMoves.visibility = View.VISIBLE
+        }else{
+            binding.reset.visibility = View.VISIBLE
+            binding.addMoves.visibility = View.GONE
+        }
+    }
+
     private fun click() {
 
         binding.addMoves.setOnClickListener {
             gameViewModel.addMoves(requireContext())
+            binding.addMoves.visibility = View.GONE
         }
 
         binding.topLeftField.setOnClickListener {
@@ -447,13 +461,14 @@ class SinglePlayerFragment : FragmentCoroutine() {
                 gameViewModel.getVerticalMid(),gameViewModel.getVerticalRight(),
                 gameViewModel.getAngleUp(),gameViewModel.getAngleDown())
             )
-            if(fMoves){
-                binding.reset.visibility = View.GONE
-                binding.addMoves.visibility = View.VISIBLE
-            }else{
-                binding.reset.visibility = View.VISIBLE
-                binding.addMoves.visibility = View.GONE
-            }
+            resetHandler.postDelayed(resetLoop,1000)
+//            if(fMoves){
+//                binding.reset.visibility = View.GONE
+//                binding.addMoves.visibility = View.VISIBLE
+//            }else{
+//                binding.reset.visibility = View.VISIBLE
+//                binding.addMoves.visibility = View.GONE
+//            }
         }
     }
 

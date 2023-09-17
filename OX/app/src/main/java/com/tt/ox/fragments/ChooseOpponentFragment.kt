@@ -119,7 +119,10 @@ class ChooseOpponentFragment : Fragment() {
 
     private fun click() {
         binding.addOpponent.setOnClickListener {
-            addNewOpponent()
+            if(!deletable){
+                addNewOpponent()
+            }
+
         }
         binding.deleteOpponent.setOnClickListener {
             state = binding.recyclerView.layoutManager?.onSaveInstanceState()

@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tt.ox.OXApplication
 import com.tt.ox.adapters.ChooseOpponentAdapter
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
+import com.tt.ox.drawables.AddDrawable
+import com.tt.ox.drawables.BinDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
@@ -30,6 +32,7 @@ class ChooseOpponentFragment : Fragment() {
     private val binding get() = _binding!!
     private var unit = 0
     private var state: Parcelable? = null
+    private var deletable = false
     private lateinit var adapter: ChooseOpponentAdapter
     private val gameViewModel: GameViewModel by activityViewModels {
         GameViewModelFactory(
@@ -120,10 +123,12 @@ class ChooseOpponentFragment : Fragment() {
         }
         binding.deleteOpponent.setOnClickListener {
             state = binding.recyclerView.layoutManager?.onSaveInstanceState()
-            adapter.delete()
+            deletable = !deletable
+            adapter.delete(deletable)
             binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
             binding.recyclerView.adapter = adapter
             binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
+            binding.deleteOpponent.setImageDrawable(BinDrawable(requireContext(),deletable))
 
         }
     }
@@ -132,12 +137,15 @@ class ChooseOpponentFragment : Fragment() {
         val set = ConstraintSet()
         set.clone(binding.chooseOpponentFragmentLayout)
 
-        set.connect(binding.topBar.id,ConstraintSet.LEFT,binding.chooseOpponentFragmentLayout.id,ConstraintSet.LEFT,0)
-        set.connect(binding.topBar.id,ConstraintSet.RIGHT,binding.chooseOpponentFragmentLayout.id,ConstraintSet.RIGHT,0)
-        set.connect(binding.topBar.id,ConstraintSet.TOP,binding.chooseOpponentFragmentLayout.id,ConstraintSet.TOP,0)
+        set.connect(binding.addOpponent.id,ConstraintSet.LEFT,binding.chooseOpponentFragmentLayout.id,ConstraintSet.LEFT,unit/2)
+        set.connect(binding.addOpponent.id,ConstraintSet.TOP,binding.chooseOpponentFragmentLayout.id,ConstraintSet.TOP,unit/2)
+
+        set.connect(binding.deleteOpponent.id,ConstraintSet.RIGHT,binding.chooseOpponentFragmentLayout.id,ConstraintSet.RIGHT,unit/2)
+        set.connect(binding.deleteOpponent.id,ConstraintSet.TOP,binding.chooseOpponentFragmentLayout.id,ConstraintSet.TOP,unit/2)
+
         set.connect(binding.recyclerView.id,
-            ConstraintSet.TOP,binding.topBar.id,
-            ConstraintSet.BOTTOM,0)
+            ConstraintSet.TOP,binding.addOpponent.id,
+            ConstraintSet.BOTTOM,unit/2)
         set.connect(binding.recyclerView.id,
             ConstraintSet.LEFT,binding.chooseOpponentFragmentLayout.id,
             ConstraintSet.LEFT,0)
@@ -151,12 +159,14 @@ class ChooseOpponentFragment : Fragment() {
     }
 
     private fun setDrawables() {
-
+        binding.addOpponent.setImageDrawable(AddDrawable(requireContext()))
+        binding.deleteOpponent.setImageDrawable(BinDrawable(requireContext(),deletable))
     }
 
     private fun setSizes() {
-        val topBarHeight = 3*unit
-        binding.topBar.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT,topBarHeight)
+        val buttonSize = unit
+        binding.addOpponent.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
+        binding.deleteOpponent.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
 
     }
 

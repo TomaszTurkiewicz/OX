@@ -23,6 +23,10 @@ class ScreenMetricsCompat {
         return getScreenSize(context).height
     }
 
+    fun getWindowWidth(context: Context):Int{
+        return getScreenSize(context).width
+    }
+
 
     private fun getScreenSize(context: Context): Size = api.getScreenSize(context)
 

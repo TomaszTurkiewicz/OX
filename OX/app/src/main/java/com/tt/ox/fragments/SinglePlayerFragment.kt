@@ -54,6 +54,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
     private var fSwitch = false
     private val handler = Handler(Looper.getMainLooper())
     private val resetHandler = Handler(Looper.getMainLooper())
+    private val winningLineHandler = Handler(Looper.getMainLooper())
     private val gameViewModel: GameViewModel by activityViewModels {
         GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
@@ -107,6 +108,17 @@ class SinglePlayerFragment : FragmentCoroutine() {
             binding.reset.visibility = View.VISIBLE
             binding.addMoves.visibility = View.GONE
         }
+    }
+
+    private val showWinningLine:Runnable = Runnable {
+        winningLineHandler.removeCallbacksAndMessages(null)
+        binding.winLine.setImageDrawable(
+            WinLineDrawable(requireContext(),
+                gameViewModel.getHorizontalTop(),gameViewModel.getHorizontalMid(),
+                gameViewModel.getHorizontalBottom(),gameViewModel.getVerticalLeft(),
+                gameViewModel.getVerticalMid(),gameViewModel.getVerticalRight(),
+                gameViewModel.getAngleUp(),gameViewModel.getAngleDown())
+        )
     }
 
     private fun click() {
@@ -374,7 +386,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
                 mode = EASY_GAME
                 displayMode()
             }
-            else if(dif>30){
+            else if(dif>20){
                 mode = HARD_GAME
                 displayMode()
             }else{
@@ -454,13 +466,15 @@ class SinglePlayerFragment : FragmentCoroutine() {
             binding.addMoves.visibility = View.GONE
         }else{
             binding.winLine.visibility = View.VISIBLE
-            binding.winLine.setImageDrawable(
-                WinLineDrawable(requireContext(),
-                gameViewModel.getHorizontalTop(),gameViewModel.getHorizontalMid(),
-                gameViewModel.getHorizontalBottom(),gameViewModel.getVerticalLeft(),
-                gameViewModel.getVerticalMid(),gameViewModel.getVerticalRight(),
-                gameViewModel.getAngleUp(),gameViewModel.getAngleDown())
-            )
+            winningLineHandler.postDelayed(showWinningLine,500)
+//            binding.winLine.setImageDrawable(
+//                WinLineDrawable(requireContext(),
+//                gameViewModel.getHorizontalTop(),gameViewModel.getHorizontalMid(),
+//                gameViewModel.getHorizontalBottom(),gameViewModel.getVerticalLeft(),
+//                gameViewModel.getVerticalMid(),gameViewModel.getVerticalRight(),
+//                gameViewModel.getAngleUp(),gameViewModel.getAngleDown())
+//            )
+            val a = 0
             resetHandler.postDelayed(resetLoop,1000)
 //            if(fMoves){
 //                binding.reset.visibility = View.GONE
@@ -471,6 +485,8 @@ class SinglePlayerFragment : FragmentCoroutine() {
 //            }
         }
     }
+
+
 
     private fun setMark(view: ImageView, mark:Int){
         val color = if(mark == gameViewModel.game.value!!.getMainPlayerMark()) gameViewModel.game.value!!.getMainPlayerMarkColor() else gameViewModel.game.value!!.getOpponentMarkColor()

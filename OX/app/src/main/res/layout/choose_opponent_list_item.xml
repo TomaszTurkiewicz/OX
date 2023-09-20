@@ -29,7 +29,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:gravity="center"
         android:textColor="@color/black"
-        android:text="vs"/>
+        android:text="@string/vs"/>
 
     <TextView
         android:id="@+id/opponentName"
@@ -47,14 +47,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-<!--    <TextView-->
-<!--        android:id="@+id/underScore"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintLeft_toRightOf="@id/playerWin"-->
-<!--        android:text="-" />-->
-
     <TextView
         android:id="@+id/opponentWin"
         android:layout_width="wrap_content"
@@ -63,26 +55,11 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-<!--    <ImageView-->
-<!--        android:id="@+id/mainPlayerMark"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"/>-->
-
-<!--    <ImageView-->
-<!--        android:id="@+id/opponentMark"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"/>-->
-
     <ImageView
         android:id="@+id/deleteItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:text="DELETE"/>
+        app:layout_constraintRight_toRightOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

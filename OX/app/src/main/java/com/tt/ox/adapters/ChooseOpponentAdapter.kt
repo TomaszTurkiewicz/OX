@@ -24,7 +24,6 @@ import com.tt.ox.helpers.SharedPreferences
 
 class ChooseOpponentAdapter(
     private val context: Context,
-    private val unit:Int,
     private val onDeleteOpponentClicked: (Opponent) -> Unit,
     private val onOpponentClicked: (Opponent)-> Unit) :
     ListAdapter<Opponent, ChooseOpponentAdapter.ChooseOpponentViewHolder>(DiffCallback) {
@@ -37,7 +36,7 @@ class ChooseOpponentAdapter(
             ChooseOpponentListItemBinding.inflate(
                 LayoutInflater.from(
                     parent.context
-                ),parent,false
+                ), parent, false
             )
         )
     }
@@ -45,11 +44,14 @@ class ChooseOpponentAdapter(
 
     override fun onBindViewHolder(holder: ChooseOpponentViewHolder, position: Int) {
         val current = getItem(position)
-            holder.layout.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT)
-            holder.opponentName.text = current.getName()
-            holder.opponentWin.text = current.getLoses().toString()
-            holder.playerWin.text = current.getWins().toString()
-            val playerName = SharedPreferences.readPlayerName(context)
+        holder.layout.layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            LayoutParams.WRAP_CONTENT
+        )
+        holder.opponentName.text = current.getName()
+        holder.opponentWin.text = current.getLoses().toString()
+        holder.playerWin.text = current.getWins().toString()
+        val playerName = SharedPreferences.readPlayerName(context)
         holder.playerName.text = playerName
 //            holder.playerName.setImageDrawable(TextDrawable(context,playerName))
 
@@ -64,9 +66,9 @@ class ChooseOpponentAdapter(
 
         setConstraint(holder)
 
-            holder.opponentName.setOnClickListener{
-                playOpponent(current)
-            }
+        holder.opponentName.setOnClickListener {
+            playOpponent(current)
+        }
         holder.playerName.setOnClickListener {
             playOpponent(current)
         }
@@ -79,20 +81,20 @@ class ChooseOpponentAdapter(
         holder.opponentWin.setOnClickListener {
             playOpponent(current)
         }
-            holder.delete.setOnClickListener {
-                if(deletable) {
-                    onDeleteOpponentClicked(current)
-                }
+        holder.delete.setOnClickListener {
+            if (deletable) {
+                onDeleteOpponentClicked(current)
             }
-            if(deletable){
-                holder.delete.visibility = View.VISIBLE
-            }else{
-                holder.delete.visibility = View.GONE
+        }
+        if (deletable) {
+            holder.delete.visibility = View.VISIBLE
+        } else {
+            holder.delete.visibility = View.GONE
         }
     }
 
-    private fun playOpponent(current:Opponent){
-        if(!deletable){
+    private fun playOpponent(current: Opponent) {
+        if (!deletable) {
             onOpponentClicked(current)
         }
     }
@@ -100,10 +102,10 @@ class ChooseOpponentAdapter(
     private fun setDrawables(holder: ChooseOpponentViewHolder) {
         holder.background.setImageDrawable(ListItemBackgroundDrawable(context))
 
-        holder.delete.setImageDrawable(BinDrawable(context,true))
+        holder.delete.setImageDrawable(BinDrawable(context, true))
     }
 
-    private fun setColors(holder: ChooseOpponentViewHolder){
+    private fun setColors(holder: ChooseOpponentViewHolder) {
         holder.vs.setTextColor(ContextCompat.getColor(context, R.color.black))
         holder.playerName.setTextColor(ContextCompat.getColor(context, R.color.black))
         holder.opponentName.setTextColor(ContextCompat.getColor(context, R.color.black))
@@ -111,25 +113,29 @@ class ChooseOpponentAdapter(
         holder.opponentWin.setTextColor(ContextCompat.getColor(context, R.color.black))
     }
 
-    private fun setSizes(holder: ChooseOpponentViewHolder){
+    private fun setSizes(holder: ChooseOpponentViewHolder) {
 
-        holder.vs.layoutParams = ConstraintLayout.LayoutParams((width*0.1).toInt(),(width*0.1).toInt())
-        holder.vs.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.05).toFloat())
+        holder.vs.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.1).toInt(), (width * 0.1).toInt())
+        holder.vs.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width * 0.05).toFloat())
 
-//        holder.playerMark.layoutParams = ConstraintLayout.LayoutParams((width*0.1).toInt(),(width*0.1).toInt())
-//        holder.opponentMark.layoutParams = ConstraintLayout.LayoutParams((width*0.1).toInt(),(width*0.1).toInt())
+        holder.background.layoutParams =
+            ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT, (width * 0.3).toInt())
 
-        holder.background.layoutParams = ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT,(width*0.3).toInt())
+        holder.playerName.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.4).toInt(), (width * 0.1).toInt())
+        holder.opponentName.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.4).toInt(), (width * 0.1).toInt())
 
-        holder.playerName.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-        holder.opponentName.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+        holder.playerWin.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.4).toInt(), (width * 0.1).toInt())
+        holder.opponentWin.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.4).toInt(), (width * 0.1).toInt())
 
-        holder.playerWin.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-        holder.opponentWin.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+        holder.delete.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.1).toInt(), (width * 0.1).toInt())
 
-        holder.delete.layoutParams = ConstraintLayout.LayoutParams((width*0.1).toInt(),(width*0.1).toInt())
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             holder.playerName.setAutoSizeTextTypeUniformWithConfiguration(
                 1,
                 200,
@@ -154,11 +160,35 @@ class ChooseOpponentAdapter(
                 1,
                 TypedValue.COMPLEX_UNIT_DIP
             )
-        }else{
-            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(holder.playerName,1,200,1,TypedValue.COMPLEX_UNIT_DIP)
-            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(holder.opponentName,1,200,1,TypedValue.COMPLEX_UNIT_DIP)
-            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(holder.playerWin,1,200,1,TypedValue.COMPLEX_UNIT_DIP)
-            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(holder.opponentWin,1,200,1,TypedValue.COMPLEX_UNIT_DIP)
+        } else {
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.playerName,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.opponentName,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.playerWin,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.opponentWin,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
         }
     }
 
@@ -166,70 +196,105 @@ class ChooseOpponentAdapter(
         val set = ConstraintSet()
         set.clone(holder.layout)
 
-        set.connect(holder.background.id,ConstraintSet.LEFT,holder.layout.id,ConstraintSet.LEFT,0)
-        set.connect(holder.background.id,ConstraintSet.RIGHT,holder.layout.id,ConstraintSet.RIGHT,0)
-        set.connect(holder.background.id,ConstraintSet.TOP,holder.layout.id,ConstraintSet.TOP,0)
-        set.connect(holder.background.id,ConstraintSet.BOTTOM,holder.layout.id,ConstraintSet.BOTTOM,0)
-
-        set.connect(holder.vs.id,ConstraintSet.LEFT,holder.layout.id,ConstraintSet.LEFT,0)
-        set.connect(holder.vs.id,ConstraintSet.RIGHT,holder.layout.id,ConstraintSet.RIGHT,0)
-        set.connect(holder.vs.id,ConstraintSet.TOP,holder.layout.id,ConstraintSet.TOP,0)
-        set.connect(holder.vs.id,ConstraintSet.BOTTOM,holder.layout.id,ConstraintSet.BOTTOM,0)
-
-        set.connect(holder.playerName.id,ConstraintSet.RIGHT,holder.vs.id,ConstraintSet.LEFT,0)
-        set.connect(holder.playerName.id,ConstraintSet.BOTTOM,holder.vs.id,ConstraintSet.BOTTOM,
-            (width*0.05).toInt()
+        set.connect(
+            holder.background.id,
+            ConstraintSet.LEFT,
+            holder.layout.id,
+            ConstraintSet.LEFT,
+            0
+        )
+        set.connect(
+            holder.background.id,
+            ConstraintSet.RIGHT,
+            holder.layout.id,
+            ConstraintSet.RIGHT,
+            0
+        )
+        set.connect(holder.background.id, ConstraintSet.TOP, holder.layout.id, ConstraintSet.TOP, 0)
+        set.connect(
+            holder.background.id,
+            ConstraintSet.BOTTOM,
+            holder.layout.id,
+            ConstraintSet.BOTTOM,
+            0
         )
 
-        set.connect(holder.opponentName.id,ConstraintSet.LEFT,holder.vs.id,ConstraintSet.RIGHT,0)
-        set.connect(holder.opponentName.id,ConstraintSet.BOTTOM,holder.vs.id,ConstraintSet.BOTTOM,(width*0.05).toInt())
+        set.connect(holder.vs.id, ConstraintSet.LEFT, holder.layout.id, ConstraintSet.LEFT, 0)
+        set.connect(holder.vs.id, ConstraintSet.RIGHT, holder.layout.id, ConstraintSet.RIGHT, 0)
+        set.connect(holder.vs.id, ConstraintSet.TOP, holder.layout.id, ConstraintSet.TOP, 0)
+        set.connect(holder.vs.id, ConstraintSet.BOTTOM, holder.layout.id, ConstraintSet.BOTTOM, 0)
 
-//        set.connect(holder.underScore.id,ConstraintSet.LEFT,holder.layout.id,ConstraintSet.LEFT,0)
-//        set.connect(holder.underScore.id,ConstraintSet.RIGHT,holder.layout.id,ConstraintSet.RIGHT,0)
-//        set.connect(holder.underScore.id,ConstraintSet.TOP,holder.vs.id,ConstraintSet.BOTTOM,0)
+        set.connect(holder.playerName.id, ConstraintSet.RIGHT, holder.vs.id, ConstraintSet.LEFT, 0)
+        set.connect(
+            holder.playerName.id, ConstraintSet.BOTTOM, holder.vs.id, ConstraintSet.BOTTOM,
+            (width * 0.05).toInt()
+        )
 
-        set.connect(holder.playerWin.id,ConstraintSet.RIGHT,holder.vs.id,ConstraintSet.LEFT,0)
-        set.connect(holder.playerWin.id,ConstraintSet.TOP,holder.playerName.id,ConstraintSet.BOTTOM,0)
+        set.connect(
+            holder.opponentName.id,
+            ConstraintSet.LEFT,
+            holder.vs.id,
+            ConstraintSet.RIGHT,
+            0
+        )
+        set.connect(
+            holder.opponentName.id,
+            ConstraintSet.BOTTOM,
+            holder.vs.id,
+            ConstraintSet.BOTTOM,
+            (width * 0.05).toInt()
+        )
 
-        set.connect(holder.opponentWin.id,ConstraintSet.LEFT,holder.vs.id,ConstraintSet.RIGHT,0)
-        set.connect(holder.opponentWin.id,ConstraintSet.TOP,holder.opponentName.id,ConstraintSet.BOTTOM,0)
+        set.connect(holder.playerWin.id, ConstraintSet.RIGHT, holder.vs.id, ConstraintSet.LEFT, 0)
+        set.connect(
+            holder.playerWin.id,
+            ConstraintSet.TOP,
+            holder.playerName.id,
+            ConstraintSet.BOTTOM,
+            0
+        )
 
-//        set.connect(holder.playerMark.id,ConstraintSet.TOP,holder.layout.id,ConstraintSet.TOP,0)
-//        set.connect(holder.playerMark.id,ConstraintSet.BOTTOM,holder.layout.id,ConstraintSet.BOTTOM,0)
-//        set.connect(holder.playerMark.id,ConstraintSet.LEFT,holder.layout.id,ConstraintSet.LEFT, (width*0.05).toInt())
-//
-//        set.connect(holder.opponentMark.id,ConstraintSet.TOP,holder.layout.id,ConstraintSet.TOP,0)
-//        set.connect(holder.opponentMark.id,ConstraintSet.BOTTOM,holder.layout.id,ConstraintSet.BOTTOM,0)
-//        set.connect(holder.opponentMark.id,ConstraintSet.RIGHT,holder.layout.id,ConstraintSet.RIGHT,(width*0.05).toInt())
+        set.connect(holder.opponentWin.id, ConstraintSet.LEFT, holder.vs.id, ConstraintSet.RIGHT, 0)
+        set.connect(
+            holder.opponentWin.id,
+            ConstraintSet.TOP,
+            holder.opponentName.id,
+            ConstraintSet.BOTTOM,
+            0
+        )
 
-        set.connect(holder.delete.id,ConstraintSet.TOP,holder.layout.id,ConstraintSet.TOP,0)
-        set.connect(holder.delete.id,ConstraintSet.BOTTOM,holder.layout.id,ConstraintSet.BOTTOM,0)
-        set.connect(holder.delete.id,ConstraintSet.RIGHT,holder.layout.id,ConstraintSet.RIGHT,0)
-        set.connect(holder.delete.id,ConstraintSet.LEFT,holder.layout.id,ConstraintSet.LEFT,0)
+        set.connect(holder.delete.id, ConstraintSet.TOP, holder.layout.id, ConstraintSet.TOP, 0)
+        set.connect(
+            holder.delete.id,
+            ConstraintSet.BOTTOM,
+            holder.layout.id,
+            ConstraintSet.BOTTOM,
+            0
+        )
+        set.connect(holder.delete.id, ConstraintSet.RIGHT, holder.layout.id, ConstraintSet.RIGHT, 0)
+        set.connect(holder.delete.id, ConstraintSet.LEFT, holder.layout.id, ConstraintSet.LEFT, 0)
 
         set.applyTo(holder.layout)
     }
 
-    fun delete(deletable:Boolean){
+    fun delete(deletable: Boolean) {
         this.deletable = deletable
     }
 
-    class ChooseOpponentViewHolder(binding: ChooseOpponentListItemBinding): RecyclerView.ViewHolder(binding.root){
+    class ChooseOpponentViewHolder(binding: ChooseOpponentListItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         val layout = binding.chooseOpponentListItemLayout
         val playerName = binding.mainPlayerName
         val opponentName = binding.opponentName
         val playerWin = binding.playerWin
         val background = binding.background
-//        val underScore = binding.underScore
         val opponentWin = binding.opponentWin
-//        val playerMark = binding.mainPlayerMark
-//        val opponentMark = binding.opponentMark
         val delete = binding.deleteItem
         val vs = binding.vs
     }
 
-    companion object{
-        private val DiffCallback = object :DiffUtil.ItemCallback<Opponent>(){
+    companion object {
+        private val DiffCallback = object : DiffUtil.ItemCallback<Opponent>() {
             override fun areItemsTheSame(oldItem: Opponent, newItem: Opponent): Boolean {
                 return oldItem === newItem
             }
@@ -239,4 +304,4 @@ class ChooseOpponentAdapter(
             }
         }
     }
-}//todo finish this first
+}

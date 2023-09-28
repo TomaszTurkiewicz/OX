@@ -216,7 +216,6 @@ class ChooseOpponentFragment : Fragment() {
         alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
 
 
-// todo finish this first
 
     }
 

@@ -14,6 +14,7 @@ import com.tt.ox.TOP_RIGHT
 
 class PhoneMoveHard(private val board:Board,private val mMark:Int,private val oMark:Int):MakeMove {
 
+
     private val horizontalTopCounters = LineMarkCounters()
     private val horizontalMidCounters = LineMarkCounters()
     private val horizontalBottomCounters = LineMarkCounters()
@@ -23,7 +24,27 @@ class PhoneMoveHard(private val board:Board,private val mMark:Int,private val oM
     private val angleUpCounters = LineMarkCounters()
     private val angleDownCounters = LineMarkCounters()
     override fun makeMove(): Int {
+
         setCounters()
+
+        if(horizontalTopCounters.getWinningCounter() or (
+            horizontalMidCounters.getWinningCounter() or (
+                horizontalBottomCounters.getWinningCounter() or (
+                    verticalLeftCounters.getWinningCounter() or (
+                        verticalMidCounters.getWinningCounter() or (
+                            verticalRightCounters.getWinningCounter() or (
+                                angleUpCounters.getWinningCounter() or (
+                                    angleDownCounters.getWinningCounter()
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )){
+          return  PhoneMoveNormal(board,mMark,oMark).makeMove()
+        }
+
 
         if(horizontalTopCounters.getLosingCounter()){
 

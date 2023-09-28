@@ -219,7 +219,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         val color = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
         val markSize = 4*unit
         alertDialog.imageView.layoutParams = ConstraintLayout.LayoutParams(markSize,markSize)
-        alertDialog.imageView.setImageDrawable(if(fMark==X) XDrawable(requireContext(),color) else ODrawable(requireContext(),color))
+        alertDialog.imageView.setImageDrawable(if(fMark==X) XDrawable(requireContext(),color,false) else ODrawable(requireContext(),color,false))
         alertDialog.arrowLeft.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         alertDialog.arrowRight.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         alertDialog.arrowLeft.setImageDrawable(LeftArrowDrawable(requireContext()))
@@ -335,16 +335,16 @@ class MultiPlayerFragment : FragmentCoroutine() {
             binding.opponentPlayerWins.text = it.getLoses().toString()
             binding.opponentPlayerMark.setImageDrawable(
                 if(it.getOpponentMark()==X){
-                    XDrawable(requireContext(),it.getOpponentMarkColor())
+                    XDrawable(requireContext(),it.getOpponentMarkColor(),true)
                 }else{
-                    ODrawable(requireContext(),it.getOpponentMarkColor())
+                    ODrawable(requireContext(),it.getOpponentMarkColor(),true)
                 }
             )
             binding.mainPlayerMark.setImageDrawable(
                 if(it.getMainPlayerMark()==X){
-                    XDrawable(requireContext(),it.getMainPlayerMarkColor())
+                    XDrawable(requireContext(),it.getMainPlayerMarkColor(),true)
                 }else{
-                    ODrawable(requireContext(),it.getMainPlayerMarkColor())
+                    ODrawable(requireContext(),it.getMainPlayerMarkColor(),true)
                 }
             )
         }
@@ -435,8 +435,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
         when(mark){
             NOTHING -> view.setImageDrawable(null)
-            X -> view.setImageDrawable(XDrawable(requireContext(), color))
-            O -> view.setImageDrawable(ODrawable(requireContext(), color))
+            X -> view.setImageDrawable(XDrawable(requireContext(), color,false))
+            O -> view.setImageDrawable(ODrawable(requireContext(), color,false))
         }
     }
 

@@ -13,14 +13,14 @@ import com.tt.ox.helpers.COLOR_BLUE
 import com.tt.ox.helpers.COLOR_GREEN
 import com.tt.ox.helpers.COLOR_RED
 
-class ODrawable (private val context: Context, private val color:Int) : Drawable(){
+class ODrawable (private val context: Context, private val color:Int, private val thick:Boolean) : Drawable(){
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
         val middleX = bounds.centerX()
         val middleY = bounds.centerY()
         val radius = bounds.width()/3
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = (bounds.width()*0.02).toFloat()
+        paint.strokeWidth = if(thick) (bounds.width()*0.04).toFloat() else (bounds.width()*0.02).toFloat()
         when(color){
             COLOR_BLACK -> paint.color = ContextCompat.getColor(context, R.color.black)
             COLOR_RED -> paint.color = ContextCompat.getColor(context, R.color.red)

@@ -15,7 +15,7 @@ class Game(context: Context,private val opponent: Opponent) {
     private var opponentMarkColor:Int
 
     init {
-        this.mainPlayerName = SharedPreferences.readPlayerName(context)
+       this.mainPlayerName = SharedPreferences.readPlayerName(context)
         this.opponentPlayerName = opponent.getName()
         this.wins = opponent.getWins()
         this.loses = opponent.getLoses()

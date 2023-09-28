@@ -15,12 +15,12 @@ import com.tt.ox.helpers.COLOR_GREEN
 import com.tt.ox.helpers.COLOR_RED
 import com.tt.ox.helpers.MyPath
 
-class XDrawable  (private val context: Context, private val color:Int) : Drawable(){
+class XDrawable  (private val context: Context, private val color:Int, private val thick:Boolean) : Drawable(){
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
         val dif = bounds.width()/6
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = (bounds.width()*0.02).toFloat()
+        paint.strokeWidth = if(thick) (bounds.width()*0.04).toFloat() else (bounds.width()*0.02).toFloat()
         when(color){
             COLOR_BLACK -> paint.color = ContextCompat.getColor(context, R.color.black)
             COLOR_RED -> paint.color = ContextCompat.getColor(context, R.color.red)

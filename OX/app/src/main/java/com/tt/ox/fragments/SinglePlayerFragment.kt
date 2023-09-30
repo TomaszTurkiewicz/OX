@@ -30,6 +30,7 @@ import com.tt.ox.X
 import com.tt.ox.database.Opponent
 import com.tt.ox.databinding.AlertDialogChangeMarkColorBinding
 import com.tt.ox.databinding.FragmentSinglePlayerBinding
+import com.tt.ox.drawables.AddMovesButton
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.LeftArrowDrawable
 import com.tt.ox.drawables.MeshDrawable
@@ -555,6 +556,8 @@ class SinglePlayerFragment : FragmentCoroutine() {
         binding.switchMarks.setImageDrawable(SwitchDrawable(requireContext()))
 
         binding.reset.setImageDrawable(ResetButtonDrawable(requireContext()))
+
+        binding.addMoves.setImageDrawable(AddMovesButton(requireContext()))
     }
 
     private fun setConstraint() {

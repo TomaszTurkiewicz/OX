@@ -181,23 +181,23 @@ class ChooseOpponentFragment : Fragment() {
         set.connect(alertDialog.inputName.id,ConstraintSet.LEFT,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.LEFT)
         set.connect(alertDialog.inputName.id,ConstraintSet.RIGHT,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.RIGHT)
 
-        set.connect(alertDialog.saveButton.id,ConstraintSet.LEFT,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.LEFT,
-            (width*0.05).toInt()
-        )
-        set.connect(alertDialog.saveButton.id,ConstraintSet.TOP,alertDialog.inputName.id,ConstraintSet.BOTTOM,
-            (width*0.1).toInt()
-        )
-        set.connect(alertDialog.saveButton.id,ConstraintSet.BOTTOM,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.BOTTOM,
-            (width*0.05).toInt()
-        )
-
-        set.connect(alertDialog.cancelButton.id,ConstraintSet.RIGHT,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.RIGHT,
+        set.connect(alertDialog.cancelButton.id,ConstraintSet.LEFT,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.LEFT,
             (width*0.05).toInt()
         )
         set.connect(alertDialog.cancelButton.id,ConstraintSet.TOP,alertDialog.inputName.id,ConstraintSet.BOTTOM,
             (width*0.1).toInt()
         )
         set.connect(alertDialog.cancelButton.id,ConstraintSet.BOTTOM,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.BOTTOM,
+            (width*0.05).toInt()
+        )
+
+        set.connect(alertDialog.saveButton.id,ConstraintSet.RIGHT,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.RIGHT,
+            (width*0.05).toInt()
+        )
+        set.connect(alertDialog.saveButton.id,ConstraintSet.TOP,alertDialog.inputName.id,ConstraintSet.BOTTOM,
+            (width*0.1).toInt()
+        )
+        set.connect(alertDialog.saveButton.id,ConstraintSet.BOTTOM,alertDialog.alertDialogAddOpponentLayout.id,ConstraintSet.BOTTOM,
             (width*0.05).toInt()
         )
 

@@ -20,15 +20,19 @@ class MeshDrawable(private val context: Context) : Drawable() {
         paint.strokeWidth = (bounds.width()*0.02).toFloat()
         paint.color = ContextCompat.getColor(context, R.color.black)
         paint.isAntiAlias = true
+        paint.strokeCap = Paint.Cap.ROUND
+
+        val dif = (bounds.width()*0.02).toInt()
+
         val mesh = MyPath()
-        mesh.move(Point(x,0))
-        mesh.line(Point(x,bounds.height()))
-        mesh.move(Point(2*x,0))
-        mesh.line(Point(2*x,bounds.height()))
-        mesh.move(Point(0,y))
-        mesh.line(Point(bounds.width(),y))
-        mesh.move(Point(0,2*y))
-        mesh.line(Point(bounds.width(),2*y))
+        mesh.move(Point(x,dif))
+        mesh.line(Point(x,bounds.height()-dif))
+        mesh.move(Point(2*x,dif))
+        mesh.line(Point(2*x,bounds.height()-dif))
+        mesh.move(Point(dif,y))
+        mesh.line(Point(bounds.width()-dif,y))
+        mesh.move(Point(dif,2*y))
+        mesh.line(Point(bounds.width()-dif,2*y))
         canvas.drawPath(mesh,paint)
     }
 

@@ -22,12 +22,21 @@ class MarkColors(private val color:Int) {
             }
         }
 
-        val a = 200
     }
 
 
     fun getColor():Int{
         return this.colors[pointer]
+    }
+
+    fun getRightColor():Int{
+        val newPointer = (pointer+1).mod(colors.size)
+        return this.colors[newPointer]
+    }
+
+    fun getLeftColor():Int{
+        val newPointer = if(pointer==0) colors.size-1 else pointer-1
+        return this.colors[newPointer]
     }
 
     fun increasePointer(){

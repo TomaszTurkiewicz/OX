@@ -163,8 +163,10 @@ class MultiPlayerFragment : FragmentCoroutine() {
         val alertDialog = AlertDialogChangeMarkColorBinding.inflate(layoutInflater)
         val currentColor = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
         val colors = MarkColors(currentColor)
+        var leftColor = colors.getLeftColor()
+        var rightColor = colors.getRightColor()
 
-        displayAlertDialogUI(alertDialog,mark,opponent)
+        displayAlertDialogUI(alertDialog,mark,opponent,leftColor,rightColor)
 
         builder.setView(alertDialog.root)
         val dialog = builder.create()
@@ -176,24 +178,28 @@ class MultiPlayerFragment : FragmentCoroutine() {
         alertDialog.arrowLeft.setOnClickListener {
             colors.decreasePointer()
             val color = colors.getColor()
+            leftColor = colors.getLeftColor()
+            rightColor = colors.getRightColor()
             if(mark== MAIN_PLAYER){
                 opponent.setPlayerColor(color)
             }else{
                 opponent.setOpponentColor(color)
             }
-            displayAlertDialogUI(alertDialog,mark,opponent)
+            displayAlertDialogUI(alertDialog,mark,opponent,leftColor, rightColor)
 
         }
 
         alertDialog.arrowRight.setOnClickListener {
             colors.increasePointer()
             val color = colors.getColor()
+            leftColor = colors.getLeftColor()
+            rightColor = colors.getRightColor()
             if(mark== MAIN_PLAYER){
                 opponent.setPlayerColor(color)
             }else{
                 opponent.setOpponentColor(color)
             }
-            displayAlertDialogUI(alertDialog,mark,opponent)
+            displayAlertDialogUI(alertDialog,mark,opponent,leftColor, rightColor)
 
         }
 
@@ -211,7 +217,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         dialog.show()
     }
 
-    private fun displayAlertDialogUI(alertDialog: AlertDialogChangeMarkColorBinding,mark:Int,opponent: Opponent) {
+    private fun displayAlertDialogUI(alertDialog: AlertDialogChangeMarkColorBinding,mark:Int,opponent: Opponent,leftColor:Int, rightColor:Int) {
         val name = if(mark== PLAYER_MARK_PRESSED) SharedPreferences.readPlayerName(requireContext()) else opponent.getName()
         alertDialog.title.text = "$name change color"
         alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
@@ -222,8 +228,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
         alertDialog.imageView.setImageDrawable(if(fMark==X) XDrawable(requireContext(),color,false) else ODrawable(requireContext(),color,false))
         alertDialog.arrowLeft.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         alertDialog.arrowRight.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
-        alertDialog.arrowLeft.setImageDrawable(LeftArrowDrawable(requireContext()))
-        alertDialog.arrowRight.setImageDrawable(RightArrowDrawable(requireContext()))
+        alertDialog.arrowLeft.setImageDrawable(LeftArrowDrawable(requireContext(),leftColor))
+        alertDialog.arrowRight.setImageDrawable(RightArrowDrawable(requireContext(),rightColor))
 
         setAlertDialogConstraints(alertDialog)
 

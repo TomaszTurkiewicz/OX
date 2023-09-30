@@ -32,6 +32,7 @@ import com.tt.ox.databinding.AlertDialogChangeMarkColorBinding
 import com.tt.ox.databinding.FragmentSinglePlayerBinding
 import com.tt.ox.drawables.AddMovesButton
 import com.tt.ox.drawables.BackgroundColorDrawable
+import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.drawables.LeftArrowDrawable
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
@@ -43,7 +44,6 @@ import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.MarkColors
 import com.tt.ox.helpers.ScreenMetricsCompat
-import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
 import kotlinx.coroutines.Runnable
@@ -55,6 +55,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
     private var _binding:FragmentSinglePlayerBinding? = null
     private val binding get() = _binding!!
     private var unit = 0
+    private var width = 0
     private var fPlay = false
     private var fMoves = false
     private var fTurn = false
@@ -72,6 +73,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
+        width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
     }
 
     override fun onCreateView(
@@ -226,7 +228,10 @@ class SinglePlayerFragment : FragmentCoroutine() {
         val currentColor = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
         val colors = MarkColors(currentColor)
 
-        displayAlertDialogUI(alertDialog,mark,opponent)
+        var leftColor = colors.getLeftColor()
+        var rightColor = colors.getRightColor()
+
+        displayAlertDialogUI(alertDialog,mark,opponent,leftColor,rightColor)
 
         builder.setView(alertDialog.root)
         val dialog = builder.create()
@@ -238,24 +243,28 @@ class SinglePlayerFragment : FragmentCoroutine() {
         alertDialog.arrowLeft.setOnClickListener {
             colors.decreasePointer()
             val color = colors.getColor()
+            leftColor = colors.getLeftColor()
+            rightColor = colors.getRightColor()
             if(mark== MAIN_PLAYER){
                 opponent.setPlayerColor(color)
             }else{
                 opponent.setOpponentColor(color)
             }
-            displayAlertDialogUI(alertDialog,mark,opponent)
+            displayAlertDialogUI(alertDialog,mark,opponent,leftColor,rightColor)
 
         }
 
         alertDialog.arrowRight.setOnClickListener {
             colors.increasePointer()
+            leftColor = colors.getLeftColor()
+            rightColor = colors.getRightColor()
             val color = colors.getColor()
             if(mark== MAIN_PLAYER){
                 opponent.setPlayerColor(color)
             }else{
                 opponent.setOpponentColor(color)
             }
-            displayAlertDialogUI(alertDialog,mark,opponent)
+            displayAlertDialogUI(alertDialog,mark,opponent,leftColor,rightColor)
 
         }
 
@@ -273,19 +282,25 @@ class SinglePlayerFragment : FragmentCoroutine() {
         dialog.show()
     }
 
-    private fun displayAlertDialogUI(alertDialog: AlertDialogChangeMarkColorBinding,mark:Int,opponent: Opponent) {
-        val name = if(mark== PLAYER_MARK_PRESSED) SharedPreferences.readPlayerName(requireContext()) else opponent.getName()
-        alertDialog.title.text = "$name change color"
-        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
+    private fun displayAlertDialogUI(alertDialog: AlertDialogChangeMarkColorBinding,mark:Int,opponent: Opponent,leftColor:Int,rightColor:Int) {
+        alertDialog.title.text = "change color"
+        alertDialog.title.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
+        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
         val fMark = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMark() else opponent.getOpponentMark()
         val color = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
         val markSize = 4*unit
         alertDialog.imageView.layoutParams = ConstraintLayout.LayoutParams(markSize,markSize)
         alertDialog.imageView.setImageDrawable(if(fMark==X) XDrawable(requireContext(),color,false) else ODrawable(requireContext(),color,false))
-        alertDialog.arrowLeft.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
-        alertDialog.arrowRight.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
-        alertDialog.arrowLeft.setImageDrawable(LeftArrowDrawable(requireContext()))
-        alertDialog.arrowRight.setImageDrawable(RightArrowDrawable(requireContext()))
+        alertDialog.arrowLeft.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
+        alertDialog.arrowRight.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
+        alertDialog.arrowLeft.setImageDrawable(LeftArrowDrawable(requireContext(),leftColor))
+        alertDialog.arrowRight.setImageDrawable(RightArrowDrawable(requireContext(),rightColor))
+
+        alertDialog.saveButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+        alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+
+        alertDialog.saveButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"SAVE"))
+        alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"CANCEL"))
 
         setAlertDialogConstraints(alertDialog)
 
@@ -314,10 +329,16 @@ class SinglePlayerFragment : FragmentCoroutine() {
         set.connect(alertDialog.cancelButton.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
         set.connect(alertDialog.cancelButton.id,ConstraintSet.RIGHT,alertDialog.middleDivider.id,ConstraintSet.LEFT,0)
         set.connect(alertDialog.cancelButton.id,ConstraintSet.TOP,alertDialog.arrowLeft.id,ConstraintSet.BOTTOM,unit)
+        set.connect(alertDialog.cancelButton.id,ConstraintSet.BOTTOM,alertDialog.layout.id,ConstraintSet.BOTTOM,
+            (width*0.1).toInt()
+        )
 
         set.connect(alertDialog.saveButton.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
         set.connect(alertDialog.saveButton.id,ConstraintSet.LEFT,alertDialog.middleDivider.id,ConstraintSet.RIGHT,0)
         set.connect(alertDialog.saveButton.id,ConstraintSet.TOP,alertDialog.arrowRight.id,ConstraintSet.BOTTOM,unit)
+        set.connect(alertDialog.saveButton.id,ConstraintSet.BOTTOM,alertDialog.layout.id,ConstraintSet.BOTTOM,
+            (width*0.1).toInt()
+        )
 
         set.applyTo(alertDialog.layout)
     }
@@ -795,5 +816,4 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
 //todo finish this first UI
 
-//todo reset button
-// todo add moves button
+// todo mesh UI and win line UI

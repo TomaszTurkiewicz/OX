@@ -97,25 +97,6 @@ class ChooseOpponentFragment : Fragment() {
 
     private fun addNewOpponent() {
         displayAlertDialogAddOpponent()
-//        val alertDialog = AlertDialog.Builder(requireContext())
-//        alertDialog.setTitle("Add Player")
-//
-//        val inputName = EditText(requireContext())
-//        inputName.inputType = InputType.TYPE_CLASS_TEXT
-//        alertDialog.setView(inputName)
-//
-//        alertDialog.setNegativeButton(
-//            "CANCEL"
-//        ) { dialogInterface, _ ->
-//            dialogInterface.cancel()
-//        }
-//
-//        alertDialog.setPositiveButton("SAVE"){
-//                _, _ ->
-//                gameViewModel.addNewOpponent(inputName.text.toString())
-//        }
-//
-//        alertDialog.show()
     }
 
     private fun displayAlertDialogAddOpponent(){

@@ -24,6 +24,7 @@ import com.tt.ox.databinding.AlertDialogAddOpponentBinding
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
 import com.tt.ox.drawables.AddDrawable
 import com.tt.ox.drawables.BinDrawable
+import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
@@ -163,6 +164,8 @@ class ChooseOpponentFragment : Fragment() {
     private fun setAlertDialogDrawables(alertDialog: AlertDialogAddOpponentBinding) {
         alertDialog.saveButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"ADD"))
         alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"CANCEL"))
+        alertDialog.saveButton.background = ButtonBackground(requireContext())
+        alertDialog.cancelButton.background = ButtonBackground(requireContext())
     }
 
     private fun setAlertDialogConstraints(alertDialog: AlertDialogAddOpponentBinding) {
@@ -279,6 +282,8 @@ class ChooseOpponentFragment : Fragment() {
     private fun setDrawables() {
         binding.addOpponent.setImageDrawable(AddDrawable(requireContext()))
         binding.deleteOpponent.setImageDrawable(BinDrawable(requireContext(),deletable))
+        binding.addOpponent.background = ButtonBackground(requireContext())
+        binding.deleteOpponent.background = ButtonBackground(requireContext())
     }
 
     private fun setSizes() {

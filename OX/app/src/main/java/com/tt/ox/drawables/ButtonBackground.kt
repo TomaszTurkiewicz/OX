@@ -5,25 +5,26 @@ import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.PixelFormat
-import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.tt.ox.R
+import com.tt.ox.helpers.ScreenMetricsCompat
 
-class AddMovesButton (private val context: Context) : Drawable(){
+class ButtonBackground (private val context: Context) : Drawable(){
     private val paint = Paint()
-    private val textBounds = Rect()
     override fun draw(canvas: Canvas) {
-        paint.strokeWidth = (bounds.width()*0.02).toFloat()
-        val text = "+10"
-        paint.color = ContextCompat.getColor(context,R.color.blue)
-        paint.style = Paint.Style.FILL
-        paint.textSize = bounds.width()*0.5f
+        val unit = ScreenMetricsCompat().getUnit(context)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = unit*0.05f
+        paint.color = ContextCompat.getColor(context, R.color.black)
         paint.isAntiAlias = true
-        paint.textAlign = Paint.Align.CENTER
-        paint.getTextBounds(text,0,text.length,textBounds)
-        val newHeight = bounds.centerY()+textBounds.height()/2
-        canvas.drawText(text, bounds.centerX().toFloat(), newHeight.toFloat(),paint)
+        val radius = unit*0.2f
+        val dif = unit*0.05f
+
+        val rect = RectF(dif,dif,bounds.width()-dif,bounds.height()-dif)
+
+        canvas.drawRoundRect(rect,radius,radius,paint)
     }
 
     override fun setAlpha(alpha: Int) {

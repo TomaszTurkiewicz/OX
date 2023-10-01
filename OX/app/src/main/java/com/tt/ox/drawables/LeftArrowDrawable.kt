@@ -6,7 +6,6 @@ import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.graphics.Point
-import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.tt.ox.R
@@ -20,17 +19,9 @@ class LeftArrowDrawable(private val context: Context, private val color:Int) : D
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
 
-        paint.style = Paint.Style.STROKE
+
         paint.strokeWidth = (bounds.width()*0.02).toFloat()
-        paint.color = ContextCompat.getColor(context, R.color.black)
         paint.isAntiAlias = true
-
-        val radius = bounds.width()*0.1f
-        val dif = bounds.width()*0.05f
-
-        val rect = RectF(dif,dif,bounds.width()-dif,bounds.height()-dif)
-
-        canvas.drawRoundRect(rect,radius,radius,paint)
 
         paint.style = Paint.Style.FILL_AND_STROKE
         when(color){

@@ -32,6 +32,7 @@ import com.tt.ox.databinding.AlertDialogChangeMarkColorBinding
 import com.tt.ox.databinding.FragmentSinglePlayerBinding
 import com.tt.ox.drawables.AddMovesButton
 import com.tt.ox.drawables.BackgroundColorDrawable
+import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.drawables.LeftArrowDrawable
 import com.tt.ox.drawables.MeshDrawable
@@ -299,6 +300,11 @@ class SinglePlayerFragment : FragmentCoroutine() {
         alertDialog.saveButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
         alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
 
+        alertDialog.saveButton.background = ButtonBackground(requireContext())
+        alertDialog.cancelButton.background = ButtonBackground(requireContext())
+        alertDialog.arrowRight.background = ButtonBackground(requireContext())
+        alertDialog.arrowLeft.background = ButtonBackground(requireContext())
+
         alertDialog.saveButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"SAVE"))
         alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"CANCEL"))
 
@@ -410,13 +416,12 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
             val dif = it.getWins()-it.getLoses()
 
-            if(dif<10){
-                mode = EASY_GAME
-            }
-            else if(dif>20){
-                mode = HARD_GAME
+            mode = if(dif<10){
+                EASY_GAME
+            } else if(dif>20){
+                HARD_GAME
             }else{
-                mode = NORMAL_GAME
+                NORMAL_GAME
             }
         }
 
@@ -579,6 +584,12 @@ class SinglePlayerFragment : FragmentCoroutine() {
         binding.reset.setImageDrawable(ResetButtonDrawable(requireContext()))
 
         binding.addMoves.setImageDrawable(AddMovesButton(requireContext()))
+
+        binding.mainPlayerMark.background = ButtonBackground(requireContext())
+        binding.opponentPlayerMark.background = ButtonBackground(requireContext())
+        binding.switchMarks.background = ButtonBackground(requireContext())
+        binding.reset.background = ButtonBackground(requireContext())
+        binding.addMoves.background = ButtonBackground(requireContext())
     }
 
     private fun setConstraint() {

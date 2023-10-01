@@ -14,39 +14,49 @@ import com.tt.ox.helpers.MyPath
 class SwitchDrawable (private val context: Context) : Drawable(){
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
-        val diff = bounds.height()/2
         paint.style = Paint.Style.FILL_AND_STROKE
         paint.strokeWidth = (bounds.width()*0.02).toFloat()
         paint.color = ContextCompat.getColor(context, R.color.green)
         paint.isAntiAlias = true
 
-        val pathMiddle = MyPath()
-        pathMiddle.move(Point(diff, (bounds.height()*0.4).toInt()))
-        pathMiddle.line(Point(bounds.width()-diff, (bounds.height()*0.4).toInt()))
-        pathMiddle.line(Point(bounds.width()-diff, (bounds.height()*0.6).toInt()))
-        pathMiddle.line(Point(diff, (bounds.height()*0.6).toInt()))
-        pathMiddle.line(Point(diff, (bounds.height()*0.4).toInt()))
-        pathMiddle.close()
+        val left = Point((bounds.width()*0.2).toInt(),bounds.centerY())
+        val leftTop = Point((bounds.width()*0.4).toInt(), (bounds.height()*0.2).toInt())
+        val leftBottom = Point(leftTop.x,bounds.height()-leftTop.y)
 
-        canvas.drawPath(pathMiddle,paint)
+        val right = Point(bounds.width()-left.x,bounds.centerY())
+        val rightTop = Point(bounds.width()-leftTop.x,leftTop.y)
+        val rightBottom = Point(bounds.width()-leftBottom.x,leftBottom.y)
 
         val pathRight = MyPath()
-        pathRight.move(Point(bounds.width()-diff,0))
-        pathRight.line(Point(bounds.width()-diff,bounds.height()))
-        pathRight.line(Point(bounds.width(),bounds.centerY()))
-        pathRight.line(Point(bounds.width()-diff,0))
+        pathRight.move(right)
+        pathRight.line(rightBottom)
+        pathRight.line(rightTop)
+        pathRight.line(right)
         pathRight.close()
 
         canvas.drawPath(pathRight,paint)
 
         val pathLeft = MyPath()
-        pathLeft.move(Point(diff,0))
-        pathLeft.line(Point(diff,bounds.height()))
-        pathLeft.line(Point(0,bounds.centerY()))
-        pathLeft.line(Point(diff,0))
+        pathLeft.move(left)
+        pathLeft.line(leftTop)
+        pathLeft.line(leftBottom)
+        pathLeft.line(left)
         pathLeft.close()
 
         canvas.drawPath(pathLeft,paint)
+
+        val topLeft = Point(leftTop.x, (bounds.height()*0.4).toInt())
+        val topRight = Point(rightTop.x, topLeft.y)
+        val bottomLeft = Point(leftTop.x, (bounds.height()*0.6).toInt())
+        val bottomRight = Point(rightTop.x, bottomLeft.y)
+
+        val middlePath = MyPath()
+        middlePath.move(topLeft)
+        middlePath.line(topRight)
+        middlePath.move(bottomLeft)
+        middlePath.line(bottomRight)
+
+        canvas.drawPath(middlePath,paint)
     }
 
     override fun setAlpha(alpha: Int) {

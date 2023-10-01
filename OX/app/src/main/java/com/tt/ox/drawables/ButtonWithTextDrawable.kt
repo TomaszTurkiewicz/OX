@@ -6,7 +6,6 @@ import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.graphics.Rect
-import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.tt.ox.R
@@ -18,16 +17,6 @@ class ButtonWithTextDrawable (private val context: Context, private val text:Str
 
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = (bounds.height()*0.02).toFloat()
-        paint.color = ContextCompat.getColor(context, R.color.black)
-        paint.isAntiAlias = true
-
-        val margin = bounds.height()*0.1f
-        val radius = margin*2
-
-        val rect = RectF(margin,margin,bounds.width()-margin,bounds.height()-margin)
-
-        canvas.drawRoundRect(rect,radius,radius,paint)
-
         textPaint.textSize = bounds.height()*0.7f
         textPaint.isAntiAlias = true
         textPaint.color = ContextCompat.getColor(context,R.color.black)
@@ -35,8 +24,6 @@ class ButtonWithTextDrawable (private val context: Context, private val text:Str
         val textBounds = Rect()
         textPaint.getTextBounds(text,0,text.length,textBounds)
         val bottom = (textBounds.height()+bounds.height())/2
-
-
         canvas.drawText(text, bounds.centerX().toFloat(),bottom.toFloat(),textPaint)
     }
 

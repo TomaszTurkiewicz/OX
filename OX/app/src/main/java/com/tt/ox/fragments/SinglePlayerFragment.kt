@@ -813,7 +813,3 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
     }
 }
-
-//todo finish this first UI
-
-// todo mesh UI and win line UI

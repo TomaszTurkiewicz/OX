@@ -26,39 +26,43 @@ class WinLineDrawable (private val context: Context,
         paint.strokeWidth = (bounds.width()*0.02).toFloat()
         paint.color = ContextCompat.getColor(context, R.color.red)
         paint.isAntiAlias = true
+        paint.strokeCap = Paint.Cap.ROUND
+
+        val dif = (bounds.width()*0.08).toInt()
         val fieldSize = bounds.width()/3
         val line = MyPath()
+
         if(horizontalTop){
-            line.move(Point(0,fieldSize/2))
-            line.line(Point(bounds.width(),fieldSize/2))
+            line.move(Point(dif,fieldSize/2))
+            line.line(Point(bounds.width()-dif,fieldSize/2))
         }
         if(horizontalMid){
-            line.move(Point(0,fieldSize+fieldSize/2))
-            line.line(Point(bounds.width(),fieldSize+fieldSize/2))
+            line.move(Point(dif,fieldSize+fieldSize/2))
+            line.line(Point(bounds.width()-dif,fieldSize+fieldSize/2))
         }
         if(horizontalBottom){
-            line.move(Point(0,2*fieldSize+fieldSize/2))
-            line.line(Point(bounds.width(),2*fieldSize+fieldSize/2))
+            line.move(Point(dif,2*fieldSize+fieldSize/2))
+            line.line(Point(bounds.width()-dif,2*fieldSize+fieldSize/2))
         }
         if(verticalLeft){
-            line.move(Point(fieldSize/2,0))
-            line.line(Point(fieldSize/2,bounds.height()))
+            line.move(Point(fieldSize/2,dif))
+            line.line(Point(fieldSize/2,bounds.height()-dif))
         }
         if(verticalMid){
-            line.move(Point(fieldSize+fieldSize/2,0))
-            line.line(Point(fieldSize+fieldSize/2,bounds.height()))
+            line.move(Point(fieldSize+fieldSize/2,dif))
+            line.line(Point(fieldSize+fieldSize/2,bounds.height()-dif))
         }
         if(verticalRight){
-            line.move(Point(2*fieldSize+fieldSize/2,0))
-            line.line(Point(2*fieldSize+fieldSize/2,bounds.height()))
+            line.move(Point(2*fieldSize+fieldSize/2,dif))
+            line.line(Point(2*fieldSize+fieldSize/2,bounds.height()-dif))
         }
         if(angleUp){
-            line.move(Point(0,bounds.height()))
-            line.line(Point(bounds.width(),0))
+            line.move(Point(dif,bounds.height()-dif))
+            line.line(Point(bounds.width()-dif,dif))
         }
         if(angleDown){
-            line.move(Point(0,0))
-            line.line(Point(bounds.width(),bounds.height()))
+            line.move(Point(dif,dif))
+            line.line(Point(bounds.width()-dif,bounds.height()-dif))
         }
 
         canvas.drawPath(line,paint)

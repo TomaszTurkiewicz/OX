@@ -19,6 +19,7 @@ import com.tt.ox.databinding.FragmentStartBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
+import com.tt.ox.drawables.MultiPlayerButtonDrawable
 import com.tt.ox.drawables.SettingButtonDrawable
 import com.tt.ox.drawables.SinglePlayerButtonDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
@@ -205,6 +206,7 @@ class StartFragment : Fragment() {
 
         binding.optionsButton.setImageDrawable(SettingButtonDrawable(requireContext()))
         binding.singlePlayerButton.setImageDrawable(SinglePlayerButtonDrawable(requireContext()))
+        binding.multiPlayerButton.setImageDrawable(MultiPlayerButtonDrawable(requireContext()))
 
         setConstraints()
     }

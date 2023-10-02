@@ -65,10 +65,6 @@ class SettingButtonDrawable (private val context: Context) : Drawable() {
             bounds.width()*0.1f,
             paint
         )
-
-
-//todo finish this first!!!
-
     }
 
     private fun makeCut(middle:Point, radiusSmall:Double, radiusBig:Double, angle:Double, canvas:Canvas){

@@ -20,6 +20,7 @@ import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.drawables.SettingButtonDrawable
+import com.tt.ox.drawables.SinglePlayerButtonDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.viewModel.GameViewModel
@@ -203,6 +204,7 @@ class StartFragment : Fragment() {
         binding.optionsButton.background = ButtonBackground(requireContext())
 
         binding.optionsButton.setImageDrawable(SettingButtonDrawable(requireContext()))
+        binding.singlePlayerButton.setImageDrawable(SinglePlayerButtonDrawable(requireContext()))
 
         setConstraints()
     }

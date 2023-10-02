@@ -20,6 +20,7 @@ import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.drawables.MultiPlayerButtonDrawable
+import com.tt.ox.drawables.OnlinePlayerButtonDrawable
 import com.tt.ox.drawables.SettingButtonDrawable
 import com.tt.ox.drawables.SinglePlayerButtonDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
@@ -190,6 +191,10 @@ class StartFragment : Fragment() {
                 val action = StartFragmentDirections.actionStartFragmentToOptionsFragment()
                 findNavController().navigate(action)
             }
+            it.onlinePlayerButton.setOnClickListener {
+                val action = StartFragmentDirections.actionStartFragmentToOnlinePlayerFragment()
+                findNavController().navigate(action)
+            }
         }
     }
 
@@ -197,22 +202,26 @@ class StartFragment : Fragment() {
 
         binding.multiPlayerButton.layoutParams = ConstraintLayout.LayoutParams(8*unit,3*unit)
         binding.singlePlayerButton.layoutParams = ConstraintLayout.LayoutParams(8*unit,3*unit)
+        binding.onlinePlayerButton.layoutParams = ConstraintLayout.LayoutParams(8*unit,3*unit)
         binding.optionsButton.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
 
         binding.fragmentStartLayout.background = BackgroundColorDrawable(requireContext())
         binding.singlePlayerButton.background = ButtonBackground(requireContext())
         binding.multiPlayerButton.background = ButtonBackground(requireContext())
+        binding.onlinePlayerButton.background = ButtonBackground(requireContext())
         binding.optionsButton.background = ButtonBackground(requireContext())
 
         binding.optionsButton.setImageDrawable(SettingButtonDrawable(requireContext()))
         binding.singlePlayerButton.setImageDrawable(SinglePlayerButtonDrawable(requireContext()))
         binding.multiPlayerButton.setImageDrawable(MultiPlayerButtonDrawable(requireContext()))
+        binding.onlinePlayerButton.setImageDrawable(OnlinePlayerButtonDrawable(requireContext()))
 
         setConstraints()
     }
 
     private fun setConstraints(){
-        val offset = (windowHeight-8*unit)/3
+        val heightWithoutSettings = windowHeight-2.5*unit
+        val offset = (heightWithoutSettings-9*unit)/4
         val set = ConstraintSet()
         set.clone(binding.fragmentStartLayout)
 
@@ -221,11 +230,21 @@ class StartFragment : Fragment() {
 
         set.connect(binding.singlePlayerButton.id,ConstraintSet.LEFT,binding.fragmentStartLayout.id,ConstraintSet.LEFT,0)
         set.connect(binding.singlePlayerButton.id,ConstraintSet.RIGHT,binding.fragmentStartLayout.id,ConstraintSet.RIGHT,0)
-        set.connect(binding.singlePlayerButton.id,ConstraintSet.TOP,binding.fragmentStartLayout.id,ConstraintSet.TOP,offset)
+        set.connect(binding.singlePlayerButton.id,ConstraintSet.TOP,binding.optionsButton.id,ConstraintSet.TOP,
+            offset.toInt()
+        )
 
         set.connect(binding.multiPlayerButton.id,ConstraintSet.LEFT,binding.fragmentStartLayout.id,ConstraintSet.LEFT,0)
         set.connect(binding.multiPlayerButton.id,ConstraintSet.RIGHT,binding.fragmentStartLayout.id,ConstraintSet.RIGHT,0)
-        set.connect(binding.multiPlayerButton.id,ConstraintSet.TOP,binding.singlePlayerButton.id,ConstraintSet.BOTTOM,offset)
+        set.connect(binding.multiPlayerButton.id,ConstraintSet.TOP,binding.singlePlayerButton.id,ConstraintSet.BOTTOM,
+            offset.toInt()
+        )
+
+        set.connect(binding.onlinePlayerButton.id,ConstraintSet.LEFT,binding.fragmentStartLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.onlinePlayerButton.id,ConstraintSet.RIGHT,binding.fragmentStartLayout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.onlinePlayerButton.id,ConstraintSet.TOP,binding.multiPlayerButton.id,ConstraintSet.BOTTOM,
+            offset.toInt()
+        )
 
         set.applyTo(binding.fragmentStartLayout)
     }

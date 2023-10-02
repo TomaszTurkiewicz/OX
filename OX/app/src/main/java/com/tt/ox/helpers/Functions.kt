@@ -7,7 +7,7 @@ import kotlin.math.sin
 
 class Functions {
     companion object{
-        fun curvedPath(a: Point, b: Point, radius: Double, up:Boolean):CurvedPoint{
+        fun curvedPath(a: Point, b: Point, radius: Float, up:Boolean):CurvedPoint{
             val midX = a.x + ((b.x-a.x)/2)
             val midY = a.y + ((b.y-a.y)/2)
             val xDiff: Double = (midX - a.x).toDouble()

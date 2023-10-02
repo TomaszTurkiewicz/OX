@@ -85,11 +85,52 @@ class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
     }
 
     private fun makeLeftPerson(leftCenter:Double, canvas:Canvas){
-        val dif = bounds.height()*0.2
-        val rect = Rect((leftCenter-dif).toInt(),
-            (bounds.centerY()-dif).toInt(), (leftCenter+dif).toInt(), (bounds.centerY()+dif).toInt()
+        paint.style = Paint.Style.FILL
+        paint.strokeWidth = 0f
+        paint.color = ContextCompat.getColor(context,R.color.black)
+        val bodyDif = bounds.height()*0.15
+        val difHorizontal = bounds.height()*0.05
+        val difHorizontalAdd = bounds.height()*0.06
+        val upperBody = RectF(
+            (leftCenter-bodyDif).toFloat(),
+            (bounds.centerY()-bodyDif+difHorizontal).toFloat(),
+            (leftCenter+bodyDif).toFloat(),
+            (bounds.centerY()+bodyDif+difHorizontal).toFloat()
         )
-        canvas.drawRect(rect,paint)
+        val radius = bounds.height()*0.1f
+
+        canvas.drawRoundRect(upperBody,radius,radius,paint)
+
+        val loverBody = Rect(
+            (leftCenter-bodyDif).toInt(),
+            bounds.centerY(),
+            (leftCenter+bodyDif).toInt(),
+            (bounds.centerY()+bodyDif+difHorizontalAdd).toInt()
+        )
+
+        canvas.drawRect(loverBody,paint)
+
+        paint.color = ContextCompat.getColor(context,R.color.white)
+
+        val down = Point(leftCenter.toInt(),bounds.centerY())
+        val left = Point((leftCenter-bodyDif).toInt(), (bounds.height()*0.3).toInt())
+        val right = Point((leftCenter+bodyDif).toInt(), (bounds.height()*0.3).toInt())
+
+
+        val neck = MyPath()
+        neck.move(down)
+        neck.line(left)
+        neck.line(right)
+        neck.line(down)
+        neck.close()
+
+        canvas.drawPath(neck,paint)
+
+        paint.color = ContextCompat.getColor(context,R.color.black)
+
+        canvas.drawCircle(leftCenter.toFloat(),
+            (bounds.height()*0.33).toFloat(), (bounds.height()*0.07).toFloat(),paint)
+
     }
 
     private fun makeRightPhone(rightCenter:Double,canvas: Canvas){

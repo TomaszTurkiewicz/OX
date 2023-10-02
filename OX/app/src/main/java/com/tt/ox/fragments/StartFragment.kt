@@ -16,8 +16,10 @@ import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogAddOpponentBinding
 import com.tt.ox.databinding.FragmentStartBinding
+import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
+import com.tt.ox.drawables.SettingButtonDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.viewModel.GameViewModel
@@ -157,27 +159,7 @@ class StartFragment : Fragment() {
         builder.setView(alertDialog.root)
         val dialog = builder.create()
         dialog.setCancelable(false)
-////        val alertDialog = AlertDialog.Builder(requireContext())
-//        alertDialog.setTitle("What's your nickname")
-//
-//        val inputName = EditText(requireContext())
-//        inputName.inputType = InputType.TYPE_CLASS_TEXT
-//        alertDialog.setView(inputName)
-//        alertDialog.setPositiveButton("SAVE",null)
-//        alertDialog.setCancelable(false)
-//        alertDialog.create()
-//
-////        val dialog = alertDialog.create()
-//        dialog.show()
-//        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-//            if(inputName.text.toString().trim().isNotBlank()){
-//
-//                gameViewModel.addNewOpponent("PHONE")
-//                SharedPreferences.saveMainPlayer(requireContext(),inputName.text.toString())
-//                clicks()
-//                dialog.dismiss()
-//            }
-//        }
+
         alertDialog.saveButton.setOnClickListener {
             val string = alertDialog.inputName.text
             string?.let {editable ->
@@ -214,6 +196,14 @@ class StartFragment : Fragment() {
         binding.multiPlayerButton.layoutParams = ConstraintLayout.LayoutParams(8*unit,3*unit)
         binding.singlePlayerButton.layoutParams = ConstraintLayout.LayoutParams(8*unit,3*unit)
         binding.optionsButton.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
+
+        binding.fragmentStartLayout.background = BackgroundColorDrawable(requireContext())
+        binding.singlePlayerButton.background = ButtonBackground(requireContext())
+        binding.multiPlayerButton.background = ButtonBackground(requireContext())
+        binding.optionsButton.background = ButtonBackground(requireContext())
+
+        binding.optionsButton.setImageDrawable(SettingButtonDrawable(requireContext()))
+
         setConstraints()
     }
 

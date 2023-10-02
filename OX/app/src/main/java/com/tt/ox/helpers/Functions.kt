@@ -24,5 +24,13 @@ class Functions {
             }
             return curvedPoint
         }
+
+        fun orthogonalPoint(centre: Point,radius:Double,angle:Double):Point{
+            val y = sin(angle)*radius
+            val x = cos(angle)*radius
+            return Point((centre.x+x).toInt(), (centre.y-y).toInt())
+        }
     }
+
+
 }

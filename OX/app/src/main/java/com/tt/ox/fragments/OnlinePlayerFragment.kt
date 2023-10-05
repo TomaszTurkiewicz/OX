@@ -30,6 +30,7 @@ import com.tt.ox.databinding.AlertDialogLogInBinding
 import com.tt.ox.databinding.FragmentOnlinePlayerBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
+import com.tt.ox.helpers.FirebaseUtils
 import com.tt.ox.helpers.ScreenMetricsCompat
 
 class OnlinePlayerFragment : Fragment() {
@@ -95,6 +96,8 @@ class OnlinePlayerFragment : Fragment() {
             auth.signOut()
             findNavController().navigateUp()
         }
+
+        FirebaseUtils().checkUser(currentUser!!.uid)
     }
 
     override fun onCreateView(

@@ -1,18 +1,31 @@
 package com.tt.ox.adapters
 
+import android.app.ActionBar
 import android.content.Context
+import android.os.Build
+import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.tt.ox.R
 import com.tt.ox.databinding.OnlineListItemBinding
+import com.tt.ox.drawables.BinDrawable
+import com.tt.ox.drawables.ListItemBackgroundDrawable
 import com.tt.ox.helpers.FirebaseUser
+import com.tt.ox.helpers.ScreenMetricsCompat
 
 class OnlineListAdapter(
     private val context:Context
 ) : ListAdapter<FirebaseUser, OnlineListAdapter.OnlineListViewHolder>(DiffCallback) {
 
+    private val width = ScreenMetricsCompat().getWindowWidth(context)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OnlineListViewHolder {
         return OnlineListViewHolder(
             OnlineListItemBinding.inflate(
@@ -25,11 +38,132 @@ class OnlineListAdapter(
 
     override fun onBindViewHolder(holder: OnlineListViewHolder, position: Int) {
         val current = getItem(position)
+        holder.layout.layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
+        )
         holder.name.text = current.userName
+        holder.wins.text = current.wins.toString()
+        holder.loses.text = current.loses.toString()
+
+        setSizes(holder)
+
+        setColors(holder)
+
+        setDrawables(holder)
+
+        setConstraint(holder)
+    }
+
+    private fun setConstraint(holder: OnlineListViewHolder) {
+        val set = ConstraintSet()
+        set.clone(holder.layout)
+
+        set.connect(
+            holder.background.id,
+            ConstraintSet.LEFT,
+            holder.layout.id,
+            ConstraintSet.LEFT,
+            0
+        )
+        set.connect(
+            holder.background.id,
+            ConstraintSet.RIGHT,
+            holder.layout.id,
+            ConstraintSet.RIGHT,
+            0
+        )
+        set.connect(holder.background.id, ConstraintSet.TOP, holder.layout.id, ConstraintSet.TOP, 0)
+        set.connect(
+            holder.background.id,
+            ConstraintSet.BOTTOM,
+            holder.layout.id,
+            ConstraintSet.BOTTOM,
+            0
+        )
+
+        set.connect(holder.name.id, ConstraintSet.BOTTOM, holder.background.id, ConstraintSet.BOTTOM,0)
+        set.connect(holder.name.id, ConstraintSet.LEFT, holder.background.id, ConstraintSet.LEFT,
+            (width*0.1).toInt()
+        )
+        set.connect(holder.name.id, ConstraintSet.TOP, holder.background.id, ConstraintSet.TOP,0)
+
+
+        set.applyTo(holder.layout)
+    }
+
+    private fun setDrawables(holder: OnlineListViewHolder) {
+        holder.background.setImageDrawable(ListItemBackgroundDrawable(context))
+        holder.sendInvitation.setImageDrawable(BinDrawable(context, true))
+    }
+
+    private fun setColors(holder: OnlineListAdapter.OnlineListViewHolder) {
+        holder.name.setTextColor(ContextCompat.getColor(context, R.color.black))
+        holder.wins.setTextColor(ContextCompat.getColor(context, R.color.black))
+        holder.loses.setTextColor(ContextCompat.getColor(context, R.color.black))
+    }
+
+    private fun setSizes(holder: OnlineListViewHolder) {
+        holder.background.layoutParams =
+            ConstraintLayout.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, (width * 0.3).toInt())
+        holder.name.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.4).toInt(), (width * 0.1).toInt())
+        holder.wins.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.4).toInt(), (width * 0.1).toInt())
+        holder.loses.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.4).toInt(), (width * 0.1).toInt())
+
+        holder.sendInvitation.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.15).toInt(), (width * 0.15).toInt())
+        holder.notUsedImage.visibility = View.GONE
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            holder.name.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+            holder.wins.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+            holder.loses.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else {
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.name,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.wins,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.loses,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        }
     }
 
     class OnlineListViewHolder(binding: OnlineListItemBinding) : RecyclerView.ViewHolder(binding.root){
         val layout = binding.onlineListLayout
+        val background = binding.background
         val name = binding.name
         val wins = binding.wins
         val loses = binding.loses

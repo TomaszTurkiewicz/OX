@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -24,14 +25,21 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.tt.ox.R
+import com.tt.ox.adapters.OnlineListAdapter
 import com.tt.ox.databinding.AlertDialogLogInBinding
 import com.tt.ox.databinding.FragmentOnlinePlayerBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
-import com.tt.ox.helpers.FirebaseUtils
+import com.tt.ox.helpers.DateUtils
+import com.tt.ox.helpers.FirebaseUserId
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.SharedPreferences
 
 class OnlinePlayerFragment : Fragment() {
 
@@ -42,6 +50,15 @@ class OnlinePlayerFragment : Fragment() {
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private var width = 0
     private var currentUser: FirebaseUser? = null
+    private val idList:MutableList<FirebaseUserId> = mutableListOf()
+    private lateinit var adapter: OnlineListAdapter
+    private val userList:MutableList<com.tt.ox.helpers.FirebaseUser> = mutableListOf()
+    private var loopCounter = 0
+    private var listSize = 0
+    private var datesListSize = 0
+    private var currentPosition = 0
+    private var currentUserPosition = 0
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,7 +114,135 @@ class OnlinePlayerFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        FirebaseUtils().checkUser(currentUser!!.uid)
+
+
+        val dbRef = Firebase.database.getReference("Users").child(currentUser!!.uid)
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(!snapshot.exists()){
+
+                    createUser(currentUser!!.uid)
+                }
+                else{
+
+                    updateTimeStamp(snapshot)
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    private fun updateTimeStamp(snapshot: DataSnapshot) {
+        val user = snapshot.getValue(com.tt.ox.helpers.FirebaseUser::class.java)
+        val currentDate = DateUtils().getCurrentDate()
+        if(user!=null){
+            if(user.timestamp==currentDate){
+                prepareUserList()
+                //do nothing
+            }else{
+                Firebase.database.getReference("Ranking").child(user.timestamp.toString()).child(user.id.toString()).removeValue()
+                user.timestamp = currentDate
+                val dbRefUser = Firebase.database.getReference("Users").child(user.id.toString())
+                dbRefUser.setValue(user)
+                val dbRefRanking = Firebase.database.getReference("Ranking").child(currentDate.toString()).child(user.id.toString())
+                val newRankingUser = FirebaseUserId()
+                newRankingUser.userId = user.id
+                dbRefRanking.setValue(newRankingUser)
+
+                prepareUserList()
+            }
+        }
+    }
+
+    private fun prepareUserList() {
+        idList.clear()
+        val dates = DateUtils().getLastMonth()
+        datesListSize = dates.size
+        currentPosition = 0
+        readListFromFirebase(dates)
+
+    }
+
+
+    private fun readListFromFirebase(dates: MutableList<Int>) {
+        if(currentPosition<datesListSize){
+        val dbRef = Firebase.database.getReference("Ranking").child(dates[currentPosition].toString())
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists()){
+                    for(id in snapshot.children){
+                        val tId = id.getValue(FirebaseUserId::class.java)
+                        idList.add(tId!!)
+                    }
+                }
+                currentPosition+=1
+                readListFromFirebase(dates)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+        }
+        else{
+            setAdapter()
+        }
+    }
+
+    private fun readUsersFromFirebase(filteredIdList: List<FirebaseUserId>) {
+        if(currentUserPosition<listSize){
+            val dbRef = Firebase.database.getReference("Users").child(filteredIdList[currentUserPosition].userId!!)
+            dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(snapshot.exists()){
+                        val user = snapshot.getValue(com.tt.ox.helpers.FirebaseUser::class.java)
+                        userList.add(user!!)
+                    }
+                    currentUserPosition+=1
+                    readUsersFromFirebase(filteredIdList)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
+        }
+        else{
+            adapter.submitList(userList)
+        }
+    }
+
+
+
+    private fun setAdapter() {
+        adapter = OnlineListAdapter(requireContext())
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
+        userList.clear()
+        loopCounter = 0
+        val filteredIdList = idList.filter { id -> id.userId != currentUser!!.uid }
+        listSize = filteredIdList.size
+        currentUserPosition = 0
+        readUsersFromFirebase(filteredIdList)
+    }
+
+    private fun createUser(userId: String) {
+        val currentDate = DateUtils().getCurrentDate()
+        val newUser = com.tt.ox.helpers.FirebaseUser()
+        newUser.id = userId
+        newUser.userName = SharedPreferences.readPlayerName(requireContext())
+        newUser.timestamp = currentDate
+
+        // create user in Users
+        val dbRefUser = Firebase.database.getReference("Users").child(userId)
+        dbRefUser.setValue(newUser)
+
+        // create ranking list with timestamp
+        val dbRefRanking = Firebase.database.getReference("Ranking").child(currentDate.toString()).child(userId)
+        val newRankingUser = FirebaseUserId()
+        newRankingUser.userId = userId
+        dbRefRanking.setValue(newRankingUser)
+
+        prepareUserList()
     }
 
     override fun onCreateView(
@@ -237,11 +382,3 @@ class OnlinePlayerFragment : Fragment() {
 
     }
 }
-
-/* todo
-*   check if firebase user not null
-*   if null ask for login
-*   if not null display active users
-*   when logging in create database if not created
-*   time stamp and saving by date
- */

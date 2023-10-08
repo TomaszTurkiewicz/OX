@@ -37,6 +37,7 @@ import com.tt.ox.databinding.FragmentOnlinePlayerBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.DateUtils
+import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUserId
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
@@ -219,7 +220,9 @@ class OnlinePlayerFragment : Fragment() {
 
 
     private fun setAdapter() {
-        adapter = OnlineListAdapter(requireContext())
+        adapter = OnlineListAdapter(requireContext()){
+            sendInvitation(it)
+        }
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
         userList.clear()
@@ -228,6 +231,13 @@ class OnlinePlayerFragment : Fragment() {
         listSize = filteredIdList.size
         currentUserPosition = 0
         readUsersFromFirebase(filteredIdList)
+    }
+
+    private fun sendInvitation(user:com.tt.ox.helpers.FirebaseUser){
+        val dbRequest = Firebase.database.getReference("Requests").child(user.id.toString()).child(currentUser!!.uid)
+        val request = FirebaseRequests()
+        request.opponentId = currentUser!!.uid
+        dbRequest.setValue(request)
     }
 
     private fun createUser(userId: String) {
@@ -247,6 +257,9 @@ class OnlinePlayerFragment : Fragment() {
         val newRankingUser = FirebaseUserId()
         newRankingUser.userId = userId
         dbRefRanking.setValue(newRankingUser)
+
+        val dbRequests = Firebase.database.getReference("Requests").child(userId)
+        dbRequests.setValue(true)
 
         prepareUserList()
     }

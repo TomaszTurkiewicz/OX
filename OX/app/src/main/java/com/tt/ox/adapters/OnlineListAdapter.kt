@@ -16,18 +16,21 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.tt.ox.R
 import com.tt.ox.databinding.OnlineListItemBinding
-import com.tt.ox.drawables.BinDrawable
+import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ListItemBackgroundDrawable
+import com.tt.ox.drawables.SendInvitationDrawable
 import com.tt.ox.helpers.DateUtils
 import com.tt.ox.helpers.FirebaseUser
 import com.tt.ox.helpers.ScreenMetricsCompat
 
 class OnlineListAdapter(
-    private val context:Context
+    private val context:Context,
+    private val sendInvitation: (FirebaseUser)->Unit
 ) : ListAdapter<FirebaseUser, OnlineListAdapter.OnlineListViewHolder>(DiffCallback) {
 
     private val width = ScreenMetricsCompat().getWindowWidth(context)
     private val height = width*0.3
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OnlineListViewHolder {
         return OnlineListViewHolder(
             OnlineListItemBinding.inflate(
@@ -54,9 +57,17 @@ class OnlineListAdapter(
 
         setColors(holder)
 
-        setDrawables(holder)
+        setDrawables(holder,current)
 
         setConstraint(holder)
+
+        holder.sendInvitation.setOnClickListener {
+            sendRequest(current)
+        }
+    }
+
+    private fun sendRequest(current:FirebaseUser) {
+        sendInvitation(current)
     }
 
     private fun setConstraint(holder: OnlineListViewHolder) {
@@ -87,12 +98,18 @@ class OnlineListAdapter(
         set.connect(holder.activity.id, ConstraintSet.BOTTOM,holder.wins.id,ConstraintSet.BOTTOM,0)
         set.connect(holder.activity.id, ConstraintSet.RIGHT,holder.background.id,ConstraintSet.RIGHT, height.toInt())
 
+        set.connect(holder.sendInvitation.id,ConstraintSet.TOP,holder.layout.id,ConstraintSet.TOP,0)
+        set.connect(holder.sendInvitation.id,ConstraintSet.BOTTOM,holder.layout.id,ConstraintSet.BOTTOM,0)
+        set.connect(holder.sendInvitation.id,ConstraintSet.RIGHT,holder.layout.id,ConstraintSet.RIGHT, (height/3).toInt())
+
         set.applyTo(holder.layout)
     }
 
-    private fun setDrawables(holder: OnlineListViewHolder) {
+    private fun setDrawables(holder: OnlineListViewHolder,current: FirebaseUser) {
         holder.background.setImageDrawable(ListItemBackgroundDrawable(context))
-        holder.sendInvitation.setImageDrawable(BinDrawable(context, true))
+        holder.sendInvitation.background = ButtonBackground(context)
+        holder.sendInvitation.setImageDrawable(SendInvitationDrawable(context,true))
+
     }
 
     private fun setColors(holder: OnlineListViewHolder) {

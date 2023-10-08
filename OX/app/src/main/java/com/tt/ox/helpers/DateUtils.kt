@@ -72,4 +72,31 @@ class DateUtils {
         }
         return list
     }
+
+    fun getLastActivity(unixTime:Long):String{
+        val currentUnixTime = System.currentTimeMillis()
+
+        val dif = currentUnixTime-unixTime
+
+        val seconds = dif/1000
+        val minutes = seconds/60
+        val hours = minutes/60
+        val days = hours/24
+        val weeks = days/7
+
+        if(weeks!=0L){
+            return "$weeks weeks ago"
+        }
+        if(days!=0L){
+            return "$days days ago"
+        }
+        if(hours!=0L){
+            return "$hours hours ago"
+        }
+        if(minutes!=0L){
+            return "$minutes minutes ago"
+        }
+
+        return "Active now"
+    }
 }

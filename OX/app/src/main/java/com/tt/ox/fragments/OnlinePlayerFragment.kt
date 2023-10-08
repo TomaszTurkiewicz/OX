@@ -138,11 +138,15 @@ class OnlinePlayerFragment : Fragment() {
         val currentDate = DateUtils().getCurrentDate()
         if(user!=null){
             if(user.timestamp==currentDate){
+                user.unixTime = System.currentTimeMillis()
+                val dbRefUser = Firebase.database.getReference("Users").child(user.id.toString())
+                dbRefUser.setValue(user)
                 prepareUserList()
                 //do nothing
             }else{
                 Firebase.database.getReference("Ranking").child(user.timestamp.toString()).child(user.id.toString()).removeValue()
                 user.timestamp = currentDate
+                user.unixTime = System.currentTimeMillis()
                 val dbRefUser = Firebase.database.getReference("Users").child(user.id.toString())
                 dbRefUser.setValue(user)
                 val dbRefRanking = Firebase.database.getReference("Ranking").child(currentDate.toString()).child(user.id.toString())
@@ -207,6 +211,7 @@ class OnlinePlayerFragment : Fragment() {
             })
         }
         else{
+            // todo check if list not empty (if empty show "No users active last month")
             adapter.submitList(userList)
         }
     }
@@ -231,6 +236,7 @@ class OnlinePlayerFragment : Fragment() {
         newUser.id = userId
         newUser.userName = SharedPreferences.readPlayerName(requireContext())
         newUser.timestamp = currentDate
+        newUser.unixTime = System.currentTimeMillis()
 
         // create user in Users
         val dbRefUser = Firebase.database.getReference("Users").child(userId)

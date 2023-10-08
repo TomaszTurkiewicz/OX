@@ -6,4 +6,5 @@ class FirebaseUser(){
     var wins:Int = 0
     var loses:Int = 0
     var timestamp:Int = 0
+    var unixTime:Long = 0
 }

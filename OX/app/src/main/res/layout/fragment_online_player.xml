@@ -14,28 +14,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
-    <Button
-        android:id="@+id/request"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="REQUEST"
-        app:layout_constraintTop_toBottomOf="@id/logout"
-        app:layout_constraintLeft_toLeftOf="parent"/>
 
-    <Button
-        android:id="@+id/accept"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ACCEPT"
-        app:layout_constraintTop_toBottomOf="@id/logout"
-        app:layout_constraintLeft_toRightOf="@id/request"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/request"
+        app:layout_constraintTop_toBottomOf="@id/logout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 

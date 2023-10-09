@@ -132,6 +132,17 @@ class OnlinePlayerFragment : Fragment() {
             override fun onCancelled(error: DatabaseError) {
             }
         })
+
+        val dbRefRequest = Firebase.database.getReference("Requests").child(currentUser!!.uid)
+        dbRefRequest.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                // todo finish this first retrieve user list from requests!!!!
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
     }
 
     private fun updateTimeStamp(snapshot: DataSnapshot) {
@@ -169,7 +180,6 @@ class OnlinePlayerFragment : Fragment() {
 
     }
 
-
     private fun readListFromFirebase(dates: MutableList<Int>) {
         if(currentPosition<datesListSize){
         val dbRef = Firebase.database.getReference("Ranking").child(dates[currentPosition].toString())
@@ -195,6 +205,9 @@ class OnlinePlayerFragment : Fragment() {
     }
 
     private fun readUsersFromFirebase(filteredIdList: List<FirebaseUserId>) {
+//        adapterId.submitList(filteredIdList)
+
+
         if(currentUserPosition<listSize){
             val dbRef = Firebase.database.getReference("Users").child(filteredIdList[currentUserPosition].userId!!)
             dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
@@ -217,13 +230,12 @@ class OnlinePlayerFragment : Fragment() {
         }
     }
 
-
-
     private fun setAdapter() {
         adapter = OnlineListAdapter(requireContext()){
             sendInvitation(it)
         }
         binding.recyclerView.adapter = adapter
+//        binding.recyclerView.adapter = adapterId
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
         userList.clear()
         loopCounter = 0
@@ -234,11 +246,21 @@ class OnlinePlayerFragment : Fragment() {
     }
 
     private fun sendInvitation(user:com.tt.ox.helpers.FirebaseUser){
-        val dbRequest = Firebase.database.getReference("Requests").child(user.id.toString()).child(currentUser!!.uid)
-        val request = FirebaseRequests()
-        request.opponentId = currentUser!!.uid
-        dbRequest.setValue(request)
+        val dbRequests = Firebase.database.getReference("Requests").child(user.id.toString())
+        dbRequests.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(!snapshot.exists()){
+                    val request = FirebaseRequests()
+                    request.opponentId = currentUser!!.uid
+                    dbRequests.setValue(request)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
+
 
     private fun createUser(userId: String) {
         val currentDate = DateUtils().getCurrentDate()
@@ -401,3 +423,5 @@ class OnlinePlayerFragment : Fragment() {
 
     }
 }
+
+//todo search on the list and refresh list button

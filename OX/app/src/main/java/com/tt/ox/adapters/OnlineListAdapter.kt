@@ -14,6 +14,11 @@ import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.tt.ox.R
 import com.tt.ox.databinding.OnlineListItemBinding
 import com.tt.ox.drawables.ButtonBackground
@@ -61,13 +66,22 @@ class OnlineListAdapter(
 
         setConstraint(holder)
 
-        holder.sendInvitation.setOnClickListener {
-            sendRequest(current)
-        }
-    }
+        val dbRequests = Firebase.database.getReference("Requests").child(current.id.toString())
+        dbRequests.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists()){
+                    holder.sendInvitation.setImageDrawable(SendInvitationDrawable(context,false))
+                }else{
+                    holder.sendInvitation.setImageDrawable(SendInvitationDrawable(context,true))
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
 
-    private fun sendRequest(current:FirebaseUser) {
-        sendInvitation(current)
+        holder.sendInvitation.setOnClickListener {
+            sendInvitation(current)
+        }
     }
 
     private fun setConstraint(holder: OnlineListViewHolder) {
@@ -108,7 +122,7 @@ class OnlineListAdapter(
     private fun setDrawables(holder: OnlineListViewHolder,current: FirebaseUser) {
         holder.background.setImageDrawable(ListItemBackgroundDrawable(context))
         holder.sendInvitation.background = ButtonBackground(context)
-        holder.sendInvitation.setImageDrawable(SendInvitationDrawable(context,true))
+
 
     }
 
@@ -143,18 +157,6 @@ class OnlineListAdapter(
                 1,
                 TypedValue.COMPLEX_UNIT_DIP
             )
-//            holder.wins.setAutoSizeTextTypeUniformWithConfiguration(
-//                1,
-//                200,
-//                1,
-//                TypedValue.COMPLEX_UNIT_DIP
-//            )
-//            holder.loses.setAutoSizeTextTypeUniformWithConfiguration(
-//                1,
-//                200,
-//                1,
-//                TypedValue.COMPLEX_UNIT_DIP
-//            )
         } else {
             TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
                 holder.name,
@@ -163,20 +165,6 @@ class OnlineListAdapter(
                 1,
                 TypedValue.COMPLEX_UNIT_DIP
             )
-//            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-//                holder.wins,
-//                1,
-//                200,
-//                1,
-//                TypedValue.COMPLEX_UNIT_DIP
-//            )
-//            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-//                holder.loses,
-//                1,
-//                200,
-//                1,
-//                TypedValue.COMPLEX_UNIT_DIP
-//            )
         }
     }
 

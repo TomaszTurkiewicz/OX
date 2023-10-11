@@ -24,7 +24,9 @@ import com.tt.ox.databinding.OnlineListItemBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ListItemBackgroundDrawable
 import com.tt.ox.drawables.SendInvitationDrawable
+import com.tt.ox.helpers.AVAILABLE
 import com.tt.ox.helpers.DateUtils
+import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUser
 import com.tt.ox.helpers.ScreenMetricsCompat
 
@@ -70,7 +72,12 @@ class OnlineListAdapter(
         dbRequests.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
-                    holder.sendInvitation.setImageDrawable(SendInvitationDrawable(context,false))
+                    val request = snapshot.getValue(FirebaseRequests::class.java)
+                    if(request!!.status== AVAILABLE){
+                        holder.sendInvitation.setImageDrawable(SendInvitationDrawable(context,true))
+                    }else{
+                        holder.sendInvitation.setImageDrawable(SendInvitationDrawable(context,false))
+                    }
                 }else{
                     holder.sendInvitation.setImageDrawable(SendInvitationDrawable(context,true))
                 }

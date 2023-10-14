@@ -41,6 +41,7 @@ import com.tt.ox.helpers.AVAILABLE
 import com.tt.ox.helpers.AlertDialogAddMoves
 import com.tt.ox.helpers.AlertDialogWaiting
 import com.tt.ox.helpers.DateUtils
+import com.tt.ox.helpers.FirebaseBattle
 import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUserId
 import com.tt.ox.helpers.PLAY
@@ -49,6 +50,7 @@ import com.tt.ox.helpers.REJECTED
 import com.tt.ox.helpers.SEND
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
+import kotlin.random.Random
 
 class OnlinePlayerFragment : Fragment() {
 
@@ -235,7 +237,6 @@ class OnlinePlayerFragment : Fragment() {
                             REJECTED -> displayRejectedAlertDialog(inv)
                             ACCEPTED -> displayAcceptedAlertDialog(inv)
                             PLAY -> moveToOnlineBattleFragment()
-                            //TODO anything different clear my request
                             else -> dialogInvitation?.dismiss()
                         }
                     }
@@ -454,7 +455,14 @@ class OnlinePlayerFragment : Fragment() {
             }
         ){
             val dbRefB = dbRefBattle.child(request.battle!!)
-            dbRefB.setValue(true)
+            val battle = FirebaseBattle()
+            battle.battleId = request.battle!!
+            battle.timestamp = System.currentTimeMillis()
+            val random = Random.nextBoolean()
+            val startingPerson = if(random) currentUser!!.uid else request.opponentId!!
+            battle.turn = startingPerson
+            dbRefB.setValue(battle)
+
             val dbRef1 = dbRefRequest.child(request.opponentId!!).child("status")
             dbRef1.setValue(ACCEPTED)
             val dbRef2 = dbRefRequest.child(currentUser!!.uid).child("status")

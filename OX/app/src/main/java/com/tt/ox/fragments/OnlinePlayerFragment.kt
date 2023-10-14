@@ -38,6 +38,7 @@ import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.ACCEPTED
 import com.tt.ox.helpers.AVAILABLE
+import com.tt.ox.helpers.AlertDialogAddMoves
 import com.tt.ox.helpers.AlertDialogWaiting
 import com.tt.ox.helpers.DateUtils
 import com.tt.ox.helpers.FirebaseRequests
@@ -208,7 +209,8 @@ class OnlinePlayerFragment : Fragment() {
     }
 
     private fun displayAddMovesAlertDialog() {
-        //todo!!!
+        dialogMoves = AlertDialogAddMoves(requireContext(),layoutInflater).create()
+        dialogMoves?.show()
     }
 
     private fun checkInvitations() {

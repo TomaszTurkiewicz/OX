@@ -36,12 +36,15 @@ import com.tt.ox.databinding.AlertDialogLogInBinding
 import com.tt.ox.databinding.FragmentOnlinePlayerBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
+import com.tt.ox.helpers.ACCEPTED
 import com.tt.ox.helpers.AVAILABLE
 import com.tt.ox.helpers.AlertDialogWaiting
 import com.tt.ox.helpers.DateUtils
 import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUserId
+import com.tt.ox.helpers.PLAY
 import com.tt.ox.helpers.RECEIVED
+import com.tt.ox.helpers.REJECTED
 import com.tt.ox.helpers.SEND
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
@@ -66,7 +69,9 @@ class OnlinePlayerFragment : Fragment() {
     private val dbRefRequest = Firebase.database.getReference("Requests")
     private val dbRefUsers = Firebase.database.getReference("Users")
     private val dbRefRanking = Firebase.database.getReference("Ranking")
+    private val dbRefBattle = Firebase.database.getReference("Battle")
     private var dialogInvitation:AlertDialog? = null
+    private var dialogMoves:AlertDialog? = null
 
 
 
@@ -162,8 +167,7 @@ class OnlinePlayerFragment : Fragment() {
                 val dbRefUser = dbRefUsers.child(user.id.toString())
                 dbRefUser.setValue(user)
 
-                checkInvitations()
-                prepareUserList()
+                startFragment()
                 //do nothing
             }else{
                 dbRefRanking.child(user.timestamp.toString()).child(user.id.toString()).removeValue()
@@ -176,10 +180,35 @@ class OnlinePlayerFragment : Fragment() {
                 newRankingUser.userId = user.id
                 dbRefRanking.setValue(newRankingUser)
 
-                checkInvitations()
-                prepareUserList()
+                startFragment()
             }
         }
+    }
+
+    private fun startFragment(){
+        val movesDbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
+        movesDbRef.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(!snapshot.exists()){
+                    displayAddMovesAlertDialog()
+                }else{
+                    val moves = snapshot.getValue(Int::class.java)
+                    if(moves!!<=0){
+                        displayAddMovesAlertDialog()
+                    }else{
+                        dialogMoves?.dismiss()
+                        checkInvitations()
+                        prepareUserList()
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    private fun displayAddMovesAlertDialog() {
+        //todo!!!
     }
 
     private fun checkInvitations() {
@@ -191,9 +220,12 @@ class OnlinePlayerFragment : Fragment() {
                     invitation?.let {inv ->
                         when(inv.status){
                             SEND -> displayWaitingAlertDialog(inv)
-                            RECEIVED -> displayAcceptAlertDialog(inv)
+                            RECEIVED -> displayReceivedAlertDialog(inv)
+                            REJECTED -> displayRejectedAlertDialog(inv)
+                            ACCEPTED -> displayAcceptedAlertDialog(inv)
+                            PLAY -> moveToOnlineBattleFragment()
+                            //TODO anything different clear my request
                             else -> dialogInvitation?.dismiss()
-
                         }
                     }
                 }
@@ -206,7 +238,11 @@ class OnlinePlayerFragment : Fragment() {
         })
     }
 
-
+    private fun moveToOnlineBattleFragment() {
+        dialogInvitation?.dismiss()
+        val action = OnlinePlayerFragmentDirections.actionOnlinePlayerFragmentToOnlineBattle()
+        findNavController().navigate(action)
+    }
 
 
     private fun prepareUserList() {
@@ -329,26 +365,89 @@ class OnlinePlayerFragment : Fragment() {
             }
         })
     }
-    private fun displayAcceptAlertDialog(request: FirebaseRequests) {
+
+    private fun displayAcceptedAlertDialog(requests: FirebaseRequests) {
+        dialogInvitation?.dismiss()
+        dialogInvitation = AlertDialogWaiting(
+            requireContext(),
+            layoutInflater,
+            requests.opponentId!!,
+            requests,
+            "Invitation accepted by",
+            false,
+            showTime = false,
+            positiveButtonText = "",
+            negativeButtonText = "PLAY",
+            endTimeCallBack = {
+                //do nothing
+            }, negativeButtonPressed = {
+                val dbRef = dbRefRequest.child(currentUser!!.uid).child("status")
+                dbRef.setValue(PLAY)
+            }){
+            //do nothing
+        }.create()
+
+        dialogInvitation?.show()
+    }
+
+    private fun displayRejectedAlertDialog(request: FirebaseRequests){
+        dialogInvitation?.dismiss()
         dialogInvitation = AlertDialogWaiting(
             requireContext(),
             layoutInflater,
             request.opponentId!!,
             request,
-            "Invitation sent from",
-            true,
-            "ACCEPT",
-            "REJECT",
-            {
+            "Invitation rejected by",
+            positiveButtonEnabled = false,
+            showTime = false,
+            positiveButtonText = "",
+            negativeButtonText = "DISMISS",
+            endTimeCallBack = {
+                //do nothing
+            },
+            negativeButtonPressed = {
                 val dbRef = dbRefRequest.child(currentUser!!.uid)
                 val request1 = FirebaseRequests()
                 request1.status = AVAILABLE
                 dbRef.setValue(request1)
-            },{
-//todo FINISH THIS FIRST
             }
         ){
+            //do nothing
+        }.create()
+        dialogInvitation?.show()
+    }
+    private fun displayReceivedAlertDialog(request: FirebaseRequests) {
+        dialogInvitation = AlertDialogWaiting(
+            requireContext(),
+            layoutInflater,
+            request.opponentId!!,
+            request,
+            "Invitation received from",
+            positiveButtonEnabled = true,
+            showTime = true,
+            positiveButtonText = "ACCEPT",
+            negativeButtonText = "REJECT",
+            endTimeCallBack = {
+                val dbRef = dbRefRequest.child(currentUser!!.uid)
+                val request1 = FirebaseRequests()
+                request1.status = AVAILABLE
+                dbRef.setValue(request1)
+            }, negativeButtonPressed = {
+                val dbRef = dbRefRequest.child(currentUser!!.uid)
+                val request1 = FirebaseRequests()
+                request1.status = AVAILABLE
+                dbRef.setValue(request1)
 
+                val dbRef2 = dbRefRequest.child(request.opponentId!!).child("status")
+                dbRef2.setValue(REJECTED)
+            }
+        ){
+            val dbRefB = dbRefBattle.child(request.battle!!)
+            dbRefB.setValue(true)
+            val dbRef1 = dbRefRequest.child(request.opponentId!!).child("status")
+            dbRef1.setValue(ACCEPTED)
+            val dbRef2 = dbRefRequest.child(currentUser!!.uid).child("status")
+            dbRef2.setValue(PLAY)
         }.create()
 
         dialogInvitation?.show()
@@ -364,24 +463,25 @@ class OnlinePlayerFragment : Fragment() {
             request.opponentId!!,
             request,
             "Invitation sent to",
-            false,
-            "OK",
-            "DISMISS",
-            {
-            val dbRef = dbRefRequest.child(currentUser!!.uid)
-            val request1 = FirebaseRequests()
-            request1.status = AVAILABLE
-            dbRef.setValue(request1)
-        },{
-            val dbRefMy = dbRefRequest.child(currentUser!!.uid)
-            val requestMy = FirebaseRequests()
-            requestMy.status = AVAILABLE
-            dbRefMy.setValue(requestMy)
-            val dbRefOpponent = dbRefRequest.child(request.opponentId!!)
-            val requestOpponent = FirebaseRequests()
-            requestOpponent.status = AVAILABLE
-            dbRefOpponent.setValue(requestOpponent)
-        }){
+            positiveButtonEnabled = false,
+            showTime = true,
+            positiveButtonText = "OK",
+            negativeButtonText = "DISMISS",
+            endTimeCallBack = {val dbRef = dbRefRequest.child(currentUser!!.uid)
+                val request1 = FirebaseRequests()
+                request1.status = AVAILABLE
+                dbRef.setValue(request1)
+            },
+            negativeButtonPressed = {
+                val dbRefMy = dbRefRequest.child(currentUser!!.uid)
+                val requestMy = FirebaseRequests()
+                requestMy.status = AVAILABLE
+                dbRefMy.setValue(requestMy)
+                val dbRefOpponent = dbRefRequest.child(request.opponentId!!)
+                val requestOpponent = FirebaseRequests()
+                requestOpponent.status = AVAILABLE
+                dbRefOpponent.setValue(requestOpponent)
+            }){
           // do nothing
         }.create()
 
@@ -410,8 +510,7 @@ class OnlinePlayerFragment : Fragment() {
         val dbRequests = dbRefRequest.child(userId)
         dbRequests.setValue(true)
 
-        checkInvitations()
-        prepareUserList()
+        startFragment()
     }
 
     override fun onCreateView(
@@ -431,11 +530,7 @@ class OnlinePlayerFragment : Fragment() {
         }
         else{
             prepareUIAndCheckUserInFirebase()
-
         }
-
-
-
     }
 
     private fun displayLoginAlertDialog() {

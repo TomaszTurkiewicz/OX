@@ -27,9 +27,10 @@ class AlertDialogWaiting(
     private val request: FirebaseRequests,
     private val message:String,
     private val positiveButtonEnabled:Boolean,
+    private val showTime:Boolean,
     private val positiveButtonText:String,
     private val negativeButtonText:String,
-    private val deleteInvitation: () -> Unit,
+    private val endTimeCallBack: () -> Unit,
     private val negativeButtonPressed: () -> Unit,
     private val positiveButtonPressed: () -> Unit
     ) {
@@ -49,8 +50,9 @@ class AlertDialogWaiting(
 
         displayUI(alertDialog)
 
-        displayTimeUI(alertDialog).run()
-
+        if(showTime) {
+            displayTimeUI(alertDialog).run()
+        }
         if(!positiveButtonEnabled){
             alertDialog.positiveButton.visibility = View.GONE
         }
@@ -93,7 +95,7 @@ class AlertDialogWaiting(
 
             alertDialog.time.text = "0"
             handler.removeCallbacksAndMessages(null)
-            deleteInvitation()
+            endTimeCallBack()
         }
     }
 

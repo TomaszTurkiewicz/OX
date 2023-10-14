@@ -7,4 +7,5 @@ class FirebaseUser(){
     var loses:Int = 0
     var timestamp:Int = 0
     var unixTime:Long = 0
+    var moves = 10
 }

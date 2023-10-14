@@ -1,7 +1,6 @@
 package com.tt.ox.fragments
 
 
-import android.app.ActionBar
 import android.app.AlertDialog
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
@@ -29,7 +29,6 @@ import com.tt.ox.X
 import com.tt.ox.database.Opponent
 import com.tt.ox.databinding.AlertDialogChangeMarkColorBinding
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
-import com.tt.ox.drawables.AddMovesButton
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
@@ -42,6 +41,7 @@ import com.tt.ox.drawables.RightArrowDrawable
 import com.tt.ox.drawables.SwitchDrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
+import com.tt.ox.helpers.AlertDialogAddMoves
 import com.tt.ox.helpers.MarkColors
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
@@ -68,6 +68,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         )
     }
     private var id = 0
+    private var addMovesDialog:AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,9 +116,9 @@ class MultiPlayerFragment : FragmentCoroutine() {
             }
         }
 
-        binding.addMoves.setOnClickListener {
-            gameViewModel.addMoves(requireContext())
-        }
+//        binding.addMoves.setOnClickListener {
+//            gameViewModel.addMoves(requireContext())
+//        }
 
         binding.topLeftField.setOnClickListener {
             gameViewModel.setTopLeft(requireContext())
@@ -418,7 +419,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
             binding.winLine.setImageDrawable(null)
             binding.winLine.visibility = View.GONE
             binding.reset.visibility = View.GONE
-            binding.addMoves.visibility = View.GONE
+//            binding.addMoves.visibility = View.GONE
         }else{
             binding.winLine.visibility = View.VISIBLE
             winningLineHandler.postDelayed(showWinningLine,500)
@@ -430,10 +431,32 @@ class MultiPlayerFragment : FragmentCoroutine() {
         resetHandler.removeCallbacksAndMessages(null)
         if (fMoves) {
             binding.reset.visibility = View.GONE
-            binding.addMoves.visibility = View.VISIBLE
+            if(!fPlay){
+                displayAddMoves()
+            }
+//            binding.addMoves.visibility = View.VISIBLE
         } else {
             binding.reset.visibility = View.VISIBLE
-            binding.addMoves.visibility = View.GONE
+//            binding.addMoves.visibility = View.GONE
+        }
+    }
+
+    private fun displayAddMoves(){
+        if(addMovesDialog==null) {
+            addMovesDialog = AlertDialogAddMoves(
+                requireContext(),
+                layoutInflater,
+                {
+                    addMovesDialog?.dismiss()
+                    addMovesDialog = null
+                    findNavController().navigateUp()
+                }
+            ) {
+                gameViewModel.addMoves(requireContext())
+                addMovesDialog?.dismiss()
+                addMovesDialog = null
+            }.create()
+            addMovesDialog?.show()
         }
     }
 
@@ -484,13 +507,13 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
         binding.reset.setImageDrawable(ResetButtonDrawable(requireContext()))
 
-        binding.addMoves.setImageDrawable(AddMovesButton(requireContext()))
+//        binding.addMoves.setImageDrawable(AddMovesButton(requireContext()))
 
         binding.mainPlayerMark.background = ButtonBackground(requireContext())
         binding.opponentPlayerMark.background = ButtonBackground(requireContext())
         binding.switchMarks.background = ButtonBackground(requireContext())
         binding.reset.background = ButtonBackground(requireContext())
-        binding.addMoves.background = ButtonBackground(requireContext())
+//        binding.addMoves.background = ButtonBackground(requireContext())
     }
     private fun setSizes(){
         val fieldSize = 3*unit
@@ -512,7 +535,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         binding.winLine.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
 
         binding.reset.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-        binding.addMoves.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
+//        binding.addMoves.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
 
         binding.mainPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
         binding.opponentPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
@@ -520,10 +543,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
         binding.mainPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
         binding.opponentPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
 
-        binding.mainPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,
-            ActionBar.LayoutParams.WRAP_CONTENT)
-        binding.opponentPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,
-            ActionBar.LayoutParams.WRAP_CONTENT)
+        binding.mainPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit, unit)
+        binding.opponentPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
 
         binding.mainPlayerMark.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.opponentPlayerMark.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
@@ -772,15 +793,15 @@ class MultiPlayerFragment : FragmentCoroutine() {
             ConstraintSet.RIGHT, binding.multiPlayerLayout.id,
             ConstraintSet.RIGHT,0)
 
-        set.connect(binding.addMoves.id,
-            ConstraintSet.BOTTOM, binding.multiPlayerLayout.id,
-            ConstraintSet.BOTTOM,0)
-        set.connect(binding.addMoves.id,
-            ConstraintSet.LEFT, binding.multiPlayerLayout.id,
-            ConstraintSet.LEFT,0)
-        set.connect(binding.addMoves.id,
-            ConstraintSet.RIGHT, binding.multiPlayerLayout.id,
-            ConstraintSet.RIGHT,0)
+//        set.connect(binding.addMoves.id,
+//            ConstraintSet.BOTTOM, binding.multiPlayerLayout.id,
+//            ConstraintSet.BOTTOM,0)
+//        set.connect(binding.addMoves.id,
+//            ConstraintSet.LEFT, binding.multiPlayerLayout.id,
+//            ConstraintSet.LEFT,0)
+//        set.connect(binding.addMoves.id,
+//            ConstraintSet.RIGHT, binding.multiPlayerLayout.id,
+//            ConstraintSet.RIGHT,0)
 
         set.applyTo(binding.multiPlayerLayout)
 

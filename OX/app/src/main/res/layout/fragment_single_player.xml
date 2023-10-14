@@ -153,8 +153,7 @@
         android:gravity="center"
         android:maxLines="1"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:background="@color/purple_200"/>
+        app:layout_constraintLeft_toLeftOf="parent"/>
 
     <TextView
         android:id="@+id/opponentPlayerName"
@@ -163,8 +162,7 @@
         android:gravity="center"
         android:maxLines="1"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:background="@color/purple_200"/>
+        app:layout_constraintRight_toRightOf="parent"/>
 
     <ImageView
         android:id="@+id/mainPlayerMark"

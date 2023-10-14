@@ -27,10 +27,17 @@
         app:layout_constraintRight_toRightOf="parent"/>
 
     <ImageView
-        android:id="@+id/button"
+        android:id="@+id/positiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/message"/>
 
+
+    <ImageView
+        android:id="@+id/negativeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/message"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

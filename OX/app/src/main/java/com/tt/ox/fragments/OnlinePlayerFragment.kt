@@ -209,7 +209,16 @@ class OnlinePlayerFragment : Fragment() {
     }
 
     private fun displayAddMovesAlertDialog() {
-        dialogMoves = AlertDialogAddMoves(requireContext(),layoutInflater).create()
+        dialogMoves = AlertDialogAddMoves(
+            requireContext(),
+            layoutInflater,{
+                dialogMoves?.dismiss()
+                findNavController().navigateUp()
+            }){
+            dialogMoves?.dismiss()
+          val dbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
+          dbRef.setValue(10)
+        }.create()
         dialogMoves?.show()
     }
 

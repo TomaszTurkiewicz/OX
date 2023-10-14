@@ -15,6 +15,8 @@ import com.tt.ox.drawables.ButtonWithTextDrawable
 class AlertDialogAddMoves(
     private val context: Context,
     private val layoutInflater: LayoutInflater,
+    private val dismissClick: () -> Unit,
+    private val addMovesClick: () -> Unit
 ) {
 
     private val builder = AlertDialog.Builder(context)
@@ -28,6 +30,14 @@ class AlertDialogAddMoves(
         setAlertDialogConstraints(alertDialog)
 
         builder.setView(alertDialog.root)
+
+        alertDialog.negativeButton.setOnClickListener {
+            dismissClick()
+        }
+
+        alertDialog.positiveButton.setOnClickListener {
+            addMovesClick()
+        }
 
         val dialog = builder.create()
         dialog.setCancelable(false)
@@ -52,22 +62,33 @@ class AlertDialogAddMoves(
         set.connect(alertDialog.message.id, ConstraintSet.LEFT,alertDialog.layout.id, ConstraintSet.LEFT)
         set.connect(alertDialog.message.id, ConstraintSet.RIGHT,alertDialog.layout.id, ConstraintSet.RIGHT)
 
-        set.connect(alertDialog.button.id,
+        set.connect(alertDialog.positiveButton.id,
             ConstraintSet.RIGHT,alertDialog.layout.id,
             ConstraintSet.RIGHT,
             (width*0.05).toInt()
         )
-        set.connect(alertDialog.button.id,
-            ConstraintSet.LEFT,alertDialog.layout.id,
-            ConstraintSet.LEFT,
-            (width*0.05).toInt()
-        )
-        set.connect(alertDialog.button.id,
+        set.connect(alertDialog.positiveButton.id,
             ConstraintSet.TOP,alertDialog.message.id,
             ConstraintSet.BOTTOM,
             (width*0.1).toInt()
         )
-        set.connect(alertDialog.button.id,
+        set.connect(alertDialog.positiveButton.id,
+            ConstraintSet.BOTTOM,alertDialog.layout.id,
+            ConstraintSet.BOTTOM,
+            (width*0.05).toInt()
+        )
+
+        set.connect(alertDialog.negativeButton.id,
+            ConstraintSet.LEFT,alertDialog.layout.id,
+            ConstraintSet.LEFT,
+            (width*0.05).toInt()
+        )
+        set.connect(alertDialog.negativeButton.id,
+            ConstraintSet.TOP,alertDialog.message.id,
+            ConstraintSet.BOTTOM,
+            (width*0.1).toInt()
+        )
+        set.connect(alertDialog.negativeButton.id,
             ConstraintSet.BOTTOM,alertDialog.layout.id,
             ConstraintSet.BOTTOM,
             (width*0.05).toInt()
@@ -81,12 +102,16 @@ class AlertDialogAddMoves(
         alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
         alertDialog.message.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.05f)
         alertDialog.message.setPadding((width*0.05).toInt(),0,(width*0.05).toInt(),0)
-        alertDialog.button.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+        alertDialog.positiveButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+        alertDialog.negativeButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
     }
 
     private fun setButtonsUI(alertDialog: AlertDialogAddMovesBinding) {
-        alertDialog.button.background = ButtonBackground(context)
-        alertDialog.button.setImageDrawable(ButtonWithTextDrawable(context,"ADD"))
+        alertDialog.positiveButton.background = ButtonBackground(context)
+        alertDialog.positiveButton.setImageDrawable(ButtonWithTextDrawable(context,"ADD"))
+
+        alertDialog.negativeButton.background = ButtonBackground(context)
+        alertDialog.negativeButton.setImageDrawable(ButtonWithTextDrawable(context,"DISMISS"))
     }
 
     private fun setAlertDialogColors(alertDialog: AlertDialogAddMovesBinding) {

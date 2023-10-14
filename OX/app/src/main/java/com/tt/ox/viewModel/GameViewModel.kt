@@ -210,7 +210,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     }
 
     private fun resetMoves(context: Context){
-        _moves.value = 10
+        _moves.value = 2
         saveMovesToSharedPreferences(context)
     }
 

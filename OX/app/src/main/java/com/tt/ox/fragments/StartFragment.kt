@@ -192,7 +192,7 @@ class StartFragment : Fragment() {
                 findNavController().navigate(action)
             }
             it.onlinePlayerButton.setOnClickListener {
-                val action = StartFragmentDirections.actionStartFragmentToOnlinePlayerFragment()
+                val action = StartFragmentDirections.actionStartFragmentToOnlineChooseOpponentFragment()
                 findNavController().navigate(action)
             }
         }

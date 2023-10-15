@@ -27,13 +27,14 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.tt.ox.R
 import com.tt.ox.adapters.OnlineListAdapter
 import com.tt.ox.databinding.AlertDialogLogInBinding
-import com.tt.ox.databinding.FragmentOnlinePlayerBinding
+import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.ACCEPTED
@@ -52,35 +53,39 @@ import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import kotlin.random.Random
 
-class OnlinePlayerFragment : Fragment() {
 
-    private var _binding: FragmentOnlinePlayerBinding? = null
+class OnlineChooseOpponentFragment : Fragment() {
+    private var _binding: FragmentOnlineChooseOpponentBinding? = null
     private val binding get() = _binding!!
-    private lateinit var auth:FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var auth: FirebaseAuth
     private var width = 0
     private var currentUser: FirebaseUser? = null
-    private val idList:MutableList<FirebaseUserId> = mutableListOf()
-    private lateinit var adapter: OnlineListAdapter
-    private val userList:MutableList<com.tt.ox.helpers.FirebaseUser> = mutableListOf()
-    private var loopCounter = 0
-    private var listSize = 0
-    private var datesListSize = 0
-    private var currentPosition = 0
-    private var currentUserPosition = 0
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private val dbRefRequest = Firebase.database.getReference("Requests")
     private val dbRefUsers = Firebase.database.getReference("Users")
     private val dbRefRanking = Firebase.database.getReference("Ranking")
     private val dbRefBattle = Firebase.database.getReference("Battle")
-    private var dialogInvitation:AlertDialog? = null
+    private var invitationsDbRef: DatabaseReference? = null
+    private var invitationsListener: ValueEventListener? = null
+    private var movesDbRef: DatabaseReference? = null
+    private var movesListener: ValueEventListener? = null
     private var dialogMoves:AlertDialog? = null
-
+    private val idList:MutableList<FirebaseUserId> = mutableListOf()
+    private var datesListSize = 0
+    private var currentPosition = 0
+    private lateinit var adapter: OnlineListAdapter
+    private val userList:MutableList<com.tt.ox.helpers.FirebaseUser> = mutableListOf()
+    private var loopCounter = 0
+    private var listSize = 0
+    private var currentUserPosition = 0
+    private var dialogInvitation:AlertDialog? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
+
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -98,6 +103,38 @@ class OnlinePlayerFragment : Fragment() {
                 displayLoginAlertDialog()
             }
         }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentOnlineChooseOpponentBinding.inflate(inflater,container,false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // todo UI sizes and drawables
+    }
+
+    override fun onResume() {
+        super.onResume()
+        currentUser = auth.currentUser
+
+
+        if(currentUser==null){
+            displayLoginAlertDialog()
+        }
+        else{
+            prepareUIAndCheckUserInFirebase()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        invitationsDbRef?.removeEventListener(invitationsListener!!)
+        movesDbRef?.removeEventListener(movesListener!!)
     }
 
     private fun doSomething(data: Intent?) {
@@ -134,7 +171,7 @@ class OnlinePlayerFragment : Fragment() {
 
 
         val dbRef = dbRefUsers.child(currentUser!!.uid)
-        dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(!snapshot.exists()){
 
@@ -147,17 +184,6 @@ class OnlinePlayerFragment : Fragment() {
             }
             override fun onCancelled(error: DatabaseError) {
             }
-        })
-
-        val dbRefR = dbRefRequest.child(currentUser!!.uid)
-        dbRefR.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                // todo finish this first retrieve user list from requests!!!!
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-            }
-
         })
     }
 
@@ -189,8 +215,8 @@ class OnlinePlayerFragment : Fragment() {
     }
 
     private fun startFragment(){
-        val movesDbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
-        movesDbRef.addValueEventListener(object : ValueEventListener{
+        movesDbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
+        movesListener = movesDbRef!!.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(!snapshot.exists()){
                     displayAddMovesAlertDialog()
@@ -210,53 +236,6 @@ class OnlinePlayerFragment : Fragment() {
         })
     }
 
-    private fun displayAddMovesAlertDialog() {
-        dialogMoves = AlertDialogAddMoves(
-            requireContext(),
-            layoutInflater,{
-                dialogMoves?.dismiss()
-                findNavController().navigateUp()
-            }){
-            dialogMoves?.dismiss()
-          val dbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
-          dbRef.setValue(10)
-        }.create()
-        dialogMoves?.show()
-    }
-
-    private fun checkInvitations() {
-        val invitationsDbRef = dbRefRequest.child(currentUser!!.uid)
-        invitationsDbRef.addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot?.let {
-                    val invitation = it.getValue(FirebaseRequests::class.java)
-                    invitation?.let {inv ->
-                        when(inv.status){
-                            SEND -> displayWaitingAlertDialog(inv)
-                            RECEIVED -> displayReceivedAlertDialog(inv)
-                            REJECTED -> displayRejectedAlertDialog(inv)
-                            ACCEPTED -> displayAcceptedAlertDialog(inv)
-                            PLAY -> moveToOnlineBattleFragment()
-                            else -> dialogInvitation?.dismiss()
-                        }
-                    }
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-
-        })
-    }
-
-    private fun moveToOnlineBattleFragment() {
-        dialogInvitation?.dismiss()
-        val action = OnlinePlayerFragmentDirections.actionOnlinePlayerFragmentToOnlineBattle()
-        findNavController().navigate(action)
-    }
-
-
     private fun prepareUserList() {
         idList.clear()
         val dates = DateUtils().getLastMonth()
@@ -268,29 +247,48 @@ class OnlinePlayerFragment : Fragment() {
 
     private fun readListFromFirebase(dates: MutableList<Int>) {
         if(currentPosition<datesListSize){
-        val dbRef = dbRefRanking.child(dates[currentPosition].toString())
-        dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists()){
-                    for(id in snapshot.children){
-                        val tId = id.getValue(FirebaseUserId::class.java)
-                        idList.add(tId!!)
+            val dbRef = dbRefRanking.child(dates[currentPosition].toString())
+            dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(snapshot.exists()){
+                        for(id in snapshot.children){
+                            val tId = id.getValue(FirebaseUserId::class.java)
+                            idList.add(tId!!)
+                        }
                     }
+                    currentPosition+=1
+                    readListFromFirebase(dates)
                 }
-                currentPosition+=1
-                readListFromFirebase(dates)
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
         }
         else{
             setAdapter()
         }
     }
 
+    private fun setAdapter() {
+        try {
+        adapter = OnlineListAdapter(requireContext()){
+            sendInvitation(it)
+        }
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
+        userList.clear()
+        loopCounter = 0
+        val filteredIdList = idList.filter { id -> id.userId != currentUser!!.uid }
+        listSize = filteredIdList.size
+        currentUserPosition = 0
+        readUsersFromFirebase(filteredIdList)
+        }catch (e:Exception){
+
+        }
+    }
+
     private fun readUsersFromFirebase(filteredIdList: List<FirebaseUserId>) {
+
         if(currentUserPosition<listSize){
             val dbRef = dbRefUsers.child(filteredIdList[currentUserPosition].userId!!)
             dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
@@ -309,25 +307,10 @@ class OnlinePlayerFragment : Fragment() {
         }
         else{
             // todo check if list not empty (if empty show "No users active last month")
+
             adapter.submitList(userList)
 
         }
-    }
-
-
-
-    private fun setAdapter() {
-        adapter = OnlineListAdapter(requireContext()){
-            sendInvitation(it)
-        }
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
-        userList.clear()
-        loopCounter = 0
-        val filteredIdList = idList.filter { id -> id.userId != currentUser!!.uid }
-        listSize = filteredIdList.size
-        currentUserPosition = 0
-        readUsersFromFirebase(filteredIdList)
     }
 
     private fun sendInvitation(user:com.tt.ox.helpers.FirebaseUser){
@@ -378,7 +361,44 @@ class OnlinePlayerFragment : Fragment() {
         })
     }
 
-    private fun displayAcceptedAlertDialog(requests: FirebaseRequests) {
+    private fun checkInvitations() {
+        invitationsDbRef = dbRefRequest.child(currentUser!!.uid)
+        invitationsListener = invitationsDbRef!!.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot?.let {
+                    val invitation = it.getValue(FirebaseRequests::class.java)
+                    invitation?.let {inv ->
+                        when(inv.status){
+                            SEND -> displayWaitingAlertDialog(inv)
+                            RECEIVED -> displayReceivedAlertDialog(inv)
+                            REJECTED -> displayRejectedAlertDialog(inv)
+                            ACCEPTED -> displayAcceptedAlertDialog(inv)
+                            PLAY -> moveToOnlineBattleFragment()
+                            else -> dialogInvitation?.dismiss()
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
+    }
+
+    private fun moveToOnlineBattleFragment() {
+
+        idList.clear()
+        userList.clear()
+        dialogInvitation?.dismiss()
+        val action = OnlineChooseOpponentFragmentDirections.actionOnlineChooseOpponentFragmentToOnlineBattle()
+
+        findNavController().navigate(action)
+    }
+
+    private fun displayAcceptedAlertDialog(
+        requests: FirebaseRequests) {
         dialogInvitation?.dismiss()
         dialogInvitation = AlertDialogWaiting(
             requireContext(),
@@ -402,7 +422,8 @@ class OnlinePlayerFragment : Fragment() {
         dialogInvitation?.show()
     }
 
-    private fun displayRejectedAlertDialog(request: FirebaseRequests){
+    private fun displayRejectedAlertDialog(
+        request: FirebaseRequests){
         dialogInvitation?.dismiss()
         dialogInvitation = AlertDialogWaiting(
             requireContext(),
@@ -428,6 +449,7 @@ class OnlinePlayerFragment : Fragment() {
         }.create()
         dialogInvitation?.show()
     }
+
     private fun displayReceivedAlertDialog(request: FirebaseRequests) {
         dialogInvitation = AlertDialogWaiting(
             requireContext(),
@@ -501,11 +523,25 @@ class OnlinePlayerFragment : Fragment() {
                 requestOpponent.status = AVAILABLE
                 dbRefOpponent.setValue(requestOpponent)
             }){
-          // do nothing
+            // do nothing
         }.create()
 
         dialogInvitation?.show()
 
+    }
+
+    private fun displayAddMovesAlertDialog() {
+        dialogMoves = AlertDialogAddMoves(
+            requireContext(),
+            layoutInflater,{
+                dialogMoves?.dismiss()
+                findNavController().navigateUp()
+            }){
+            dialogMoves?.dismiss()
+            val dbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
+            dbRef.setValue(10)
+        }.create()
+        dialogMoves?.show()
     }
 
     private fun createUser(userId: String) {
@@ -530,26 +566,6 @@ class OnlinePlayerFragment : Fragment() {
         dbRequests.setValue(true)
 
         startFragment()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentOnlinePlayerBinding.inflate(inflater,container,false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        currentUser = auth.currentUser
-        if(currentUser==null){
-            displayLoginAlertDialog()
-        }
-        else{
-            prepareUIAndCheckUserInFirebase()
-        }
     }
 
     private fun displayLoginAlertDialog() {
@@ -582,6 +598,27 @@ class OnlinePlayerFragment : Fragment() {
         setAlertDialogSizes(alertDialog)
         setAlertDialogDrawables(alertDialog,"LOGIN", "CANCEL")
         setAlertDialogConstraints(alertDialog)
+    }
+
+    private fun setAlertDialogColors(alertDialog: AlertDialogLogInBinding) {
+        alertDialog.title.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        alertDialog.message.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+
+    }
+
+    private fun setAlertDialogSizes(alertDialog: AlertDialogLogInBinding) {
+        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
+        alertDialog.message.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.05f)
+        alertDialog.message.setPadding((width*0.05).toInt(),0,(width*0.05).toInt(),0)
+        alertDialog.loginButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+        alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+    }
+
+    private fun setAlertDialogDrawables(alertDialog: AlertDialogLogInBinding,positive:String,negative:String) {
+        alertDialog.loginButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),positive))
+        alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),negative))
+        alertDialog.loginButton.background = ButtonBackground(requireContext())
+        alertDialog.cancelButton.background = ButtonBackground(requireContext())
     }
 
     private fun setAlertDialogConstraints(alertDialog: AlertDialogLogInBinding) {
@@ -643,26 +680,4 @@ class OnlinePlayerFragment : Fragment() {
 
         set.applyTo(alertDialog.alertDialogLogIn)
     }
-
-    private fun setAlertDialogDrawables(alertDialog: AlertDialogLogInBinding,positive:String,negative:String) {
-        alertDialog.loginButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),positive))
-        alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),negative))
-        alertDialog.loginButton.background = ButtonBackground(requireContext())
-        alertDialog.cancelButton.background = ButtonBackground(requireContext())
-    }
-
-    private fun setAlertDialogSizes(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
-        alertDialog.message.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.05f)
-        alertDialog.message.setPadding((width*0.05).toInt(),0,(width*0.05).toInt(),0)
-        alertDialog.loginButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-        alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-    }
-
-    private fun setAlertDialogColors(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        alertDialog.message.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
-    }
 }
-

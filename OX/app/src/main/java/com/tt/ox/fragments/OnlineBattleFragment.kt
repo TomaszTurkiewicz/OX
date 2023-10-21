@@ -1,6 +1,7 @@
 package com.tt.ox.fragments
 
 import android.app.ActionBar
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
@@ -19,14 +20,22 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.tt.ox.MainActivity
 import com.tt.ox.R
+import com.tt.ox.X
 import com.tt.ox.databinding.FragmentOnlineBattleBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.MeshDrawable
+import com.tt.ox.drawables.ODrawable
 import com.tt.ox.drawables.PointerUpperDrawable
+import com.tt.ox.drawables.XDrawable
+import com.tt.ox.helpers.FirebaseBattle
+import com.tt.ox.helpers.FirebaseHistory
 import com.tt.ox.helpers.FirebaseRequests
+import com.tt.ox.helpers.FirebaseUser
+import com.tt.ox.helpers.OnlineMarks
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.SharedPreferences
+import kotlin.random.Random
 
 class OnlineBattleFragment : Fragment() {
     private var _binding:FragmentOnlineBattleBinding? = null
@@ -36,14 +45,21 @@ class OnlineBattleFragment : Fragment() {
     private val currentUser = FirebaseAuth.getInstance().currentUser
     private var dbRefBattle:DatabaseReference? = null
     private val dbRefRequest = Firebase.database.getReference("Requests")
+    private val dbRefUser = Firebase.database.getReference("Users")
+    private val dbRefHistory = Firebase.database.getReference("History")
     private var battleId:String = ""
+    private var opponentId:String = ""
+    private var request:FirebaseRequests? = null
+    private var score:FirebaseHistory? = null
+    private lateinit var marks: OnlineMarks
+    private var battleListener: ValueEventListener? = null
+    private lateinit var onlineBattle: FirebaseBattle
+    private var myTurn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
-        val activity = activity as MainActivity
-        activity.setBack()
     }
 
     override fun onCreateView(
@@ -66,11 +82,14 @@ class OnlineBattleFragment : Fragment() {
         dbR.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
-                    val req = snapshot.getValue(FirebaseRequests::class.java)
-                    battleId = req!!.battle!!
+                    request = snapshot.getValue(FirebaseRequests::class.java)
+                    battleId = request!!.battle!!
+                    opponentId = request!!.opponentId!!
                     dbRefBattle = Firebase.database.getReference("Battle").child(battleId)
                     checkIfBattleExists()
 
+                }else{
+                    findNavController().navigateUp()
                 }
             }
 
@@ -83,36 +102,252 @@ class OnlineBattleFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        dbRefBattle = null
+        dbRefBattle?.removeEventListener(battleListener!!)
     }
 
     private fun checkIfBattleExists() {
         dbRefBattle!!.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
-
+                        setUpUI()
                 }else{
-                    val req = FirebaseRequests()
-                    dbRefRequest.child(currentUser!!.uid).setValue(req)
-//                    val currentFragment = findNavController().currentDestination
-//                    val a = 100
-                    val action = OnlineBattleFragmentDirections.actionOnlineBattleToOnlineChooseOpponentFragment()
-                    findNavController().navigateUp()
+                    val battle = FirebaseBattle()
+                    battle.battleId = battleId
+                    battle.timestamp = System.currentTimeMillis()
+                    val random = Random.nextBoolean()
+                    val startingPerson = if(random) currentUser!!.uid else opponentId
+                    battle.turn = startingPerson
+                    dbRefBattle!!.setValue(battle)
+                    setUpUI()
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
 
+    private fun setUpUI() {
+
+        val myDbRef = dbRefUser.child(currentUser!!.uid)
+        myDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshotMe: DataSnapshot) {
+                val me = snapshotMe.getValue(FirebaseUser::class.java)
+                binding.mainPlayerName.text = me!!.userName
+                val opponentDbRef = dbRefUser.child(request!!.opponentId!!)
+                opponentDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onDataChange(snapshotOpponent: DataSnapshot) {
+                        val opponent = snapshotOpponent.getValue(FirebaseUser::class.java)
+                        binding.opponentPlayerName.text = opponent!!.userName
+                        setHistory()
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                })
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    private fun setHistory() {
+        val history = dbRefHistory.child(currentUser!!.uid).child(request!!.opponentId!!)
+        history.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(!snapshot.exists()){
+                    score = FirebaseHistory()
+                    history.setValue(score)
+                    displayScore()
+                }else{
+                    score = snapshot.getValue(FirebaseHistory::class.java)
+                    displayScore()
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
             }
 
         })
+    }
+
+    private fun displayScore() {
+        binding.mainPlayerWins.text = score!!.wins.toString()
+        binding.opponentPlayerWins.text = score!!.loses.toString()
+        displayMarks()
 
     }
+
+    private fun displayMarks() {
+        marks = SharedPreferences.readOnlineMarks(requireContext())
+        binding.mainPlayerMark.setImageDrawable(
+            if(marks.playerMark == X) XDrawable(requireContext(),marks.playerColor,true) else ODrawable(requireContext(),marks.playerColor,true)
+        )
+        binding.opponentPlayerMark.setImageDrawable(
+            if(marks.opponentMark == X) XDrawable(requireContext(),marks.opponentColor,true) else ODrawable(requireContext(),marks.opponentColor,true)
+        )
+        startGame()
+    }
+
+    private fun startGame() {
+        battleListener = dbRefBattle!!.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                onlineBattle = snapshot.getValue(FirebaseBattle::class.java)!!
+                setOnClickListeners()
+                displayField()
+                gameLogic()
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    private fun displayField() {
+        binding.topLeftField.setImageDrawable(
+            displayField(onlineBattle.field.topLeft)
+        )
+        binding.topMidField.setImageDrawable(
+            displayField(onlineBattle.field.topMid)
+        )
+        binding.topRightField.setImageDrawable(
+            displayField(onlineBattle.field.topRight)
+        )
+
+        binding.midLeftField.setImageDrawable(
+            displayField(onlineBattle.field.midLeft)
+        )
+        binding.midMidField.setImageDrawable(
+            displayField(onlineBattle.field.midMid)
+        )
+        binding.midRightField.setImageDrawable(
+            displayField(onlineBattle.field.midRight)
+        )
+
+        binding.bottomLeftField.setImageDrawable(
+            displayField(onlineBattle.field.bottomLeft)
+        )
+        binding.bottomMidField.setImageDrawable(
+            displayField(onlineBattle.field.bottomMid)
+        )
+        binding.bottomRightField.setImageDrawable(
+            displayField(onlineBattle.field.bottomRight)
+        )
+    }
+
+    private fun displayField(string:String):Drawable?{
+        return when(string){
+            currentUser!!.uid -> markDrawable(true)
+            request!!.opponentId -> markDrawable(false)
+            else -> null
+        }
+    }
+
+    private fun markDrawable(mainPlayer:Boolean):Drawable{
+        return if(mainPlayer){
+            if(marks.playerMark==X) XDrawable(requireContext(),marks.playerColor,false) else ODrawable(requireContext(),marks.playerColor,false)
+        }else{
+            if(marks.opponentMark==X) XDrawable(requireContext(),marks.opponentColor,false) else ODrawable(requireContext(),marks.opponentColor,false)
+        }
+    }
+
+    private fun setOnClickListeners() {
+        binding.topLeftField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.topLeft == ""){
+                    dbRefBattle!!.child("field").child("topLeft").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+            }
+        }
+        binding.topMidField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.topMid == ""){
+                    dbRefBattle!!.child("field").child("topMid").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+                }
+        }
+        binding.topRightField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.topRight == ""){
+                    dbRefBattle!!.child("field").child("topRight").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+                }
+        }
+
+        binding.midLeftField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.midLeft == ""){
+                    dbRefBattle!!.child("field").child("midLeft").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+            }
+        }
+        binding.midMidField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.midMid == ""){
+                    dbRefBattle!!.child("field").child("midMid").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+            }
+        }
+        binding.midRightField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.midRight == ""){
+                    dbRefBattle!!.child("field").child("midRight").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+            }
+        }
+
+        binding.bottomLeftField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.bottomLeft == ""){
+                    dbRefBattle!!.child("field").child("bottomLeft").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+            }
+        }
+        binding.bottomMidField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.bottomMid == ""){
+                    dbRefBattle!!.child("field").child("bottomMid").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+            }
+        }
+        binding.bottomRightField.setOnClickListener {
+            if(myTurn){
+                if(onlineBattle.field.bottomRight == ""){
+                    dbRefBattle!!.child("field").child("bottomRight").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn()
+                }
+            }
+        }
+    }
+
+    private fun checkWinningAndChangeTurn(){
+        //todo check winning
+        dbRefBattle!!.child("turn").setValue(request!!.opponentId)
+    }
+
+    private fun gameLogic() {
+        myTurn = onlineBattle.turn == currentUser!!.uid
+        if(myTurn){
+            binding.mainPlayerPointerUpper.visibility = View.VISIBLE
+            binding.opponentPointerUpper.visibility = View.GONE
+        }else{
+            binding.mainPlayerPointerUpper.visibility = View.GONE
+            binding.opponentPointerUpper.visibility = View.VISIBLE
+        }
+    }
+
+
 
     private fun prepareUI() {
         setSizes()
         setDrawables()
         setConstraint()
+        binding.mainPlayerPointerUpper.visibility = View.GONE
+        binding.opponentPointerUpper.visibility = View.GONE
     }
 
     private fun setConstraint() {
@@ -237,7 +472,7 @@ class OnlineBattleFragment : Fragment() {
 
         set.connect(binding.mainPlayerWins.id,
             ConstraintSet.TOP,binding.onlineBattleLayout.id,
-            ConstraintSet.TOP,0)
+            ConstraintSet.TOP, (unit*1.5).toInt())
         set.connect(binding.mainPlayerWins.id,
             ConstraintSet.LEFT,binding.onlineBattleLayout.id,
             ConstraintSet.LEFT,0)
@@ -266,7 +501,7 @@ class OnlineBattleFragment : Fragment() {
 
         set.connect(binding.opponentPlayerWins.id,
             ConstraintSet.TOP,binding.onlineBattleLayout.id,
-            ConstraintSet.TOP,0)
+            ConstraintSet.TOP,(unit*1.5).toInt())
         set.connect(binding.opponentPlayerWins.id,
             ConstraintSet.RIGHT,binding.onlineBattleLayout.id,
             ConstraintSet.RIGHT,unit)

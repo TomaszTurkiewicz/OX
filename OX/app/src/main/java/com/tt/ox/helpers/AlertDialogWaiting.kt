@@ -27,7 +27,7 @@ class AlertDialogWaiting(
     private val request: FirebaseRequests,
     private val message:String,
     private val positiveButtonEnabled:Boolean,
-    private val showTime:Boolean,
+    private val showTimeInvitation:Boolean,
     private val positiveButtonText:String,
     private val negativeButtonText:String,
     private val endTimeCallBack: () -> Unit,
@@ -50,8 +50,8 @@ class AlertDialogWaiting(
 
         displayUI(alertDialog)
 
-        if(showTime) {
-            displayTimeUI(alertDialog).run()
+        if(showTimeInvitation) {
+            displayTimeInvitationUI(alertDialog).run()
         }
         if(!positiveButtonEnabled){
             alertDialog.positiveButton.visibility = View.GONE
@@ -78,7 +78,7 @@ class AlertDialogWaiting(
 
     }
 
-    private fun displayTimeUI(
+    private fun displayTimeInvitationUI(
         alertDialog: AlertDialogInvitationBinding
     ):Runnable = Runnable {
         val handler = Handler(Looper.getMainLooper())
@@ -89,7 +89,7 @@ class AlertDialogWaiting(
 
 
         if(timeLeft>=0) {
-            handler.postDelayed(displayTimeUI(alertDialog), 1000)
+            handler.postDelayed(displayTimeInvitationUI(alertDialog), 1000)
             alertDialog.time.text = timeLeft.toString()
         }else{
 

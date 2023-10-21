@@ -407,7 +407,7 @@ class OnlineChooseOpponentFragment : Fragment() {
             requests,
             "Invitation accepted by",
             false,
-            showTime = false,
+            showTimeInvitation = false,
             positiveButtonText = "",
             negativeButtonText = "PLAY",
             endTimeCallBack = {
@@ -432,7 +432,7 @@ class OnlineChooseOpponentFragment : Fragment() {
             request,
             "Invitation rejected by",
             positiveButtonEnabled = false,
-            showTime = false,
+            showTimeInvitation = false,
             positiveButtonText = "",
             negativeButtonText = "DISMISS",
             endTimeCallBack = {
@@ -458,7 +458,7 @@ class OnlineChooseOpponentFragment : Fragment() {
             request,
             "Invitation received from",
             positiveButtonEnabled = true,
-            showTime = true,
+            showTimeInvitation = true,
             positiveButtonText = "ACCEPT",
             negativeButtonText = "REJECT",
             endTimeCallBack = {
@@ -505,7 +505,7 @@ class OnlineChooseOpponentFragment : Fragment() {
             request,
             "Invitation sent to",
             positiveButtonEnabled = false,
-            showTime = true,
+            showTimeInvitation = true,
             positiveButtonText = "OK",
             negativeButtonText = "DISMISS",
             endTimeCallBack = {val dbRef = dbRefRequest.child(currentUser!!.uid)

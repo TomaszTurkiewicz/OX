@@ -1,6 +1,8 @@
 package com.tt.ox.helpers
 
 import android.content.Context
+import com.tt.ox.O
+import com.tt.ox.X
 
 class SharedPreferences {
     companion object {
@@ -48,6 +50,18 @@ class SharedPreferences {
                 moves = sharedPreferences.getInt("moves",0)
             }
             return moves
+        }
+
+        fun readOnlineMarks(context: Context):OnlineMarks{
+            var onlineMarks = OnlineMarks()
+            context.let {
+                val sharedPreferences = it.getSharedPreferences("OnlineMarks",Context.MODE_PRIVATE)
+                onlineMarks.playerMark = sharedPreferences.getInt("playerMark", X)
+                onlineMarks.playerColor = sharedPreferences.getInt("playerColor", COLOR_BLACK)
+                onlineMarks.opponentMark = sharedPreferences.getInt("opponentMark", O)
+                onlineMarks.opponentColor = sharedPreferences.getInt("opponentColor", COLOR_BLACK)
+            }
+            return onlineMarks
         }
     }
 }

@@ -8,6 +8,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -27,15 +28,30 @@ import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
 import com.tt.ox.drawables.PointerUpperDrawable
+import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
+import com.tt.ox.helpers.ANGLE_DOWN_LINE
+import com.tt.ox.helpers.ANGLE_UP_LINE
+import com.tt.ox.helpers.BOTTOM_LINE
+import com.tt.ox.helpers.END_DRAW
 import com.tt.ox.helpers.FirebaseBattle
 import com.tt.ox.helpers.FirebaseHistory
 import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUser
+import com.tt.ox.helpers.HORIZONTAL_MID_LINE
+import com.tt.ox.helpers.LEFT_LINE
+import com.tt.ox.helpers.NONE
 import com.tt.ox.helpers.OnlineMarks
+import com.tt.ox.helpers.RIGHT_LINE
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
+import com.tt.ox.helpers.TOP_LINE
+import com.tt.ox.helpers.VERTICAL_MID_LINE
 import kotlin.random.Random
+
+private const val CONTINUE = 0
+private const val WIN = 1
+private const val DRAW = 2
 
 class OnlineBattleFragment : Fragment() {
     private var _binding:FragmentOnlineBattleBinding? = null
@@ -55,6 +71,7 @@ class OnlineBattleFragment : Fragment() {
     private var battleListener: ValueEventListener? = null
     private lateinit var onlineBattle: FirebaseBattle
     private var myTurn = false
+    private var play = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -187,10 +204,10 @@ class OnlineBattleFragment : Fragment() {
     }
 
     private fun startGame() {
+        setOnClickListeners()
         battleListener = dbRefBattle!!.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 onlineBattle = snapshot.getValue(FirebaseBattle::class.java)!!
-                setOnClickListeners()
                 displayField()
                 gameLogic()
             }
@@ -229,6 +246,36 @@ class OnlineBattleFragment : Fragment() {
         binding.bottomRightField.setImageDrawable(
             displayField(onlineBattle.field.bottomRight)
         )
+        displayWinningLine()
+    }
+
+    private fun displayWinningLine() {
+        var horizontalTop = false
+        var horizontalMid = false
+        var horizontalBottom = false
+        var verticalLeft = false
+        var verticalMid = false
+        var verticalRight = false
+        var angleUp = false
+        var angleDown = false
+
+        when(onlineBattle.winningLine){
+            TOP_LINE -> horizontalTop = true
+            HORIZONTAL_MID_LINE -> horizontalMid = true
+            BOTTOM_LINE -> horizontalBottom = true
+            LEFT_LINE -> verticalLeft = true
+            VERTICAL_MID_LINE -> verticalMid = true
+            RIGHT_LINE -> verticalRight = true
+            ANGLE_UP_LINE -> angleUp = true
+            ANGLE_DOWN_LINE -> angleDown = true
+        }
+
+        binding.winLine.setImageDrawable(
+            WinLineDrawable(
+                requireContext(),
+                horizontalTop, horizontalMid, horizontalBottom, verticalLeft, verticalMid, verticalRight, angleUp, angleDown
+            )
+        )
     }
 
     private fun displayField(string:String):Drawable?{
@@ -249,94 +296,314 @@ class OnlineBattleFragment : Fragment() {
 
     private fun setOnClickListeners() {
         binding.topLeftField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.topLeft == ""){
-                    dbRefBattle!!.child("field").child("topLeft").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+
+                    onlineBattle.field.topLeft = currentUser!!.uid
+                    checkWinningAndChangeTurn(){
+                        dbRefBattle!!.child("field").child("topLeft").setValue(currentUser.uid)
+                    }
                 }
             }
         }
         binding.topMidField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.topMid == ""){
-                    dbRefBattle!!.child("field").child("topMid").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+                    onlineBattle.field.topMid = currentUser!!.uid
+                    checkWinningAndChangeTurn(){
+                        dbRefBattle!!.child("field").child("topMid").setValue(currentUser!!.uid)
+                    }
                 }
                 }
         }
         binding.topRightField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.topRight == ""){
-                    dbRefBattle!!.child("field").child("topRight").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+                    onlineBattle.field.topRight = currentUser!!.uid
+                    checkWinningAndChangeTurn(){
+                        dbRefBattle!!.child("field").child("topRight").setValue(currentUser!!.uid)
+                    }
                 }
                 }
         }
 
         binding.midLeftField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.midLeft == ""){
-                    dbRefBattle!!.child("field").child("midLeft").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+
+                    onlineBattle.field.midLeft = currentUser!!.uid
+                    checkWinningAndChangeTurn {
+                        dbRefBattle!!.child("field").child("midLeft").setValue(currentUser!!.uid)
+                    }
                 }
             }
         }
         binding.midMidField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.midMid == ""){
-                    dbRefBattle!!.child("field").child("midMid").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+                    onlineBattle.field.midMid = currentUser!!.uid
+                    checkWinningAndChangeTurn(){
+                        dbRefBattle!!.child("field").child("midMid").setValue(currentUser!!.uid)
+                    }
                 }
             }
         }
         binding.midRightField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.midRight == ""){
-                    dbRefBattle!!.child("field").child("midRight").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+
+                    onlineBattle.field.midRight = currentUser!!.uid
+                    checkWinningAndChangeTurn(){
+                        dbRefBattle!!.child("field").child("midRight").setValue(currentUser!!.uid)
+                    }
                 }
             }
         }
 
         binding.bottomLeftField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.bottomLeft == ""){
-                    dbRefBattle!!.child("field").child("bottomLeft").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+
+                    onlineBattle.field.bottomLeft = currentUser!!.uid
+                    checkWinningAndChangeTurn(){
+                        dbRefBattle!!.child("field").child("bottomLeft").setValue(currentUser!!.uid)
+                    }
                 }
             }
         }
         binding.bottomMidField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.bottomMid == ""){
-                    dbRefBattle!!.child("field").child("bottomMid").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+
+                    onlineBattle.field.bottomMid = currentUser!!.uid
+                    checkWinningAndChangeTurn(){
+                        dbRefBattle!!.child("field").child("bottomMid").setValue(currentUser!!.uid)
+                    }
                 }
             }
         }
         binding.bottomRightField.setOnClickListener {
-            if(myTurn){
+            if(myTurn and (play)){
                 if(onlineBattle.field.bottomRight == ""){
-                    dbRefBattle!!.child("field").child("bottomRight").setValue(currentUser!!.uid)
-                    checkWinningAndChangeTurn()
+
+                    onlineBattle.field.bottomRight = currentUser!!.uid
+                    checkWinningAndChangeTurn(){
+                        dbRefBattle!!.child("field").child("bottomRight").setValue(currentUser!!.uid)
+                    }
                 }
             }
         }
     }
 
-    private fun checkWinningAndChangeTurn(){
-        //todo check winning
-        dbRefBattle!!.child("turn").setValue(request!!.opponentId)
+    private fun checkWinningAndChangeTurn(
+        setField: () -> Unit
+    ){
+        var endGame = CONTINUE
+
+        if(onlineBattle.field.topLeft != "" &&(
+                    onlineBattle.field.topMid != "" &&(
+                            onlineBattle.field.topRight != "" &&(
+                                    onlineBattle.field.midLeft != "" &&(
+                                            onlineBattle.field.midMid != "" &&(
+                                                    onlineBattle.field.midRight != "" &&(
+                                                            onlineBattle.field.bottomLeft != "" &&(
+                                                                    onlineBattle.field.bottomMid != "" &&(
+                                                                            onlineBattle.field.bottomRight != ""
+                                                                            )
+                                                                    )
+                                                            )
+                                                    )
+                                            )
+                                    )
+                            )
+                )
+            ){
+            endGame = DRAW
+        }
+
+
+
+        if(onlineBattle.field.topLeft == currentUser!!.uid && (
+                onlineBattle.field.topMid == currentUser.uid && (
+                        onlineBattle.field.topRight == currentUser.uid
+                        )
+                )
+            ){
+//            dbRefBattle!!.child("win").setValue(currentUser.uid)
+//            dbRefBattle!!.child("winningLine").setValue(TOP_LINE)
+            onlineBattle.winningLine = TOP_LINE
+            endGame = WIN
+        }
+
+        if(onlineBattle.field.midLeft == currentUser.uid && (
+                    onlineBattle.field.midMid == currentUser.uid && (
+                            onlineBattle.field.midRight == currentUser.uid
+                            )
+                    )
+        ){
+//            dbRefBattle!!.child("win").setValue(currentUser.uid)
+//            dbRefBattle!!.child("winningLine").setValue(HORIZONTAL_MID_LINE)
+            onlineBattle.winningLine = HORIZONTAL_MID_LINE
+            endGame = WIN
+        }
+
+        if(onlineBattle.field.bottomLeft == currentUser.uid && (
+                    onlineBattle.field.bottomMid == currentUser.uid && (
+                            onlineBattle.field.bottomRight == currentUser.uid
+                            )
+                    )
+        ){
+//            dbRefBattle!!.child("win").setValue(currentUser.uid)
+//            dbRefBattle!!.child("winningLine").setValue(BOTTOM_LINE)
+            onlineBattle.winningLine = BOTTOM_LINE
+            endGame = WIN
+        }
+
+        if(onlineBattle.field.topLeft == currentUser.uid && (
+                    onlineBattle.field.midLeft == currentUser.uid && (
+                            onlineBattle.field.bottomLeft == currentUser.uid
+                            )
+                    )
+        ){
+//            dbRefBattle!!.child("win").setValue(currentUser.uid)
+//            dbRefBattle!!.child("winningLine").setValue(LEFT_LINE)
+            onlineBattle.winningLine = LEFT_LINE
+            endGame = WIN
+        }
+
+        if(onlineBattle.field.topMid == currentUser.uid && (
+                    onlineBattle.field.midMid == currentUser.uid && (
+                            onlineBattle.field.bottomMid == currentUser.uid
+                            )
+                    )
+        ){
+//            dbRefBattle!!.child("win").setValue(currentUser.uid)
+//            dbRefBattle!!.child("winningLine").setValue(VERTICAL_MID_LINE)
+            onlineBattle.winningLine = VERTICAL_MID_LINE
+            endGame = WIN
+        }
+
+        if(onlineBattle.field.topRight == currentUser.uid && (
+                    onlineBattle.field.midRight == currentUser.uid && (
+                            onlineBattle.field.bottomRight == currentUser.uid
+                            )
+                    )
+        ){
+//            dbRefBattle!!.child("win").setValue(currentUser.uid)
+//            dbRefBattle!!.child("winningLine").setValue(RIGHT_LINE)
+            onlineBattle.winningLine = RIGHT_LINE
+            endGame = WIN
+        }
+
+        if(onlineBattle.field.topLeft == currentUser.uid && (
+                    onlineBattle.field.midMid == currentUser.uid && (
+                            onlineBattle.field.bottomRight == currentUser.uid
+                            )
+                    )
+        ){
+//            dbRefBattle!!.child("win").setValue(currentUser.uid)
+//            dbRefBattle!!.child("winningLine").setValue(ANGLE_DOWN_LINE)
+            onlineBattle.winningLine = ANGLE_DOWN_LINE
+            endGame = WIN
+        }
+
+        if(onlineBattle.field.topRight == currentUser.uid && (
+                    onlineBattle.field.midMid == currentUser.uid && (
+                            onlineBattle.field.bottomLeft == currentUser.uid
+                            )
+                    )
+        ){
+//            dbRefBattle!!.child("win").setValue(currentUser.uid)
+//            dbRefBattle!!.child("winningLine").setValue(ANGLE_UP_LINE)
+            onlineBattle.winningLine = ANGLE_UP_LINE
+            endGame = WIN
+        }
+
+
+
+        when(endGame){
+            CONTINUE -> {
+                setField()
+                dbRefBattle!!.child("turn").setValue(request!!.opponentId)
+            }
+            WIN -> {
+                dbRefBattle?.removeEventListener(battleListener!!)
+                play = false
+                displayField()
+                displayWinningLine()
+                setField()
+                dbRefBattle!!.child("winningLine").setValue(onlineBattle.winningLine)
+                dbRefBattle!!.child("win").setValue(currentUser.uid)
+
+                val history = dbRefHistory.child(currentUser.uid).child(request!!.opponentId!!)
+                history.addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val firebaseHistory = snapshot.getValue(FirebaseHistory::class.java)
+                        firebaseHistory!!.addWin()
+                        history.setValue(firebaseHistory)
+                        val request = FirebaseRequests()
+                        dbRefRequest.child(currentUser.uid).setValue(request)
+                        //todo display win alert dialog
+                        Toast.makeText(requireContext(),"WIN", Toast.LENGTH_LONG).show()
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                })
+            }
+            DRAW -> {
+                dbRefBattle?.removeEventListener(battleListener!!)
+                displayField()
+                setField()
+                dbRefBattle!!.child("win").setValue(END_DRAW)
+                val request = FirebaseRequests()
+                dbRefRequest.child(currentUser.uid).setValue(request)
+                //todo display draw alert dialog
+                Toast.makeText(requireContext(),"DRAW", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun gameLogic() {
-        myTurn = onlineBattle.turn == currentUser!!.uid
-        if(myTurn){
-            binding.mainPlayerPointerUpper.visibility = View.VISIBLE
-            binding.opponentPointerUpper.visibility = View.GONE
-        }else{
-            binding.mainPlayerPointerUpper.visibility = View.GONE
-            binding.opponentPointerUpper.visibility = View.VISIBLE
+        when(onlineBattle.win){
+            NONE -> {
+                myTurn = onlineBattle.turn == currentUser!!.uid
+                play = onlineBattle.win == NONE
+                if(myTurn){
+                    binding.mainPlayerPointerUpper.visibility = View.VISIBLE
+                    binding.opponentPointerUpper.visibility = View.GONE
+                }else{
+                    binding.mainPlayerPointerUpper.visibility = View.GONE
+                    binding.opponentPointerUpper.visibility = View.VISIBLE
+                }
+            }
+            request!!.opponentId -> {
+                displayWinningLine()
+                dbRefBattle?.removeEventListener(battleListener!!)
+                val history = dbRefHistory.child(currentUser!!.uid).child(request!!.opponentId!!)
+                history.addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val firebaseHistory = snapshot.getValue(FirebaseHistory::class.java)
+                        firebaseHistory!!.addLose()
+                        history.setValue(firebaseHistory)
+                        dbRefBattle?.removeValue()
+                        val request = FirebaseRequests()
+                        dbRefRequest.child(currentUser.uid).setValue(request)
+                        //todo display lose alert dialog
+                        Toast.makeText(requireContext(),"LOSE", Toast.LENGTH_LONG).show()
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                })
+            }
+            END_DRAW -> {
+                dbRefBattle?.removeEventListener(battleListener!!)
+
+                        dbRefBattle?.removeValue()
+                        val request = FirebaseRequests()
+                        dbRefRequest.child(currentUser!!.uid).setValue(request)
+                        //todo display draw alert dialog
+                Toast.makeText(requireContext(),"DRAW", Toast.LENGTH_LONG).show()
+            }
         }
     }
 

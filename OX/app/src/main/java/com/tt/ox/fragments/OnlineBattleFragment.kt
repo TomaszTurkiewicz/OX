@@ -4,6 +4,8 @@ import android.app.ActionBar
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -41,12 +43,15 @@ import com.tt.ox.helpers.FirebaseUser
 import com.tt.ox.helpers.HORIZONTAL_MID_LINE
 import com.tt.ox.helpers.LEFT_LINE
 import com.tt.ox.helpers.NONE
+import com.tt.ox.helpers.OUT_OF_TIME
 import com.tt.ox.helpers.OnlineMarks
 import com.tt.ox.helpers.RIGHT_LINE
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.helpers.TOP_LINE
 import com.tt.ox.helpers.VERTICAL_MID_LINE
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import kotlin.random.Random
 
 private const val CONTINUE = 0
@@ -72,6 +77,9 @@ class OnlineBattleFragment : Fragment() {
     private lateinit var onlineBattle: FirebaseBattle
     private var myTurn = false
     private var play = false
+    private var timestampStart = 0L
+    private val clockHandler = Handler(Looper.getMainLooper())
+    private var clockStarted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,6 +127,8 @@ class OnlineBattleFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        clockStarted=false
+        clockHandler.removeCallbacksAndMessages(null)
         dbRefBattle?.removeEventListener(battleListener!!)
     }
 
@@ -126,11 +136,14 @@ class OnlineBattleFragment : Fragment() {
         dbRefBattle!!.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
+                    val b = snapshot.getValue(FirebaseBattle::class.java)
+                    timestampStart = b!!.timestamp
                         setUpUI()
                 }else{
                     val battle = FirebaseBattle()
                     battle.battleId = battleId
                     battle.timestamp = System.currentTimeMillis()
+                    timestampStart = battle.timestamp
                     val random = Random.nextBoolean()
                     val startingPerson = if(random) currentUser!!.uid else opponentId
                     battle.turn = startingPerson
@@ -141,6 +154,30 @@ class OnlineBattleFragment : Fragment() {
             override fun onCancelled(error: DatabaseError) {
             }
         })
+    }
+
+    private fun runClock():Runnable = Runnable {
+        val currentTime = System.currentTimeMillis()
+        val endTime = timestampStart+60000
+        val remainingTime = (endTime-currentTime)/1000
+        if(remainingTime>=0) {
+            val minutes = remainingTime / 60
+            val seconds = remainingTime % 60
+            val f: NumberFormat = DecimalFormat("00")
+            binding.time.text = "${f.format(minutes)}:${f.format(seconds)}"
+            clockHandler.postDelayed(runClock(), 1000)
+        }else{
+            play = false
+            clockHandler.removeCallbacksAndMessages(null)
+            battleListener?.let {
+                dbRefBattle?.removeEventListener(battleListener!!)
+            }
+            dbRefBattle!!.child("win").setValue(OUT_OF_TIME)
+            val request = FirebaseRequests()
+            dbRefRequest.child(currentUser!!.uid).setValue(request)
+            //todo display out of time alert dialog
+            Toast.makeText(requireContext(),"OUT OF TIME", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun setUpUI() {
@@ -300,7 +337,7 @@ class OnlineBattleFragment : Fragment() {
                 if(onlineBattle.field.topLeft == ""){
 
                     onlineBattle.field.topLeft = currentUser!!.uid
-                    checkWinningAndChangeTurn(){
+                    checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("topLeft").setValue(currentUser.uid)
                     }
                 }
@@ -310,8 +347,8 @@ class OnlineBattleFragment : Fragment() {
             if(myTurn and (play)){
                 if(onlineBattle.field.topMid == ""){
                     onlineBattle.field.topMid = currentUser!!.uid
-                    checkWinningAndChangeTurn(){
-                        dbRefBattle!!.child("field").child("topMid").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn {
+                        dbRefBattle!!.child("field").child("topMid").setValue(currentUser.uid)
                     }
                 }
                 }
@@ -320,8 +357,8 @@ class OnlineBattleFragment : Fragment() {
             if(myTurn and (play)){
                 if(onlineBattle.field.topRight == ""){
                     onlineBattle.field.topRight = currentUser!!.uid
-                    checkWinningAndChangeTurn(){
-                        dbRefBattle!!.child("field").child("topRight").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn {
+                        dbRefBattle!!.child("field").child("topRight").setValue(currentUser.uid)
                     }
                 }
                 }
@@ -333,7 +370,7 @@ class OnlineBattleFragment : Fragment() {
 
                     onlineBattle.field.midLeft = currentUser!!.uid
                     checkWinningAndChangeTurn {
-                        dbRefBattle!!.child("field").child("midLeft").setValue(currentUser!!.uid)
+                        dbRefBattle!!.child("field").child("midLeft").setValue(currentUser.uid)
                     }
                 }
             }
@@ -342,8 +379,8 @@ class OnlineBattleFragment : Fragment() {
             if(myTurn and (play)){
                 if(onlineBattle.field.midMid == ""){
                     onlineBattle.field.midMid = currentUser!!.uid
-                    checkWinningAndChangeTurn(){
-                        dbRefBattle!!.child("field").child("midMid").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn {
+                        dbRefBattle!!.child("field").child("midMid").setValue(currentUser.uid)
                     }
                 }
             }
@@ -353,8 +390,8 @@ class OnlineBattleFragment : Fragment() {
                 if(onlineBattle.field.midRight == ""){
 
                     onlineBattle.field.midRight = currentUser!!.uid
-                    checkWinningAndChangeTurn(){
-                        dbRefBattle!!.child("field").child("midRight").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn {
+                        dbRefBattle!!.child("field").child("midRight").setValue(currentUser.uid)
                     }
                 }
             }
@@ -365,8 +402,8 @@ class OnlineBattleFragment : Fragment() {
                 if(onlineBattle.field.bottomLeft == ""){
 
                     onlineBattle.field.bottomLeft = currentUser!!.uid
-                    checkWinningAndChangeTurn(){
-                        dbRefBattle!!.child("field").child("bottomLeft").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn {
+                        dbRefBattle!!.child("field").child("bottomLeft").setValue(currentUser.uid)
                     }
                 }
             }
@@ -376,8 +413,8 @@ class OnlineBattleFragment : Fragment() {
                 if(onlineBattle.field.bottomMid == ""){
 
                     onlineBattle.field.bottomMid = currentUser!!.uid
-                    checkWinningAndChangeTurn(){
-                        dbRefBattle!!.child("field").child("bottomMid").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn {
+                        dbRefBattle!!.child("field").child("bottomMid").setValue(currentUser.uid)
                     }
                 }
             }
@@ -387,8 +424,8 @@ class OnlineBattleFragment : Fragment() {
                 if(onlineBattle.field.bottomRight == ""){
 
                     onlineBattle.field.bottomRight = currentUser!!.uid
-                    checkWinningAndChangeTurn(){
-                        dbRefBattle!!.child("field").child("bottomRight").setValue(currentUser!!.uid)
+                    checkWinningAndChangeTurn {
+                        dbRefBattle!!.child("field").child("bottomRight").setValue(currentUser.uid)
                     }
                 }
             }
@@ -527,6 +564,7 @@ class OnlineBattleFragment : Fragment() {
                 dbRefBattle!!.child("turn").setValue(request!!.opponentId)
             }
             WIN -> {
+                clockHandler.removeCallbacksAndMessages(null)
                 dbRefBattle?.removeEventListener(battleListener!!)
                 play = false
                 displayField()
@@ -551,6 +589,7 @@ class OnlineBattleFragment : Fragment() {
                 })
             }
             DRAW -> {
+                clockHandler.removeCallbacksAndMessages(null)
                 dbRefBattle?.removeEventListener(battleListener!!)
                 displayField()
                 setField()
@@ -566,6 +605,10 @@ class OnlineBattleFragment : Fragment() {
     private fun gameLogic() {
         when(onlineBattle.win){
             NONE -> {
+                if(!clockStarted){
+                    clockStarted=true
+                    runClock().run()
+                }
                 myTurn = onlineBattle.turn == currentUser!!.uid
                 play = onlineBattle.win == NONE
                 if(myTurn){
@@ -577,6 +620,7 @@ class OnlineBattleFragment : Fragment() {
                 }
             }
             request!!.opponentId -> {
+                clockHandler.removeCallbacksAndMessages(null)
                 displayWinningLine()
                 dbRefBattle?.removeEventListener(battleListener!!)
                 val history = dbRefHistory.child(currentUser!!.uid).child(request!!.opponentId!!)
@@ -596,6 +640,7 @@ class OnlineBattleFragment : Fragment() {
                 })
             }
             END_DRAW -> {
+                clockHandler.removeCallbacksAndMessages(null)
                 dbRefBattle?.removeEventListener(battleListener!!)
 
                         dbRefBattle?.removeValue()
@@ -604,7 +649,18 @@ class OnlineBattleFragment : Fragment() {
                         //todo display draw alert dialog
                 Toast.makeText(requireContext(),"DRAW", Toast.LENGTH_LONG).show()
             }
+            OUT_OF_TIME -> {
+                dbRefBattle?.removeEventListener(battleListener!!)
+
+                Firebase.database.getReference("Battle").child(request!!.battle!!).removeValue()
+                val request = FirebaseRequests()
+                dbRefRequest.child(currentUser!!.uid).setValue(request)
+                //todo display out of time alert dialog
+                Toast.makeText(requireContext(),"OUT OF TIME", Toast.LENGTH_LONG).show()
+            }
         }
+
+
     }
 
 
@@ -816,6 +872,10 @@ class OnlineBattleFragment : Fragment() {
             ConstraintSet.RIGHT,binding.opponentPlayerWins.id,
             ConstraintSet.RIGHT,0)
 
+        set.connect(binding.time.id,ConstraintSet.TOP,binding.onlineBattleLayout.id,ConstraintSet.TOP,unit/4)
+        set.connect(binding.time.id,ConstraintSet.LEFT,binding.onlineBattleLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.time.id,ConstraintSet.RIGHT,binding.onlineBattleLayout.id,ConstraintSet.RIGHT,0)
+
         set.applyTo(binding.onlineBattleLayout)
 
     }
@@ -828,6 +888,7 @@ class OnlineBattleFragment : Fragment() {
         binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.time.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
 
         binding.mainPlayerPointerUpper.setImageDrawable(PointerUpperDrawable(requireContext()))
         binding.opponentPointerUpper.setImageDrawable(PointerUpperDrawable(requireContext()))
@@ -855,6 +916,8 @@ class OnlineBattleFragment : Fragment() {
 
         binding.mainPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
         binding.opponentPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
+
+        binding.time.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
 
         binding.mainPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
         binding.opponentPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())

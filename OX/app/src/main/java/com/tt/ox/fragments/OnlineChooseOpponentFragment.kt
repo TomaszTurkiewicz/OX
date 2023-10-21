@@ -271,7 +271,7 @@ class OnlineChooseOpponentFragment : Fragment() {
 
     private fun setAdapter() {
         try {
-        adapter = OnlineListAdapter(requireContext()){
+        adapter = OnlineListAdapter(requireContext(),currentUser!!.uid){
             sendInvitation(it)
         }
         binding.recyclerView.adapter = adapter

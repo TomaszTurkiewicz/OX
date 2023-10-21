@@ -26,12 +26,14 @@ import com.tt.ox.drawables.ListItemBackgroundDrawable
 import com.tt.ox.drawables.SendInvitationDrawable
 import com.tt.ox.helpers.AVAILABLE
 import com.tt.ox.helpers.DateUtils
+import com.tt.ox.helpers.FirebaseHistory
 import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUser
 import com.tt.ox.helpers.ScreenMetricsCompat
 
 class OnlineListAdapter(
     private val context:Context,
+    private val userId:String,
     private val sendInvitation: (FirebaseUser)->Unit
 ) : ListAdapter<FirebaseUser, OnlineListAdapter.OnlineListViewHolder>(DiffCallback) {
 
@@ -55,8 +57,27 @@ class OnlineListAdapter(
             ConstraintLayout.LayoutParams.WRAP_CONTENT
         )
         holder.name.text = current.userName
-        holder.wins.text = current.wins.toString()
-        holder.loses.text = current.loses.toString()
+
+        val dbHistory = Firebase.database.getReference("History").child(userId).child(current.id!!)
+        dbHistory.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists()){
+                    val history = snapshot.getValue(FirebaseHistory::class.java)
+                    holder.wins.text = "${history!!.wins} (${current.wins})"
+                    holder.loses.text = "${history!!.loses} (${current.loses})"
+                }else{
+                    holder.wins.text = "0 (${current.wins})"
+                    holder.loses.text = "0 (${current.loses})"
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+//        holder.wins.text = current.wins.toString()
+//        holder.loses.text = current.loses.toString()
         holder.activity.text = DateUtils().getLastActivity(current.unixTime)
 
 
@@ -68,7 +89,7 @@ class OnlineListAdapter(
 
         setConstraint(holder)
 
-        val dbRequests = Firebase.database.getReference("Requests").child(current.id.toString())
+        val dbRequests = Firebase.database.getReference("Requests").child(current.id!!)
         dbRequests.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){

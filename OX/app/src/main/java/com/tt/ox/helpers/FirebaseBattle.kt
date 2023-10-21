@@ -2,6 +2,7 @@ package com.tt.ox.helpers
 
 const val NONE = "NONE"
 const val END_DRAW = "DRAW"
+const val OUT_OF_TIME = "OUT_OF_TIME"
 
 const val TOP_LINE = 1
 const val HORIZONTAL_MID_LINE = 2

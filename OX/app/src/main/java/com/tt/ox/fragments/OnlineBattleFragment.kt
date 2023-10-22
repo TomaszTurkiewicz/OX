@@ -1,6 +1,8 @@
 package com.tt.ox.fragments
 
+import android.annotation.SuppressLint
 import android.app.ActionBar
+import android.app.AlertDialog
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
@@ -11,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -34,6 +37,7 @@ import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ANGLE_DOWN_LINE
 import com.tt.ox.helpers.ANGLE_UP_LINE
+import com.tt.ox.helpers.AlertDialogEndGameOnlineBattle
 import com.tt.ox.helpers.BOTTOM_LINE
 import com.tt.ox.helpers.END_DRAW
 import com.tt.ox.helpers.FirebaseBattle
@@ -80,11 +84,14 @@ class OnlineBattleFragment : Fragment() {
     private var timestampStart = 0L
     private val clockHandler = Handler(Looper.getMainLooper())
     private var clockStarted = false
+    private var dialog:AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
+
+
     }
 
     override fun onCreateView(
@@ -97,6 +104,9 @@ class OnlineBattleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner){
+            Toast.makeText(requireContext(),"WAIT TO THE END OF TIME",Toast.LENGTH_LONG).show()
+        }
         prepareUI()
 
     }
@@ -125,6 +135,8 @@ class OnlineBattleFragment : Fragment() {
         })
     }
 
+
+
     override fun onPause() {
         super.onPause()
         clockStarted=false
@@ -134,6 +146,7 @@ class OnlineBattleFragment : Fragment() {
 
     private fun checkIfBattleExists() {
         dbRefBattle!!.addListenerForSingleValueEvent(object : ValueEventListener{
+            @SuppressLint("SuspiciousIndentation")
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
                     val b = snapshot.getValue(FirebaseBattle::class.java)
@@ -158,7 +171,7 @@ class OnlineBattleFragment : Fragment() {
 
     private fun runClock():Runnable = Runnable {
         val currentTime = System.currentTimeMillis()
-        val endTime = timestampStart+60000
+        val endTime = timestampStart+120000
         val remainingTime = (endTime-currentTime)/1000
         if(remainingTime>=0) {
             val minutes = remainingTime / 60
@@ -175,8 +188,11 @@ class OnlineBattleFragment : Fragment() {
             dbRefBattle!!.child("win").setValue(OUT_OF_TIME)
             val request = FirebaseRequests()
             dbRefRequest.child(currentUser!!.uid).setValue(request)
-            //todo display out of time alert dialog
-            Toast.makeText(requireContext(),"OUT OF TIME", Toast.LENGTH_LONG).show()
+            dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"OUT OF TIME"){
+                dialog?.dismiss()
+                findNavController().navigateUp()
+            }.create()
+            dialog?.show()
         }
     }
 
@@ -581,8 +597,35 @@ class OnlineBattleFragment : Fragment() {
                         history.setValue(firebaseHistory)
                         val request = FirebaseRequests()
                         dbRefRequest.child(currentUser.uid).setValue(request)
-                        //todo display win alert dialog
-                        Toast.makeText(requireContext(),"WIN", Toast.LENGTH_LONG).show()
+                        val userDb = dbRefUser.child(currentUser.uid)
+                        userDb.addListenerForSingleValueEvent(object : ValueEventListener{
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if(snapshot.exists()){
+                                    val user = snapshot.getValue(FirebaseUser::class.java)
+                                    user!!.addWins()
+                                    userDb.setValue(user)
+                                    dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"WIN"){
+                                        dialog?.dismiss()
+                                        findNavController().navigateUp()
+                                    }.create()
+                                    dialog?.show()
+                                }else{
+                                    val user = FirebaseUser()
+                                    user.addWins()
+                                    userDb.setValue(user)
+                                    dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"WIN"){
+                                        dialog?.dismiss()
+                                        findNavController().navigateUp()
+                                    }.create()
+                                    dialog?.show()
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                            }
+
+                        })
+
                     }
                     override fun onCancelled(error: DatabaseError) {
                     }
@@ -596,8 +639,11 @@ class OnlineBattleFragment : Fragment() {
                 dbRefBattle!!.child("win").setValue(END_DRAW)
                 val request = FirebaseRequests()
                 dbRefRequest.child(currentUser.uid).setValue(request)
-                //todo display draw alert dialog
-                Toast.makeText(requireContext(),"DRAW", Toast.LENGTH_LONG).show()
+                dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"DRAW"){
+                    dialog?.dismiss()
+                    findNavController().navigateUp()
+                }.create()
+                dialog?.show()
             }
         }
     }
@@ -632,8 +678,37 @@ class OnlineBattleFragment : Fragment() {
                         dbRefBattle?.removeValue()
                         val request = FirebaseRequests()
                         dbRefRequest.child(currentUser.uid).setValue(request)
-                        //todo display lose alert dialog
-                        Toast.makeText(requireContext(),"LOSE", Toast.LENGTH_LONG).show()
+
+
+                        val userDb = dbRefUser.child(currentUser.uid)
+                        userDb.addListenerForSingleValueEvent(object : ValueEventListener{
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if(snapshot.exists()){
+                                    val user = snapshot.getValue(FirebaseUser::class.java)
+                                    user!!.addLoses()
+                                    userDb.setValue(user)
+                                    dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"LOSE"){
+                                        dialog?.dismiss()
+                                        findNavController().navigateUp()
+                                    }.create()
+                                    dialog?.show()
+                                }else{
+                                    val user = FirebaseUser()
+                                    user.addLoses()
+                                    userDb.setValue(user)
+                                    dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"LOSE"){
+                                        dialog?.dismiss()
+                                        findNavController().navigateUp()
+                                    }.create()
+                                    dialog?.show()
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                            }
+
+                        })
+
                     }
                     override fun onCancelled(error: DatabaseError) {
                     }
@@ -646,8 +721,11 @@ class OnlineBattleFragment : Fragment() {
                         dbRefBattle?.removeValue()
                         val request = FirebaseRequests()
                         dbRefRequest.child(currentUser!!.uid).setValue(request)
-                        //todo display draw alert dialog
-                Toast.makeText(requireContext(),"DRAW", Toast.LENGTH_LONG).show()
+                dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"DRAW"){
+                    dialog?.dismiss()
+                    findNavController().navigateUp()
+                }.create()
+                dialog?.show()
             }
             OUT_OF_TIME -> {
                 dbRefBattle?.removeEventListener(battleListener!!)
@@ -655,8 +733,11 @@ class OnlineBattleFragment : Fragment() {
                 Firebase.database.getReference("Battle").child(request!!.battle!!).removeValue()
                 val request = FirebaseRequests()
                 dbRefRequest.child(currentUser!!.uid).setValue(request)
-                //todo display out of time alert dialog
-                Toast.makeText(requireContext(),"OUT OF TIME", Toast.LENGTH_LONG).show()
+                dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"OUT OF TIME"){
+                    dialog?.dismiss()
+                    findNavController().navigateUp()
+                }.create()
+                dialog?.show()
             }
         }
 

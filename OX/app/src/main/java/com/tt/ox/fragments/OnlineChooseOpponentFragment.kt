@@ -63,6 +63,7 @@ class OnlineChooseOpponentFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
     private var width = 0
+    private var unit = 0
     private var currentUser: FirebaseUser? = null
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
@@ -95,7 +96,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         auth = Firebase.auth
 
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
-
+        unit = ScreenMetricsCompat().getUnit(requireContext())
         _moves.value = 0
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -127,11 +128,66 @@ class OnlineChooseOpponentFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // todo UI sizes and drawables
+        setUI()
         moves.observe(this.viewLifecycleOwner){
             binding.moves.text = it.toString()
         }
 
+    }
+
+    private fun setUI() {
+        setSizes()
+        setDrawables()
+        setConstraints()
+
+    }
+
+    private fun setConstraints() {
+        val set = ConstraintSet()
+        set.clone(binding.layout)
+
+        set.connect(binding.middleDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.middleDivider.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.middleDivider.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.rightDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.rightDivider.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.rightDivider.id,ConstraintSet.LEFT,binding.middleDivider.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.leftDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.leftDivider.id,ConstraintSet.RIGHT,binding.middleDivider.id,ConstraintSet.LEFT,0)
+        set.connect(binding.leftDivider.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.logout.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.logout.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.logout.id,ConstraintSet.RIGHT,binding.leftDivider.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.moves.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.moves.id,ConstraintSet.LEFT,binding.leftDivider.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.moves.id,ConstraintSet.RIGHT,binding.middleDivider.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.updateList.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.updateList.id,ConstraintSet.LEFT,binding.middleDivider.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.updateList.id,ConstraintSet.RIGHT,binding.rightDivider.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.searchButton.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.searchButton.id,ConstraintSet.LEFT,binding.rightDivider.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.searchButton.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+
+        set.applyTo(binding.layout)
+    }
+
+    private fun setDrawables() {
+        //todo finish this first
+    }
+
+    private fun setSizes() {
+        val buttonSize = (1.4*unit).toInt()
+        binding.moves.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
+        binding.searchButton.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
+        binding.updateList.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
+        binding.logout.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
     }
 
     override fun onResume() {

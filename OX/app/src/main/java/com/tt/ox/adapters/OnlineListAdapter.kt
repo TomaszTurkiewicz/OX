@@ -58,16 +58,32 @@ class OnlineListAdapter(
         )
         holder.name.text = current.userName
 
-        val dbHistory = Firebase.database.getReference("History").child(userId).child(current.id!!)
-        dbHistory.addListenerForSingleValueEvent(object : ValueEventListener{
+        val user = Firebase.database.getReference("Users").child(current.id!!)
+        user.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
-                    val history = snapshot.getValue(FirebaseHistory::class.java)
-                    holder.wins.text = "${history!!.wins} (${current.wins})"
-                    holder.loses.text = "${history!!.loses} (${current.loses})"
-                }else{
-                    holder.wins.text = "0 (${current.wins})"
-                    holder.loses.text = "0 (${current.loses})"
+                    val u = snapshot.getValue(FirebaseUser::class.java)
+                    holder.activity.text = DateUtils().getLastActivity(u!!.unixTime)
+
+                    val dbHistory = Firebase.database.getReference("History").child(userId).child(current.id!!)
+                    dbHistory.addListenerForSingleValueEvent(object : ValueEventListener{
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if(snapshot.exists()){
+                                val history = snapshot.getValue(FirebaseHistory::class.java)
+                                holder.wins.text = "${history!!.wins} (${u.wins})"
+                                holder.loses.text = "${history!!.loses} (${u.loses})"
+                            }else{
+                                holder.wins.text = "0 (${u.wins})"
+                                holder.loses.text = "0 (${u.loses})"
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
+
                 }
             }
 
@@ -76,9 +92,11 @@ class OnlineListAdapter(
             }
 
         })
+
+
 //        holder.wins.text = current.wins.toString()
 //        holder.loses.text = current.loses.toString()
-        holder.activity.text = DateUtils().getLastActivity(current.unixTime)
+//        holder.activity.text = DateUtils().getLastActivity(current.unixTime)
 
 
         setSizes(holder)

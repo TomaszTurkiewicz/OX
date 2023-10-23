@@ -15,6 +15,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -80,6 +82,8 @@ class OnlineChooseOpponentFragment : Fragment() {
     private var listSize = 0
     private var currentUserPosition = 0
     private var dialogInvitation:AlertDialog? = null
+    private val _moves = MutableLiveData<Int>()
+    private val moves:LiveData<Int> = _moves
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,6 +91,8 @@ class OnlineChooseOpponentFragment : Fragment() {
         auth = Firebase.auth
 
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
+
+        _moves.value = 0
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("329182313552-1nrhrejp03ndlhnvff60leaj2p87sk5p.apps.googleusercontent.com")
@@ -116,6 +122,9 @@ class OnlineChooseOpponentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // todo UI sizes and drawables
+        moves.observe(this.viewLifecycleOwner){
+            binding.moves.text = it.toString()
+        }
     }
 
     override fun onResume() {
@@ -215,25 +224,35 @@ class OnlineChooseOpponentFragment : Fragment() {
     }
 
     private fun startFragment(){
-        movesDbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
-        movesListener = movesDbRef!!.addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if(!snapshot.exists()){
-                    displayAddMovesAlertDialog()
-                }else{
-                    val moves = snapshot.getValue(Int::class.java)
-                    if(moves!!<=0){
-                        displayAddMovesAlertDialog()
-                    }else{
-                        dialogMoves?.dismiss()
-                        checkInvitations()
-                        prepareUserList()
-                    }
-                }
-            }
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })
+        _moves.value = SharedPreferences.readOnlineMoves(requireContext())
+        if(_moves.value!!<=0){
+            displayAddMovesAlertDialog()
+        }else{
+            dialogMoves?.dismiss()
+            checkInvitations()
+            prepareUserList()
+        }
+
+
+//        movesDbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
+//        movesListener = movesDbRef!!.addValueEventListener(object : ValueEventListener{
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                if(!snapshot.exists()){
+//                    displayAddMovesAlertDialog()
+//                }else{
+//                    val moves = snapshot.getValue(Int::class.java)
+//                    if(moves!!<=0){
+//                        displayAddMovesAlertDialog()
+//                    }else{
+//                        dialogMoves?.dismiss()
+//                        checkInvitations()
+//                        prepareUserList()
+//                    }
+//                }
+//            }
+//            override fun onCancelled(error: DatabaseError) {
+//            }
+//        })
     }
 
     private fun prepareUserList() {
@@ -391,6 +410,9 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         idList.clear()
         userList.clear()
+        val temp = _moves.value!!-1
+        _moves.value = temp
+        SharedPreferences.saveOnlineMoves(requireContext(),_moves.value!!)
         dialogInvitation?.dismiss()
         val action = OnlineChooseOpponentFragmentDirections.actionOnlineChooseOpponentFragmentToOnlineBattle()
 
@@ -533,13 +555,16 @@ class OnlineChooseOpponentFragment : Fragment() {
     private fun displayAddMovesAlertDialog() {
         dialogMoves = AlertDialogAddMoves(
             requireContext(),
-            layoutInflater,{
+            layoutInflater,
+            {
                 dialogMoves?.dismiss()
                 findNavController().navigateUp()
             }){
             dialogMoves?.dismiss()
-            val dbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
-            dbRef.setValue(10)
+            _moves.value = 10
+            SharedPreferences.saveOnlineMoves(requireContext(),_moves.value!!)
+            checkInvitations()
+            prepareUserList()
         }.create()
         dialogMoves?.show()
     }

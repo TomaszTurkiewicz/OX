@@ -52,6 +52,24 @@ class SharedPreferences {
             return moves
         }
 
+        fun saveOnlineMoves(context: Context,moves:Int){
+            context.let {
+                val sp = it.getSharedPreferences("OnlineMoves",Context.MODE_PRIVATE)
+                val editor = sp.edit()
+                editor.putInt("online_moves",moves)
+                editor.apply()
+            }
+        }
+
+        fun readOnlineMoves(context: Context):Int{
+            var moves = 0
+            context.let {
+                val sharedPreferences = it.getSharedPreferences("OnlineMoves",Context.MODE_PRIVATE)
+                moves = sharedPreferences.getInt("online_moves",0)
+            }
+            return moves
+        }
+
         fun readOnlineMarks(context: Context):OnlineMarks{
             var onlineMarks = OnlineMarks()
             context.let {

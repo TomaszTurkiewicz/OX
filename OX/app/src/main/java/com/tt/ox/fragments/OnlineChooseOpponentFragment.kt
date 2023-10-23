@@ -353,77 +353,6 @@ class OnlineChooseOpponentFragment : Fragment() {
         }
     }
 
-//    private fun readUsersFromFirebase(filteredIdList: List<FirebaseUserId>) {
-//
-//        if(currentUserPosition<listSize){
-//            val dbRef = dbRefUsers.child(filteredIdList[currentUserPosition].userId!!)
-//            dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    if(snapshot.exists()){
-//                        val user = snapshot.getValue(com.tt.ox.helpers.FirebaseUser::class.java)
-//                        userList.add(user!!)
-//                    }
-//                    currentUserPosition+=1
-//                    readUsersFromFirebase(filteredIdList)
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                }
-//            })
-//        }
-//        else{
-//            // todo check if list not empty (if empty show "No users active last month")
-//
-//            adapter.submitList(userList)
-//
-//        }
-//    }
-
-//    private fun setAdapter() {
-//        try {
-//            adapter = OnlineListAdapter(requireContext(),currentUser!!.uid){
-//                sendInvitation(it)
-//            }
-//            binding.recyclerView.adapter = adapter
-//            binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
-//            userList.clear()
-//            loopCounter = 0
-//            val filteredIdList = idList.filter { id -> id.userId != currentUser!!.uid }
-//            listSize = filteredIdList.size
-//            currentUserPosition = 0
-//            readUsersFromFirebase(filteredIdList)
-//        }catch (e:Exception){
-//
-//        }
-//    }
-
-//    private fun readListFromFirebase(dates: MutableList<Int>) {
-//        if(currentPosition<datesListSize){
-//            val dbRef = dbRefRanking.child(dates[currentPosition].toString())
-//            dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    if(snapshot.exists()){
-//                        for(id in snapshot.children){
-//                            val tId = id.getValue(FirebaseUserId::class.java)
-//                            idList.add(tId!!)
-//                        }
-//                    }
-//                    currentPosition+=1
-//                    readListFromFirebase(dates)
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                }
-//            })
-//        }
-//        else{
-//            setAdapter()
-//        }
-//    }
-
-
-
-
 
     private fun sendInvitation(user:com.tt.ox.helpers.FirebaseUser){
         val dbRequests = dbRefRequest.child(user.id.toString())
@@ -659,6 +588,11 @@ class OnlineChooseOpponentFragment : Fragment() {
             checkInvitations()
             //todo old user list
 //            prepareUserList()
+            adapter = OnlineListAdapter(requireContext(),currentUser!!.uid){
+                sendInvitation(it)
+            }
+            binding.recyclerView.adapter = adapter
+            binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
             displayList().run()
         }.create()
         dialogMoves?.show()

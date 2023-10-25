@@ -1,33 +1,22 @@
 package com.tt.ox.fragments
 
-import android.app.Activity
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -35,12 +24,11 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.tt.ox.R
 import com.tt.ox.adapters.OnlineListAdapter
-import com.tt.ox.databinding.AlertDialogLogInBinding
 import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
 import com.tt.ox.drawables.ButtonBackground
-import com.tt.ox.drawables.ButtonWithTextDrawable
+import com.tt.ox.drawables.LogoutDrawable
+import com.tt.ox.drawables.UpdateListDrawable
 import com.tt.ox.helpers.ACCEPTED
 import com.tt.ox.helpers.AVAILABLE
 import com.tt.ox.helpers.AlertDialogAddMoves
@@ -65,8 +53,6 @@ class OnlineChooseOpponentFragment : Fragment() {
     private var width = 0
     private var unit = 0
     private var currentUser: FirebaseUser? = null
-    private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private val dbRefRequest = Firebase.database.getReference("Requests")
     private val dbRefUsers = Firebase.database.getReference("Users")
     private val dbRefRanking = Firebase.database.getReference("Ranking")
@@ -87,33 +73,20 @@ class OnlineChooseOpponentFragment : Fragment() {
     private var dialogInvitation:AlertDialog? = null
     private val _moves = MutableLiveData<Int>()
     private val moves:LiveData<Int> = _moves
-    private var listReady = false
+    private val _listReady = MutableLiveData<Boolean>()
+    private var listReady:LiveData<Boolean> = _listReady
     private val listHandler = Handler(Looper.getMainLooper())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
+        currentUser = auth.currentUser
 
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
         unit = ScreenMetricsCompat().getUnit(requireContext())
         _moves.value = 0
-
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("329182313552-1nrhrejp03ndlhnvff60leaj2p87sk5p.apps.googleusercontent.com")
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
-
-        resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
-            if(result.resultCode == Activity.RESULT_OK){
-                val data: Intent? = result.data
-                doSomething(data)
-            }
-            else if(result.resultCode == Activity.RESULT_CANCELED){
-                displayLoginAlertDialog()
-            }
-        }
+        _listReady.value = false
 
         prepareList()
     }
@@ -128,9 +101,22 @@ class OnlineChooseOpponentFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        listReady.observe(this.viewLifecycleOwner){
+            binding.logout.setImageDrawable(LogoutDrawable(requireContext(),listReady.value!!))
+            binding.updateList.setImageDrawable(UpdateListDrawable(requireContext(),listReady.value!!))
+        }
         setUI()
         moves.observe(this.viewLifecycleOwner){
             binding.moves.text = it.toString()
+        }
+
+        binding.logout.setOnClickListener {
+            if(listReady.value!!) {
+                auth.signOut()
+                findNavController().navigateUp()
+            }else{
+                Toast.makeText(requireContext(),"Not ready yet", Toast.LENGTH_LONG).show()
+            }
         }
 
     }
@@ -158,19 +144,19 @@ class OnlineChooseOpponentFragment : Fragment() {
         set.connect(binding.leftDivider.id,ConstraintSet.RIGHT,binding.middleDivider.id,ConstraintSet.LEFT,0)
         set.connect(binding.leftDivider.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
 
-        set.connect(binding.logout.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.logout.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
         set.connect(binding.logout.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
         set.connect(binding.logout.id,ConstraintSet.RIGHT,binding.leftDivider.id,ConstraintSet.LEFT,0)
 
-        set.connect(binding.moves.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.moves.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
         set.connect(binding.moves.id,ConstraintSet.LEFT,binding.leftDivider.id,ConstraintSet.RIGHT,0)
         set.connect(binding.moves.id,ConstraintSet.RIGHT,binding.middleDivider.id,ConstraintSet.LEFT,0)
 
-        set.connect(binding.updateList.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.updateList.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
         set.connect(binding.updateList.id,ConstraintSet.LEFT,binding.middleDivider.id,ConstraintSet.RIGHT,0)
         set.connect(binding.updateList.id,ConstraintSet.RIGHT,binding.rightDivider.id,ConstraintSet.LEFT,0)
 
-        set.connect(binding.searchButton.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+        set.connect(binding.searchButton.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
         set.connect(binding.searchButton.id,ConstraintSet.LEFT,binding.rightDivider.id,ConstraintSet.RIGHT,0)
         set.connect(binding.searchButton.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
 
@@ -179,6 +165,9 @@ class OnlineChooseOpponentFragment : Fragment() {
     }
 
     private fun setDrawables() {
+        binding.logout.background = ButtonBackground(requireContext())
+        binding.updateList.background = ButtonBackground(requireContext())
+
         //todo finish this first
     }
 
@@ -192,14 +181,11 @@ class OnlineChooseOpponentFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        currentUser = auth.currentUser
-
-
-        if(currentUser==null){
-            displayLoginAlertDialog()
+        if(currentUser!=null) {
+            prepareUIAndCheckUserInFirebase()
         }
         else{
-            prepareUIAndCheckUserInFirebase()
+            findNavController().navigateUp()
         }
     }
 
@@ -210,33 +196,8 @@ class OnlineChooseOpponentFragment : Fragment() {
         listHandler.removeCallbacksAndMessages(null)
     }
 
-    private fun doSomething(data: Intent?) {
-        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            firebaseAuthWithGoogle(account.idToken)
-        }catch (e: ApiException){
-            Log.w("TAG","Google sign in failed", e)
-        }
-    }
-
-    private fun firebaseAuthWithGoogle(idToken:String?){
-        val credentials = GoogleAuthProvider.getCredential(idToken,null)
-        auth.signInWithCredential(credentials)
-            .addOnCompleteListener(requireActivity()){ task ->
-                if(task.isSuccessful){
-                    val user = Firebase.auth.currentUser
-                    if(user!=null){
-                        currentUser = user
-                        prepareUIAndCheckUserInFirebase()
-                        // create user if not exists or compare if exists
-                    }
-                }
-            }
-    }
-
     private fun displayList():Runnable = Runnable {
-        if(listReady){
+        if(listReady.value!!){
             listHandler.removeCallbacksAndMessages(null)
             adapter.submitList(userList)
         }else{
@@ -245,11 +206,6 @@ class OnlineChooseOpponentFragment : Fragment() {
     }
 
     private fun prepareUIAndCheckUserInFirebase() {
-        binding.logout.setOnClickListener {
-            auth.signOut()
-            findNavController().navigateUp()
-        }
-
 
         val dbRef = dbRefUsers.child(currentUser!!.uid)
         dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -302,49 +258,15 @@ class OnlineChooseOpponentFragment : Fragment() {
         }else{
             dialogMoves?.dismiss()
             checkInvitations()
-            //todo old user list
-//            prepareUserList()
-
             adapter = OnlineListAdapter(requireContext(),currentUser!!.uid){
                 sendInvitation(it)
             }
             binding.recyclerView.adapter = adapter
             binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
-
             displayList().run()
-
         }
-
-
-//        movesDbRef = dbRefUsers.child(currentUser!!.uid).child("moves")
-//        movesListener = movesDbRef!!.addValueEventListener(object : ValueEventListener{
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                if(!snapshot.exists()){
-//                    displayAddMovesAlertDialog()
-//                }else{
-//                    val moves = snapshot.getValue(Int::class.java)
-//                    if(moves!!<=0){
-//                        displayAddMovesAlertDialog()
-//                    }else{
-//                        dialogMoves?.dismiss()
-//                        checkInvitations()
-//                        prepareUserList()
-//                    }
-//                }
-//            }
-//            override fun onCancelled(error: DatabaseError) {
-//            }
-//        })
     }
 
-//    private fun prepareUserList() {
-//        idList.clear()
-//        val dates = DateUtils().getLastMonth()
-//        datesListSize = dates.size
-//        currentPosition = 0
-//        readListFromFirebase(dates)
-//
-//    }
 
     private fun prepareList(){
         idList.clear()
@@ -405,7 +327,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         }
         else{
             // todo check if list not empty (if empty show "No users active last month")
-            listReady = true
+            _listReady.value = true
         }
     }
 
@@ -462,7 +384,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         invitationsDbRef = dbRefRequest.child(currentUser!!.uid)
         invitationsListener = invitationsDbRef!!.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot?.let {
+                snapshot.let {
                     val invitation = it.getValue(FirebaseRequests::class.java)
                     invitation?.let {inv ->
                         when(inv.status){
@@ -642,8 +564,6 @@ class OnlineChooseOpponentFragment : Fragment() {
             _moves.value = 10
             SharedPreferences.saveOnlineMoves(requireContext(),_moves.value!!)
             checkInvitations()
-            //todo old user list
-//            prepareUserList()
             adapter = OnlineListAdapter(requireContext(),currentUser!!.uid){
                 sendInvitation(it)
             }
@@ -673,121 +593,14 @@ class OnlineChooseOpponentFragment : Fragment() {
         dbRefRanking.setValue(newRankingUser)
 
         val dbRequests = dbRefRequest.child(userId)
-        dbRequests.setValue(true)
+        val request = FirebaseRequests()
+        dbRequests.setValue(request)
 
         startFragment()
     }
 
-    private fun displayLoginAlertDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        val alertDialog = AlertDialogLogInBinding.inflate(layoutInflater)
-        displayAlertDialogUI(alertDialog)
-        builder.setView(alertDialog.root)
 
-        val dialog = builder.create()
-        dialog.setCancelable(false)
-
-        alertDialog.loginButton.setOnClickListener {
-            val signInIntent = googleSignInClient.signInIntent
-            resultLauncher.launch(signInIntent)
-            dialog.dismiss()
-        }
-
-        alertDialog.cancelButton.setOnClickListener {
-            dialog.dismiss()
-            findNavController().navigateUp()
-        }
-
-        dialog.show()
-    }
-
-    private fun displayAlertDialogUI(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.text = "LOGIN"
-        alertDialog.message.text = "To play online you have to be logged in. Do You want login?"
-        setAlertDialogColors(alertDialog)
-        setAlertDialogSizes(alertDialog)
-        setAlertDialogDrawables(alertDialog,"LOGIN", "CANCEL")
-        setAlertDialogConstraints(alertDialog)
-    }
-
-    private fun setAlertDialogColors(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        alertDialog.message.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
-    }
-
-    private fun setAlertDialogSizes(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
-        alertDialog.message.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.05f)
-        alertDialog.message.setPadding((width*0.05).toInt(),0,(width*0.05).toInt(),0)
-        alertDialog.loginButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-        alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-    }
-
-    private fun setAlertDialogDrawables(alertDialog: AlertDialogLogInBinding,positive:String,negative:String) {
-        alertDialog.loginButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),positive))
-        alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),negative))
-        alertDialog.loginButton.background = ButtonBackground(requireContext())
-        alertDialog.cancelButton.background = ButtonBackground(requireContext())
-    }
-
-    private fun setAlertDialogConstraints(alertDialog: AlertDialogLogInBinding) {
-        val set = ConstraintSet()
-        set.clone(alertDialog.alertDialogLogIn)
-
-        set.connect(alertDialog.title.id,
-            ConstraintSet.TOP,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.TOP)
-        set.connect(alertDialog.title.id,
-            ConstraintSet.LEFT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.LEFT)
-        set.connect(alertDialog.title.id,
-            ConstraintSet.RIGHT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.RIGHT)
-
-        set.connect(alertDialog.message.id,
-            ConstraintSet.TOP,alertDialog.title.id,
-            ConstraintSet.BOTTOM,(width*0.05).toInt())
-        set.connect(alertDialog.message.id,
-            ConstraintSet.LEFT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.LEFT)
-        set.connect(alertDialog.message.id,
-            ConstraintSet.RIGHT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.RIGHT)
-
-        set.connect(alertDialog.cancelButton.id,
-            ConstraintSet.LEFT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.LEFT,
-            (width*0.05).toInt()
-        )
-        set.connect(alertDialog.cancelButton.id,
-            ConstraintSet.TOP,alertDialog.message.id,
-            ConstraintSet.BOTTOM,
-            (width*0.1).toInt()
-        )
-        set.connect(alertDialog.cancelButton.id,
-            ConstraintSet.BOTTOM,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.BOTTOM,
-            (width*0.05).toInt()
-        )
-
-        set.connect(alertDialog.loginButton.id,
-            ConstraintSet.RIGHT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.RIGHT,
-            (width*0.05).toInt()
-        )
-        set.connect(alertDialog.loginButton.id,
-            ConstraintSet.TOP,alertDialog.message.id,
-            ConstraintSet.BOTTOM,
-            (width*0.1).toInt()
-        )
-        set.connect(alertDialog.loginButton.id,
-            ConstraintSet.BOTTOM,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.BOTTOM,
-            (width*0.05).toInt()
-        )
-
-
-        set.applyTo(alertDialog.alertDialogLogIn)
-    }
 }
+
+//todo show info when preparing list
+//todo show info when refreshing list

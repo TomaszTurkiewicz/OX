@@ -1,6 +1,7 @@
 package com.tt.ox.fragments
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,6 +29,7 @@ import com.tt.ox.adapters.OnlineListAdapter
 import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.LogoutDrawable
+import com.tt.ox.drawables.SearchDrawable
 import com.tt.ox.drawables.UpdateListDrawable
 import com.tt.ox.helpers.ACCEPTED
 import com.tt.ox.helpers.AVAILABLE
@@ -104,6 +106,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         listReady.observe(this.viewLifecycleOwner){
             binding.logout.setImageDrawable(LogoutDrawable(requireContext(),listReady.value!!))
             binding.updateList.setImageDrawable(UpdateListDrawable(requireContext(),listReady.value!!))
+            binding.searchButton.setImageDrawable(SearchDrawable(requireContext(),listReady.value!!))
         }
         setUI()
         moves.observe(this.viewLifecycleOwner){
@@ -167,6 +170,7 @@ class OnlineChooseOpponentFragment : Fragment() {
     private fun setDrawables() {
         binding.logout.background = ButtonBackground(requireContext())
         binding.updateList.background = ButtonBackground(requireContext())
+        binding.searchButton.background = ButtonBackground(requireContext())
 
         //todo finish this first
     }
@@ -252,18 +256,27 @@ class OnlineChooseOpponentFragment : Fragment() {
     }
 
     private fun startFragment(){
-        _moves.value = SharedPreferences.readOnlineMoves(requireContext())
-        if(_moves.value!!<=0){
-            displayAddMovesAlertDialog()
-        }else{
-            dialogMoves?.dismiss()
-            checkInvitations()
-            adapter = OnlineListAdapter(requireContext(),currentUser!!.uid){
-                sendInvitation(it)
+        checkIfFragmentAttached {
+            _moves.value = SharedPreferences.readOnlineMoves(requireContext())
+            if (_moves.value!! <= 0) {
+                displayAddMovesAlertDialog()
+            } else {
+                dialogMoves?.dismiss()
+                checkInvitations()
+                adapter = OnlineListAdapter(requireContext(), currentUser!!.uid) {
+                    sendInvitation(it)
+                }
+                binding.recyclerView.adapter = adapter
+                binding.recyclerView.layoutManager = LinearLayoutManager(this)
+                displayList().run()
             }
-            binding.recyclerView.adapter = adapter
-            binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
-            displayList().run()
+        }
+    }
+
+
+    private fun checkIfFragmentAttached(operation: Context.() -> Unit){
+        if(isAdded && context != null){
+            operation(requireContext())
         }
     }
 

@@ -87,7 +87,6 @@ class StartFragment : Fragment() {
                 doSomething(data)
             }
             else if(result.resultCode == Activity.RESULT_CANCELED){
-                val a = 100
                 displayLoginAlertDialogLogin("result launcher")
 
             }

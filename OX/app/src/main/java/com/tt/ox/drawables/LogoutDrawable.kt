@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
 
-class LogoutDrawable (private val context: Context, val active:Boolean) : Drawable() {
+class LogoutDrawable (private val context: Context, private val active:Boolean) : Drawable() {
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
         val stroke = bounds.width()*0.1f

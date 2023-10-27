@@ -56,26 +56,7 @@ class ResetButtonDrawable (private val context: Context) : Drawable(){
         lowerTriangle.line(lRight)
         lowerTriangle.line(lTop)
         lowerTriangle.close()
-
         canvas.drawPath(lowerTriangle,paint)
-
-//        paint.style = Paint.Style.STROKE
-//        paint.strokeWidth = bounds.width()*0.04f
-//        paint.color = ContextCompat.getColor(context,R.color.green)
-//
-//        val upperArrow = MyPath()
-//        val a = Point((bounds.width()*0.9).toInt(), (bounds.height()*0.4).toInt())
-//        val b = Point((bounds.width()*0.1).toInt(), (bounds.height()*0.4).toInt())
-//        val curvedAB = Functions.curvedPath(a,b,bounds.width()*0.5,false)
-//
-//        upperArrow.move(a)
-//        upperArrow.cubic(a,b,curvedAB)
-//
-//        canvas.drawPath(upperArrow,paint)
-
-
-
-
     }
 
     override fun setAlpha(alpha: Int) {

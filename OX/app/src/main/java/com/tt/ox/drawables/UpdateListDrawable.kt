@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
 
-class UpdateListDrawable (private val context: Context, val active:Boolean) : Drawable(){
+class UpdateListDrawable (private val context: Context, private val active:Boolean) : Drawable(){
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
         paint.style = Paint.Style.STROKE

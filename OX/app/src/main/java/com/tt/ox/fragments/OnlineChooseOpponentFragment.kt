@@ -34,6 +34,7 @@ import com.tt.ox.drawables.UpdateListDrawable
 import com.tt.ox.helpers.ACCEPTED
 import com.tt.ox.helpers.AVAILABLE
 import com.tt.ox.helpers.AlertDialogAddMoves
+import com.tt.ox.helpers.AlertDialogLogin
 import com.tt.ox.helpers.AlertDialogWaiting
 import com.tt.ox.helpers.DateUtils
 import com.tt.ox.helpers.FirebaseBattle
@@ -78,6 +79,7 @@ class OnlineChooseOpponentFragment : Fragment() {
     private val _listReady = MutableLiveData<Boolean>()
     private var listReady:LiveData<Boolean> = _listReady
     private val listHandler = Handler(Looper.getMainLooper())
+    private var dialogLogout:AlertDialog? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,8 +117,25 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         binding.logout.setOnClickListener {
             if(listReady.value!!) {
-                auth.signOut()
-                findNavController().navigateUp()
+                dialogLogout = AlertDialogLogin(
+                    requireContext(),
+                    layoutInflater,
+                    "LOGOUT",
+                    "Are You sure You want to logout?",
+                    {
+                        auth.signOut()
+                        dialogLogout?.dismiss()
+                        findNavController().navigateUp()
+                    },
+                    {
+                        dialogLogout?.dismiss()
+                    }
+                ).create()
+                dialogLogout?.show()
+
+
+//                auth.signOut()
+//                findNavController().navigateUp()
             }else{
                 Toast.makeText(requireContext(),"Not ready yet", Toast.LENGTH_LONG).show()
             }

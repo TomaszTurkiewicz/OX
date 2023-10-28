@@ -28,7 +28,6 @@ import com.google.firebase.ktx.Firebase
 import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogAddOpponentBinding
-import com.tt.ox.databinding.AlertDialogLogInBinding
 import com.tt.ox.databinding.FragmentStartBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
@@ -37,6 +36,7 @@ import com.tt.ox.drawables.MultiPlayerButtonDrawable
 import com.tt.ox.drawables.OnlinePlayerButtonDrawable
 import com.tt.ox.drawables.SettingButtonDrawable
 import com.tt.ox.drawables.SinglePlayerButtonDrawable
+import com.tt.ox.helpers.AlertDialogLogin
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.viewModel.GameViewModel
@@ -56,6 +56,8 @@ class StartFragment : Fragment() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
+
+    private var dialogLogin:AlertDialog? = null
 
     private val gameViewModel: GameViewModel by activityViewModels {
         GameViewModelFactory(
@@ -87,7 +89,7 @@ class StartFragment : Fragment() {
                 doSomething(data)
             }
             else if(result.resultCode == Activity.RESULT_CANCELED){
-                displayLoginAlertDialogLogin("result launcher")
+                displayLoginAlertDialogLogin()
 
             }
         }
@@ -141,116 +143,22 @@ class StartFragment : Fragment() {
             }
     }
 
-    private fun displayLoginAlertDialogLogin(tag:String) {
-        val builder = AlertDialog.Builder(requireContext())
-        val alertDialog = AlertDialogLogInBinding.inflate(layoutInflater)
-        displayAlertDialogUILogin(alertDialog,tag)
-        builder.setView(alertDialog.root)
-
-        val dialog = builder.create()
-        dialog.setCancelable(false)
-
-        alertDialog.loginButton.setOnClickListener {
-            val signInIntent = googleSignInClient.signInIntent
-            resultLauncher.launch(signInIntent)
-            dialog.dismiss()
-        }
-
-        alertDialog.cancelButton.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
-
-    private fun displayAlertDialogUILogin(alertDialog: AlertDialogLogInBinding, tag:String) {
-        alertDialog.title.text = "LOGIN "+tag
-        alertDialog.message.text = "To play online you have to be logged in. Do You want login?"
-        setAlertDialogColorsLogin(alertDialog)
-        setAlertDialogSizesLogin(alertDialog)
-        setAlertDialogDrawablesLogin(alertDialog,"LOGIN", "CANCEL")
-        setAlertDialogConstraintsLogin(alertDialog)
-    }
-
-    private fun setAlertDialogColorsLogin(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        alertDialog.message.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
-    }
-
-    private fun setAlertDialogSizesLogin(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
-        alertDialog.message.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.05f)
-        alertDialog.message.setPadding((width*0.05).toInt(),0,(width*0.05).toInt(),0)
-        alertDialog.loginButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-        alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-    }
-
-    private fun setAlertDialogDrawablesLogin(alertDialog: AlertDialogLogInBinding,positive:String,negative:String) {
-        alertDialog.loginButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),positive))
-        alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),negative))
-        alertDialog.loginButton.background = ButtonBackground(requireContext())
-        alertDialog.cancelButton.background = ButtonBackground(requireContext())
-    }
-
-    private fun setAlertDialogConstraintsLogin(alertDialog: AlertDialogLogInBinding) {
-        val set = ConstraintSet()
-        set.clone(alertDialog.alertDialogLogIn)
-
-        set.connect(alertDialog.title.id,
-            ConstraintSet.TOP,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.TOP)
-        set.connect(alertDialog.title.id,
-            ConstraintSet.LEFT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.LEFT)
-        set.connect(alertDialog.title.id,
-            ConstraintSet.RIGHT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.RIGHT)
-
-        set.connect(alertDialog.message.id,
-            ConstraintSet.TOP,alertDialog.title.id,
-            ConstraintSet.BOTTOM,(width*0.05).toInt())
-        set.connect(alertDialog.message.id,
-            ConstraintSet.LEFT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.LEFT)
-        set.connect(alertDialog.message.id,
-            ConstraintSet.RIGHT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.RIGHT)
-
-        set.connect(alertDialog.cancelButton.id,
-            ConstraintSet.LEFT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.LEFT,
-            (width*0.05).toInt()
-        )
-        set.connect(alertDialog.cancelButton.id,
-            ConstraintSet.TOP,alertDialog.message.id,
-            ConstraintSet.BOTTOM,
-            (width*0.1).toInt()
-        )
-        set.connect(alertDialog.cancelButton.id,
-            ConstraintSet.BOTTOM,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.BOTTOM,
-            (width*0.05).toInt()
-        )
-
-        set.connect(alertDialog.loginButton.id,
-            ConstraintSet.RIGHT,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.RIGHT,
-            (width*0.05).toInt()
-        )
-        set.connect(alertDialog.loginButton.id,
-            ConstraintSet.TOP,alertDialog.message.id,
-            ConstraintSet.BOTTOM,
-            (width*0.1).toInt()
-        )
-        set.connect(alertDialog.loginButton.id,
-            ConstraintSet.BOTTOM,alertDialog.alertDialogLogIn.id,
-            ConstraintSet.BOTTOM,
-            (width*0.05).toInt()
-        )
-
-
-        set.applyTo(alertDialog.alertDialogLogIn)
+    private fun displayLoginAlertDialogLogin() {
+        dialogLogin = AlertDialogLogin(
+            requireContext(),
+            layoutInflater,
+            "LOGIN",
+            "To play online you have to be logged in. Do You want login?",
+            {
+                val signInIntent = googleSignInClient.signInIntent
+                resultLauncher.launch(signInIntent)
+                dialogLogin?.dismiss()
+            },
+            {
+                dialogLogin?.dismiss()
+            }
+        ).create()
+        dialogLogin?.show()
     }
 
     private fun setAlertDialogColors(alertDialog: AlertDialogAddOpponentBinding) {
@@ -377,7 +285,7 @@ class StartFragment : Fragment() {
                     val action = StartFragmentDirections.actionStartFragmentToOnlineChooseOpponentFragment()
                     findNavController().navigate(action)
                 }else{
-                    displayLoginAlertDialogLogin("start fragment")
+                    displayLoginAlertDialogLogin()
                 }
             }
         }

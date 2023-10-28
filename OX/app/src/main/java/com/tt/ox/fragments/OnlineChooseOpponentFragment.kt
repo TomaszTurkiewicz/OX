@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.tt.ox.MOVES
 import com.tt.ox.R
 import com.tt.ox.adapters.OnlineListAdapter
 import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
@@ -367,6 +368,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         if(user!=null){
             if(user.timestamp==currentDate){
                 user.unixTime = System.currentTimeMillis()
+                user.userName = SharedPreferences.readPlayerName(requireContext())
                 val dbRefUser = dbRefUsers.child(user.id.toString())
                 dbRefUser.setValue(user)
 
@@ -376,6 +378,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 dbRefRanking.child(user.timestamp.toString()).child(user.id.toString()).removeValue()
                 user.timestamp = currentDate
                 user.unixTime = System.currentTimeMillis()
+                user.userName = SharedPreferences.readPlayerName(requireContext())
                 val dbRefUser = dbRefUsers.child(user.id.toString())
                 dbRefUser.setValue(user)
                 val dbRefRanking = dbRefRanking.child(currentDate.toString()).child(user.id.toString())
@@ -709,7 +712,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 findNavController().navigateUp()
             }){
             dialogMoves?.dismiss()
-            _moves.value = 10
+            _moves.value = MOVES
             SharedPreferences.saveOnlineMoves(requireContext(),_moves.value!!)
             checkInvitations()
             adapter = OnlineListAdapter(requireContext(),currentUser!!.uid){

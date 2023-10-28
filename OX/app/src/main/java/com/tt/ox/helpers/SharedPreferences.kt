@@ -1,6 +1,7 @@
 package com.tt.ox.helpers
 
 import android.content.Context
+import com.tt.ox.MOVES
 import com.tt.ox.O
 import com.tt.ox.X
 
@@ -47,7 +48,7 @@ class SharedPreferences {
             var moves = 0
             context.let {
                 val sharedPreferences = it.getSharedPreferences("Moves",Context.MODE_PRIVATE)
-                moves = sharedPreferences.getInt("moves",0)
+                moves = sharedPreferences.getInt("moves", MOVES)
             }
             return moves
         }
@@ -65,7 +66,7 @@ class SharedPreferences {
             var moves = 0
             context.let {
                 val sharedPreferences = it.getSharedPreferences("OnlineMoves",Context.MODE_PRIVATE)
-                moves = sharedPreferences.getInt("online_moves",0)
+                moves = sharedPreferences.getInt("online_moves", MOVES)
             }
             return moves
         }

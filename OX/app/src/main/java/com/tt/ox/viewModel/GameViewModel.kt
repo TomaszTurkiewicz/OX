@@ -16,6 +16,7 @@ import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.MID_LEFT
 import com.tt.ox.MID_MID
 import com.tt.ox.MID_RIGHT
+import com.tt.ox.MOVES
 import com.tt.ox.NORMAL_GAME
 import com.tt.ox.NOTHING
 import com.tt.ox.NO_ONE
@@ -210,7 +211,7 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     }
 
     private fun resetMoves(context: Context){
-        _moves.value = 2
+        _moves.value = MOVES
         saveMovesToSharedPreferences(context)
     }
 

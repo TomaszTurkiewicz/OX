@@ -49,8 +49,6 @@ class MainActivity : AppCompatActivity() {
 *  clear statistic singleplayer
 *  send game
 *  other games
-*  update name from shared preferences everytime when checking timestamp !!!
-*  always add 10 moves
 *  adverts
 *  better showing player turn
 *  delete user from firebase if logged in

@@ -13,13 +13,13 @@ import androidx.core.content.ContextCompat
 import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
 
-class LogoutDrawable (private val context: Context, private val active:Boolean) : Drawable() {
+class LogoutDrawable (private val context: Context) : Drawable() {
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
         val stroke = bounds.width()*0.1f
         paint.strokeWidth = stroke
         paint.style = Paint.Style.STROKE
-        paint.color = if(active) ContextCompat.getColor(context, R.color.red) else ContextCompat.getColor(context, R.color.gray)
+        paint.color = ContextCompat.getColor(context, R.color.red)
         paint.isAntiAlias = true
 
         val radius = bounds.width()*0.1f
@@ -47,7 +47,7 @@ class LogoutDrawable (private val context: Context, private val active:Boolean) 
         canvas.drawPath(blank,paint)
 
 
-        paint.color = if(active) ContextCompat.getColor(context, R.color.red) else ContextCompat.getColor(context, R.color.gray)
+        paint.color = ContextCompat.getColor(context, R.color.red)
 
 
         val rad = radius/2

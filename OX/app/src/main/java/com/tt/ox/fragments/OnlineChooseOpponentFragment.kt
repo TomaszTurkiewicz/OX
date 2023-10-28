@@ -5,12 +5,14 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,6 +27,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.tt.ox.R
 import com.tt.ox.adapters.OnlineListAdapter
 import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
 import com.tt.ox.drawables.ButtonBackground
@@ -48,6 +51,9 @@ import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import kotlin.random.Random
 
+private const val DATES = 0
+private const val USERS = 1
+private const val FILTERING = 2
 
 class OnlineChooseOpponentFragment : Fragment() {
     private var _binding: FragmentOnlineChooseOpponentBinding? = null
@@ -80,6 +86,8 @@ class OnlineChooseOpponentFragment : Fragment() {
     private var listReady:LiveData<Boolean> = _listReady
     private val listHandler = Handler(Looper.getMainLooper())
     private var dialogLogout:AlertDialog? = null
+    private val _stage = MutableLiveData<Int>()
+    private val stage:LiveData<Int> = _stage
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +99,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         unit = ScreenMetricsCompat().getUnit(requireContext())
         _moves.value = 0
         _listReady.value = false
+
 
         prepareList()
     }
@@ -106,17 +115,25 @@ class OnlineChooseOpponentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         listReady.observe(this.viewLifecycleOwner){
-            binding.logout.setImageDrawable(LogoutDrawable(requireContext(),listReady.value!!))
-            binding.updateList.setImageDrawable(UpdateListDrawable(requireContext(),listReady.value!!))
-            binding.searchButton.setImageDrawable(SearchDrawable(requireContext(),listReady.value!!))
+            binding.updateList.setImageDrawable(UpdateListDrawable(requireContext(),it))
+            binding.searchButton.setImageDrawable(SearchDrawable(requireContext(),it))
+            setInfoVisibility(it)
         }
         setUI()
         moves.observe(this.viewLifecycleOwner){
             binding.moves.text = it.toString()
         }
 
+        stage.observe(this.viewLifecycleOwner){
+            binding.infoText.text = when(it){
+                DATES -> "CHECKING LAST MONTH ACTIVITIES"
+                USERS -> "DOWNLOADING USERS"
+                FILTERING -> "FILTERING USERS"
+                else -> "ELSE"
+            }
+        }
+
         binding.logout.setOnClickListener {
-            if(listReady.value!!) {
                 dialogLogout = AlertDialogLogin(
                     requireContext(),
                     layoutInflater,
@@ -133,14 +150,27 @@ class OnlineChooseOpponentFragment : Fragment() {
                 ).create()
                 dialogLogout?.show()
 
+        }
 
-//                auth.signOut()
-//                findNavController().navigateUp()
+        binding.updateList.setOnClickListener {
+            if(listReady.value!!){
+                _listReady.value = false
+                adapter.submitList(null)
+                prepareList()
+                displayList().run()
             }else{
-                Toast.makeText(requireContext(),"Not ready yet", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),"LIST NOT READY YET",Toast.LENGTH_LONG).show()
             }
         }
 
+    }
+
+    private fun setInfoVisibility(it: Boolean) {
+        if(it){
+            binding.infoText.visibility = View.GONE
+        }else{
+            binding.infoText.visibility = View.VISIBLE
+        }
     }
 
     private fun setUI() {
@@ -191,6 +221,11 @@ class OnlineChooseOpponentFragment : Fragment() {
         binding.updateList.background = ButtonBackground(requireContext())
         binding.searchButton.background = ButtonBackground(requireContext())
 
+        binding.logout.setImageDrawable(LogoutDrawable(requireContext()))
+
+        binding.moves.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.infoText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+
         //todo finish this first
     }
 
@@ -200,6 +235,8 @@ class OnlineChooseOpponentFragment : Fragment() {
         binding.searchButton.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.updateList.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.logout.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
+        binding.moves.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit.toFloat())
+        binding.infoText.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
     }
 
     override fun onResume() {
@@ -301,6 +338,7 @@ class OnlineChooseOpponentFragment : Fragment() {
 
 
     private fun prepareList(){
+        _stage.value = DATES
         idList.clear()
         val dates = DateUtils().getLastMonth()
         datesListSize = dates.size
@@ -334,9 +372,11 @@ class OnlineChooseOpponentFragment : Fragment() {
     private fun readUserListFromFirebaseNew(){
         userList.clear()
         loopCounter = 0
+        _stage.value = FILTERING
         val filteredIdList = idList.filter { id -> id.userId != currentUser!!.uid }
         listSize = filteredIdList.size
         currentUserPosition = 0
+        _stage.value = USERS
         readUsersFromFirebaseNew(filteredIdList)
     }
 
@@ -358,7 +398,6 @@ class OnlineChooseOpponentFragment : Fragment() {
             })
         }
         else{
-            // todo check if list not empty (if empty show "No users active last month")
             _listReady.value = true
         }
     }

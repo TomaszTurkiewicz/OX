@@ -1,6 +1,5 @@
 package com.tt.ox.fragments
 
-import android.app.ActionBar.LayoutParams
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
@@ -34,6 +33,7 @@ import com.tt.ox.R
 import com.tt.ox.adapters.OnlineListAdapter
 import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
 import com.tt.ox.drawables.ButtonBackground
+import com.tt.ox.drawables.EditTextBackground
 import com.tt.ox.drawables.LogoutDrawable
 import com.tt.ox.drawables.SearchDrawable
 import com.tt.ox.drawables.UpdateListDrawable
@@ -93,6 +93,8 @@ class OnlineChooseOpponentFragment : Fragment() {
     private val stage:LiveData<Int> = _stage
     private val _searching = MutableLiveData<Boolean>()
     private val searching:LiveData<Boolean> = _searching
+    private val _noUsers = MutableLiveData<Boolean>()
+    private val noUsers:LiveData<Boolean> = _noUsers
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,6 +107,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         _moves.value = SharedPreferences.readOnlineMoves(requireContext())
         _listReady.value = false
         _searching.value = false
+        _noUsers.value = false
 
 
         prepareList()
@@ -139,6 +142,10 @@ class OnlineChooseOpponentFragment : Fragment() {
             }
         }
 
+        noUsers.observe(this.viewLifecycleOwner){
+            binding.noUsers.visibility = if(it) View.VISIBLE else View.GONE
+        }
+
         searching.observe(this.viewLifecycleOwner){
             if(it){
                 binding.searchEditText.visibility = View.VISIBLE
@@ -171,6 +178,7 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         binding.updateList.setOnClickListener {
             if(listReady.value!!){
+                _noUsers.value = false
                 _listReady.value = false
                 adapter.submitList(null)
                 prepareList()
@@ -187,6 +195,9 @@ class OnlineChooseOpponentFragment : Fragment() {
                 _searching.value = s
                 if(s){
                     adapter.submitList(getUserList(binding.searchEditText.text.toString()))
+                    binding.searchEditText.requestFocus()
+                    val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputMethodManager.showSoftInput(binding.searchEditText, InputMethodManager.SHOW_IMPLICIT)
                 }else{
                     val inputManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     inputManager.hideSoftInputFromWindow(view.windowToken,0)
@@ -253,6 +264,7 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         set.connect(binding.searchEditText.id,ConstraintSet.TOP,binding.searchButton.id,ConstraintSet.BOTTOM,0)
         set.connect(binding.searchEditText.id,ConstraintSet.LEFT, binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.searchEditText.id,ConstraintSet.RIGHT, binding.layout.id,ConstraintSet.RIGHT,0)
 
         set.applyTo(binding.layout)
     }
@@ -266,9 +278,11 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         binding.moves.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.infoText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.noUsers.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.searchEditText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
 
-        //todo finish this first
+        binding.searchEditText.background = EditTextBackground(requireContext())
+
     }
 
     private fun setSizes() {
@@ -279,7 +293,8 @@ class OnlineChooseOpponentFragment : Fragment() {
         binding.logout.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.moves.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit.toFloat())
         binding.infoText.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
-        binding.searchEditText.layoutParams = ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT,buttonSize)
+        binding.noUsers.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
+        binding.searchEditText.layoutParams = ConstraintLayout.LayoutParams(width,buttonSize)
         binding.searchEditText.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
     }
 
@@ -315,11 +330,14 @@ class OnlineChooseOpponentFragment : Fragment() {
         return if(searching.value!!){
             if(string!=null){
                 val newList = userList.filter { user -> user.userName.contains(string,false) }
+                _noUsers.value = newList.isEmpty()
                 newList
             }else{
+                _noUsers.value = userList.isEmpty()
                 userList
             }
         }else{
+            _noUsers.value = userList.isEmpty()
             userList
         }
     }
@@ -731,6 +749,3 @@ class OnlineChooseOpponentFragment : Fragment() {
 
 
 }
-
-//todo show info when preparing list
-//todo show info when refreshing list

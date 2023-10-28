@@ -25,10 +25,3 @@ class OptionsFragment : Fragment() {
 
 }
 
-/*todo
-*  settings:
-*  dark mode
-*  sounds?
-*  clear statistic singleplayer
-*  send game
-*  other games */

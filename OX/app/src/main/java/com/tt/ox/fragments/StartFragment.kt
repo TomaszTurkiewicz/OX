@@ -342,5 +342,3 @@ class StartFragment : Fragment() {
         set.applyTo(binding.fragmentStartLayout)
     }
 }
-
-//todo multiplayer online ??? at the end...

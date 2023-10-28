@@ -29,6 +29,8 @@ const val EASY_GAME = 1
 const val NORMAL_GAME = 2
 const val HARD_GAME = 3
 
+const val MOVES = 10
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -40,3 +42,16 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
+/*todo
+*  settings:
+*  dark mode
+*  sounds?
+*  clear statistic singleplayer
+*  send game
+*  other games
+*  update name from shared preferences everytime when checking timestamp !!!
+*  always add 10 moves
+*  adverts
+*  better showing player turn
+*  delete user from firebase if logged in
+ */

@@ -224,4 +224,3 @@ class OnlineListAdapter(
     }
     }
 
-// todo update name from shared preferences everytime when checking timestamp !!!

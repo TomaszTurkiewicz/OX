@@ -1,5 +1,6 @@
 package com.tt.ox.fragments
 
+import android.app.ActionBar.LayoutParams
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
@@ -9,10 +10,12 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -88,6 +91,8 @@ class OnlineChooseOpponentFragment : Fragment() {
     private var dialogLogout:AlertDialog? = null
     private val _stage = MutableLiveData<Int>()
     private val stage:LiveData<Int> = _stage
+    private val _searching = MutableLiveData<Boolean>()
+    private val searching:LiveData<Boolean> = _searching
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,8 +102,9 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
         unit = ScreenMetricsCompat().getUnit(requireContext())
-        _moves.value = 0
+        _moves.value = SharedPreferences.readOnlineMoves(requireContext())
         _listReady.value = false
+        _searching.value = false
 
 
         prepareList()
@@ -133,6 +139,17 @@ class OnlineChooseOpponentFragment : Fragment() {
             }
         }
 
+        searching.observe(this.viewLifecycleOwner){
+            if(it){
+                binding.searchEditText.visibility = View.VISIBLE
+            }else{
+                binding.searchEditText.visibility = View.GONE
+                if(listReady.value!!){
+                    adapter.submitList(getUserList(null))
+                }
+            }
+        }
+
         binding.logout.setOnClickListener {
                 dialogLogout = AlertDialogLogin(
                     requireContext(),
@@ -160,6 +177,28 @@ class OnlineChooseOpponentFragment : Fragment() {
                 displayList().run()
             }else{
                 Toast.makeText(requireContext(),"LIST NOT READY YET",Toast.LENGTH_LONG).show()
+            }
+        }
+
+        binding.searchButton.setOnClickListener {
+            if(listReady.value!!){
+                var s = searching.value!!
+                s = !s
+                _searching.value = s
+                if(s){
+                    adapter.submitList(getUserList(binding.searchEditText.text.toString()))
+                }else{
+                    val inputManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputManager.hideSoftInputFromWindow(view.windowToken,0)
+                }
+            }else{
+                Toast.makeText(requireContext(),"LIST NOT READY YET",Toast.LENGTH_LONG).show()
+            }
+        }
+
+        binding.searchEditText.doAfterTextChanged {
+            if(searching.value!!){
+                adapter.submitList(getUserList(it.toString()))
             }
         }
 
@@ -212,6 +251,8 @@ class OnlineChooseOpponentFragment : Fragment() {
         set.connect(binding.searchButton.id,ConstraintSet.LEFT,binding.rightDivider.id,ConstraintSet.RIGHT,0)
         set.connect(binding.searchButton.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
 
+        set.connect(binding.searchEditText.id,ConstraintSet.TOP,binding.searchButton.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.searchEditText.id,ConstraintSet.LEFT, binding.layout.id,ConstraintSet.LEFT,0)
 
         set.applyTo(binding.layout)
     }
@@ -225,6 +266,7 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         binding.moves.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.infoText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.searchEditText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
 
         //todo finish this first
     }
@@ -237,6 +279,8 @@ class OnlineChooseOpponentFragment : Fragment() {
         binding.logout.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.moves.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit.toFloat())
         binding.infoText.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
+        binding.searchEditText.layoutParams = ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT,buttonSize)
+        binding.searchEditText.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
     }
 
     override fun onResume() {
@@ -259,9 +303,24 @@ class OnlineChooseOpponentFragment : Fragment() {
     private fun displayList():Runnable = Runnable {
         if(listReady.value!!){
             listHandler.removeCallbacksAndMessages(null)
-            adapter.submitList(userList)
+
+
+            adapter.submitList(getUserList(binding.searchEditText.text.toString()))
         }else{
             listHandler.postDelayed(displayList(),1000)
+        }
+    }
+
+    private fun getUserList(string:String?):List<com.tt.ox.helpers.FirebaseUser>{
+        return if(searching.value!!){
+            if(string!=null){
+                val newList = userList.filter { user -> user.userName.contains(string,false) }
+                newList
+            }else{
+                userList
+            }
+        }else{
+            userList
         }
     }
 
@@ -313,7 +372,7 @@ class OnlineChooseOpponentFragment : Fragment() {
 
     private fun startFragment(){
         checkIfFragmentAttached {
-            _moves.value = SharedPreferences.readOnlineMoves(requireContext())
+//            _moves.value = SharedPreferences.readOnlineMoves(requireContext())
             if (_moves.value!! <= 0) {
                 displayAddMovesAlertDialog()
             } else {

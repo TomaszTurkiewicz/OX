@@ -79,34 +79,18 @@ class OnlineListAdapter(
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            TODO("Not yet implemented")
                         }
-
                     })
-
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
-
         })
 
-
-//        holder.wins.text = current.wins.toString()
-//        holder.loses.text = current.loses.toString()
-//        holder.activity.text = DateUtils().getLastActivity(current.unixTime)
-
-
         setSizes(holder)
-
         setColors(holder)
-
         setDrawables(holder,current)
-
         setConstraint(holder)
-
         val dbRequests = Firebase.database.getReference("Requests").child(current.id!!)
         dbRequests.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -238,6 +222,6 @@ class OnlineListAdapter(
 
         }
     }
+    }
 
 // todo update name from shared preferences everytime when checking timestamp !!!
-}

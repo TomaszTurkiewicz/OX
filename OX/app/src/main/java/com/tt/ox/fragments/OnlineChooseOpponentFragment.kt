@@ -20,6 +20,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -31,6 +36,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.tt.ox.MOVES
 import com.tt.ox.R
+import com.tt.ox.TEST
 import com.tt.ox.adapters.OnlineListAdapter
 import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
 import com.tt.ox.drawables.ButtonBackground
@@ -72,8 +78,6 @@ class OnlineChooseOpponentFragment : Fragment() {
     private val dbRefBattle = Firebase.database.getReference("Battle")
     private var invitationsDbRef: DatabaseReference? = null
     private var invitationsListener: ValueEventListener? = null
-    private var movesDbRef: DatabaseReference? = null
-    private var movesListener: ValueEventListener? = null
     private var dialogMoves:AlertDialog? = null
     private val idList:MutableList<FirebaseUserId> = mutableListOf()
     private var datesListSize = 0
@@ -96,6 +100,9 @@ class OnlineChooseOpponentFragment : Fragment() {
     private val searching:LiveData<Boolean> = _searching
     private val _noUsers = MutableLiveData<Boolean>()
     private val noUsers:LiveData<Boolean> = _noUsers
+    private var mRewardedAd : RewardedAd? = null
+
+    private val handler = Handler(Looper.getMainLooper())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,7 +117,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         _searching.value = false
         _noUsers.value = false
 
-
+        prepareRewardedAd()
         prepareList()
     }
 
@@ -312,7 +319,8 @@ class OnlineChooseOpponentFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         invitationsDbRef?.removeEventListener(invitationsListener!!)
-        movesDbRef?.removeEventListener(movesListener!!)
+        invitationsDbRef= null
+//        movesDbRef?.removeEventListener(movesListener!!)
         listHandler.removeCallbacksAndMessages(null)
     }
 
@@ -557,16 +565,31 @@ class OnlineChooseOpponentFragment : Fragment() {
         })
     }
 
-    private fun moveToOnlineBattleFragment() {
+    private fun moveToOnlineBattle():Runnable = Runnable {
+        handler.removeCallbacksAndMessages(null)
+        try {
+            invitationsDbRef?.removeEventListener(invitationsListener!!)
+            invitationsDbRef= null
+            val action = OnlineChooseOpponentFragmentDirections.actionOnlineChooseOpponentFragmentToOnlineBattle()
+            findNavController().navigate(action)
+        }
+        catch (e:Exception){
+            val current = findNavController().currentDestination?.displayName
+            Toast.makeText(requireContext(),current,Toast.LENGTH_SHORT).show()
+            handler.postDelayed(moveToOnlineBattle(),1000)
+        }
+    }
 
-//        idList.clear()
-//        userList.clear()
+
+    private fun moveToOnlineBattleFragment() {
         val temp = _moves.value!!-1
         _moves.value = temp
         SharedPreferences.saveOnlineMoves(requireContext(),_moves.value!!)
         dialogInvitation?.dismiss()
+        dialogInvitation=null
+        invitationsDbRef?.removeEventListener(invitationsListener!!)
+        invitationsDbRef= null
         val action = OnlineChooseOpponentFragmentDirections.actionOnlineChooseOpponentFragmentToOnlineBattle()
-
         findNavController().navigate(action)
     }
 
@@ -586,6 +609,7 @@ class OnlineChooseOpponentFragment : Fragment() {
             endTimeCallBack = {
                 //do nothing
             }, negativeButtonPressed = {
+                dialogInvitation?.dismiss()
                 val dbRef = dbRefRequest.child(currentUser!!.uid).child("status")
                 dbRef.setValue(PLAY)
             }){
@@ -616,6 +640,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 val request1 = FirebaseRequests()
                 request1.status = AVAILABLE
                 dbRef.setValue(request1)
+                dialogInvitation?.dismiss()
             }
         ){
             //do nothing
@@ -647,6 +672,7 @@ class OnlineChooseOpponentFragment : Fragment() {
 
                 val dbRef2 = dbRefRequest.child(request.opponentId!!).child("status")
                 dbRef2.setValue(REJECTED)
+                dialogInvitation?.dismiss()
             }
         ){
             val dbRefB = dbRefBattle.child(request.battle!!)
@@ -662,6 +688,7 @@ class OnlineChooseOpponentFragment : Fragment() {
             dbRef1.setValue(ACCEPTED)
             val dbRef2 = dbRefRequest.child(currentUser!!.uid).child("status")
             dbRef2.setValue(PLAY)
+            dialogInvitation?.dismiss()
         }.create()
 
         dialogInvitation?.show()
@@ -687,6 +714,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 dbRef.setValue(request1)
             },
             negativeButtonPressed = {
+
                 val dbRefMy = dbRefRequest.child(currentUser!!.uid)
                 val requestMy = FirebaseRequests()
                 requestMy.status = AVAILABLE
@@ -695,6 +723,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 val requestOpponent = FirebaseRequests()
                 requestOpponent.status = AVAILABLE
                 dbRefOpponent.setValue(requestOpponent)
+                dialogInvitation?.dismiss()
             }){
             // do nothing
         }.create()
@@ -711,7 +740,55 @@ class OnlineChooseOpponentFragment : Fragment() {
                 dialogMoves?.dismiss()
                 findNavController().navigateUp()
             }){
-            dialogMoves?.dismiss()
+
+            if(mRewardedAd!=null){
+                dialogMoves?.dismiss()
+                showAdvertReward()
+            }else{
+                Toast.makeText(requireContext(),"POOR INTERNET", Toast.LENGTH_SHORT).show()
+            }
+        }.create()
+        dialogMoves?.show()
+    }
+
+    private fun showAdvertReward(){
+        mRewardedAd?.fullScreenContentCallback = object  : FullScreenContentCallback(){
+            override fun onAdClicked() {
+                super.onAdClicked()
+                //do nothing
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                super.onAdDismissedFullScreenContent()
+                //do nothing
+                dialogInvitation?.dismiss()
+                dialogInvitation=null
+                invitationsDbRef?.removeEventListener(invitationsListener!!)
+                invitationsDbRef= null
+            }
+
+            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                super.onAdFailedToShowFullScreenContent(p0)
+                // do nothing
+            }
+
+            override fun onAdImpression() {
+                super.onAdImpression()
+                // do nothing
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                super.onAdShowedFullScreenContent()
+                dialogInvitation?.dismiss()
+                dialogInvitation=null
+                invitationsDbRef?.removeEventListener(invitationsListener!!)
+                invitationsDbRef= null
+                prepareRewardedAd()
+            }
+        }
+
+        if(mRewardedAd != null){
+            mRewardedAd?.show(requireActivity()){
             _moves.value = MOVES
             SharedPreferences.saveOnlineMoves(requireContext(),_moves.value!!)
             checkInvitations()
@@ -721,8 +798,24 @@ class OnlineChooseOpponentFragment : Fragment() {
             binding.recyclerView.adapter = adapter
             binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
             displayList().run()
-        }.create()
-        dialogMoves?.show()
+            }
+        }
+    }
+
+    private fun prepareRewardedAd(){
+        val adRequest = com.google.android.gms.ads.AdRequest.Builder().build()
+        val adId = if(TEST) getString(R.string.testRewardedAd) else getString(R.string.onlinePlayerRewardedAd)
+        RewardedAd.load(requireContext(),adId,adRequest, object : RewardedAdLoadCallback(){
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                super.onAdFailedToLoad(p0)
+                mRewardedAd = null
+            }
+
+            override fun onAdLoaded(p0: RewardedAd) {
+                super.onAdLoaded(p0)
+                mRewardedAd = p0
+            }
+        })
     }
 
     private fun createUser(userId: String) {

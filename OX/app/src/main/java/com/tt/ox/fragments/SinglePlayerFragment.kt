@@ -15,6 +15,11 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.tt.ox.EASY_GAME
 import com.tt.ox.HARD_GAME
 import com.tt.ox.MAIN_PLAYER
@@ -26,6 +31,7 @@ import com.tt.ox.OPPONENT_MARK_PRESSED
 import com.tt.ox.OXApplication
 import com.tt.ox.PLAYER_MARK_PRESSED
 import com.tt.ox.R
+import com.tt.ox.TEST
 import com.tt.ox.X
 import com.tt.ox.database.Opponent
 import com.tt.ox.databinding.AlertDialogChangeMarkColorBinding
@@ -72,10 +78,13 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
     private var mode = EASY_GAME
     private var addMovesDialog:AlertDialog? = null
+
+    private var mRewardedAd : RewardedAd? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
+        prepareRewardedAd()
     }
 
     override fun onCreateView(
@@ -230,6 +239,57 @@ class SinglePlayerFragment : FragmentCoroutine() {
             }
         }
 
+    }
+
+    private fun prepareRewardedAd(){
+        val adRequest = com.google.android.gms.ads.AdRequest.Builder().build()
+        val adId = if(TEST) getString(R.string.testRewardedAd) else getString(R.string.singlePlayerRewardedAd)
+        RewardedAd.load(requireContext(),adId,adRequest, object : RewardedAdLoadCallback(){
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                super.onAdFailedToLoad(p0)
+                mRewardedAd = null
+            }
+
+            override fun onAdLoaded(p0: RewardedAd) {
+                super.onAdLoaded(p0)
+                mRewardedAd = p0
+            }
+        })
+    }
+
+    private fun showAdvertReward(){
+        mRewardedAd?.fullScreenContentCallback = object  : FullScreenContentCallback(){
+            override fun onAdClicked() {
+                super.onAdClicked()
+                //do nothing
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                super.onAdDismissedFullScreenContent()
+                //do nothing
+            }
+
+            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                super.onAdFailedToShowFullScreenContent(p0)
+                // do nothing
+            }
+
+            override fun onAdImpression() {
+                super.onAdImpression()
+                // do nothing
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                super.onAdShowedFullScreenContent()
+                prepareRewardedAd()
+            }
+        }
+
+        if(mRewardedAd != null){
+            mRewardedAd?.show(requireActivity()){
+                gameViewModel.addMoves(requireContext())
+            }
+        }
     }
 
     private fun openChangeColorAlertDialog(mark:Int) {
@@ -503,7 +563,8 @@ class SinglePlayerFragment : FragmentCoroutine() {
                     findNavController().navigateUp()
                 }
             ) {
-                gameViewModel.addMoves(requireContext())
+                showAdvertReward()
+//                gameViewModel.addMoves(requireContext())
                 addMovesDialog?.dismiss()
                 addMovesDialog = null
             }.create()

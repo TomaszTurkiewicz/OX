@@ -2,6 +2,7 @@ package com.tt.ox
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.MobileAds
 import com.tt.ox.databinding.ActivityMainBinding
 
 const val NOTHING = 0
@@ -31,6 +32,8 @@ const val HARD_GAME = 3
 
 const val MOVES = 10
 
+const val TEST = true
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -39,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        MobileAds.initialize(this)
     }
 
 }
@@ -49,7 +54,8 @@ class MainActivity : AppCompatActivity() {
 *  clear statistic singleplayer
 *  send game
 *  other games
-*  adverts
+*  adverts ------------------------------------------------------------------------CURRENT!!!!
 *  better showing player turn
 *  delete user from firebase if logged in
+*  change user name
  */

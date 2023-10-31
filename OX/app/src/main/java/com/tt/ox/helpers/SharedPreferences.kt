@@ -18,7 +18,7 @@ class SharedPreferences {
         }
 
         fun checkIfPlayerNameSetUp(context:Context):Boolean{
-            var boolean = false
+            var boolean: Boolean
             context.let {
                 val sharedPreferences = it.getSharedPreferences("Player_Name", Context.MODE_PRIVATE)
                 boolean = sharedPreferences.getBoolean("player_name_set_up",false)
@@ -45,7 +45,7 @@ class SharedPreferences {
         }
 
         fun readMoves(context: Context):Int{
-            var moves = 0
+            var moves: Int
             context.let {
                 val sharedPreferences = it.getSharedPreferences("Moves",Context.MODE_PRIVATE)
                 moves = sharedPreferences.getInt("moves", MOVES)
@@ -63,7 +63,7 @@ class SharedPreferences {
         }
 
         fun readOnlineMoves(context: Context):Int{
-            var moves = 0
+            var moves: Int
             context.let {
                 val sharedPreferences = it.getSharedPreferences("OnlineMoves",Context.MODE_PRIVATE)
                 moves = sharedPreferences.getInt("online_moves", MOVES)
@@ -72,7 +72,7 @@ class SharedPreferences {
         }
 
         fun readOnlineMarks(context: Context):OnlineMarks{
-            var onlineMarks = OnlineMarks()
+            val onlineMarks = OnlineMarks()
             context.let {
                 val sharedPreferences = it.getSharedPreferences("OnlineMarks",Context.MODE_PRIVATE)
                 onlineMarks.playerMark = sharedPreferences.getInt("playerMark", X)

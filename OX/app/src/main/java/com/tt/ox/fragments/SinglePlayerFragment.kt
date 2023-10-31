@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -563,10 +564,14 @@ class SinglePlayerFragment : FragmentCoroutine() {
                     findNavController().navigateUp()
                 }
             ) {
-                showAdvertReward()
+                if(mRewardedAd!=null){
+                    addMovesDialog?.dismiss()
+                    addMovesDialog = null
+                    showAdvertReward()
+                }else{
+                    Toast.makeText(requireContext(),"POOR INTERNET", Toast.LENGTH_SHORT).show()
+                }
 //                gameViewModel.addMoves(requireContext())
-                addMovesDialog?.dismiss()
-                addMovesDialog = null
             }.create()
             addMovesDialog?.show()
         }

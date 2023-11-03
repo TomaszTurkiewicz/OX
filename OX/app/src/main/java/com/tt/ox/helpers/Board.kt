@@ -128,29 +128,29 @@ class Board {
         return this._bottomRight
     }
 
-    fun setSwitchButtonEnable():Boolean{
-        var enable = false
-        if(_topLeft.value!! == NOTHING){
-            if(_topMid.value!! == NOTHING){
-                if(_topRight.value!! == NOTHING){
-                    if(_midLeft.value!! == NOTHING){
-                        if(_midMid.value!! == NOTHING){
-                            if(_midRight.value!! == NOTHING){
-                                if(_bottomLeft.value!! == NOTHING){
-                                    if(_bottomMid.value!! == NOTHING){
-                                        if(_bottomRight.value!! == NOTHING){
-                                            enable = true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return enable
-    }
+//    fun setSwitchButtonEnable():Boolean{
+//        var enable = false
+//        if(_topLeft.value!! == NOTHING){
+//            if(_topMid.value!! == NOTHING){
+//                if(_topRight.value!! == NOTHING){
+//                    if(_midLeft.value!! == NOTHING){
+//                        if(_midMid.value!! == NOTHING){
+//                            if(_midRight.value!! == NOTHING){
+//                                if(_bottomLeft.value!! == NOTHING){
+//                                    if(_bottomMid.value!! == NOTHING){
+//                                        if(_bottomRight.value!! == NOTHING){
+//                                            enable = true
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return enable
+//    }
 
 
     fun setField(mark:Int, field:MutableLiveData<Int>):Boolean{

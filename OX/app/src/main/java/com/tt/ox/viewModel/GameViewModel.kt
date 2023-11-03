@@ -28,6 +28,7 @@ import com.tt.ox.database.Opponent
 import com.tt.ox.database.OpponentDao
 import com.tt.ox.helpers.Board
 import com.tt.ox.helpers.Game
+import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.PhoneMoveEasy
 import com.tt.ox.helpers.PhoneMoveHard
 import com.tt.ox.helpers.PhoneMoveNormal
@@ -53,8 +54,8 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     private val _win = MutableLiveData<Boolean>()
     val win:LiveData<Boolean> = _win
 
-    private val _buttonSwitch = MutableLiveData<Boolean>()
-    val buttonSwitch:LiveData<Boolean> = _buttonSwitch
+//    private val _buttonSwitch = MutableLiveData<Boolean>()
+//    val buttonSwitch:LiveData<Boolean> = _buttonSwitch
 
     private val _game = MutableLiveData<Game>()
     val game:LiveData<Game> = _game
@@ -102,24 +103,25 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
     fun getAngleDown():Boolean{
         return this.board.getAngleDown()
     }
-    fun switchMarks(){
-        game.value!!.switchMarks()
-    }
+//    fun switchMarks(){
+//        game.value!!.switchMarks()
+//    }
 
-    fun setOpponentMarkColor(color:Int){
-        game.value!!.setOpponentMarkColor(color)
-    }
+//    fun setOpponentMarkColor(color:Int){
+//        game.value!!.setOpponentMarkColor(color)
+//    }
 
-    fun setMainPlayerMarkColor(color:Int){
-        game.value!!.setPlayerMarkColor(color)
-    }
+//    fun setMainPlayerMarkColor(color:Int){
+//        game.value!!.setPlayerMarkColor(color)
+//    }
 
     fun initialize(firstGame:Boolean){
         _win.value = false
         _play.value = _moves.value!!>0
         board.initialize()
         setStartingTurn(firstGame)
-        _buttonSwitch.value = board.setSwitchButtonEnable()
+
+//        _buttonSwitch.value = board.setSwitchButtonEnable()
         resetWiningPerson()
         resetMovesDecreased()
     }
@@ -165,44 +167,44 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         return win or (noMoves)
     }
 
-    fun setBottomRight(context: Context){
-        setField(context,board.getBottomRight())
+    fun setBottomRight(context: Context,marks:Marks){
+        setField(context,board.getBottomRight(),marks)
     }
-    fun setBottomMid(context: Context){
-        setField(context,board.getBottomMid())
+    fun setBottomMid(context: Context,marks:Marks){
+        setField(context,board.getBottomMid(),marks)
     }
-    fun setBottomLeft(context: Context){
-        setField(context,board.getBottomLeft())
+    fun setBottomLeft(context: Context,marks:Marks){
+        setField(context,board.getBottomLeft(),marks)
     }
-    fun setMidRight(context: Context){
-        setField(context,board.getMidRight())
+    fun setMidRight(context: Context,marks:Marks){
+        setField(context,board.getMidRight(),marks)
     }
-    fun setMidMid(context: Context){
-        setField(context,board.getMidMid())
+    fun setMidMid(context: Context,marks:Marks){
+        setField(context,board.getMidMid(),marks)
     }
-    fun setMidLeft(context: Context){
-        setField(context,board.getMidLeft())
+    fun setMidLeft(context: Context,marks:Marks){
+        setField(context,board.getMidLeft(),marks)
     }
-    fun setTopRight(context: Context){
-        setField(context,board.getTopRight())
+    fun setTopRight(context: Context,marks:Marks){
+        setField(context,board.getTopRight(),marks)
     }
-    fun setTopMid(context: Context){
-        setField(context,board.getTopMid())
+    fun setTopMid(context: Context,marks:Marks){
+        setField(context,board.getTopMid(),marks)
     }
-    fun setTopLeft(context: Context){
-        setField(context,board.getTopLeft())
-    }
-
-
-    fun playPhone(context: Context, mode:Int){
-            phoneMakeMove(context,mode)
+    fun setTopLeft(context: Context,marks:Marks){
+        setField(context,board.getTopLeft(),marks)
     }
 
-    private fun setFieldPhone(context: Context, field:MutableLiveData<Int>,mode:Int){
+
+    fun playPhone(context: Context, mode:Int, marks:Marks){
+            phoneMakeMove(context,mode,marks)
+    }
+
+    private fun setFieldPhone(context: Context, field:MutableLiveData<Int>,mode:Int, marks:Marks){
         if(field.value!! == NOTHING){
-            setField(context,field)
+            setField(context,field,marks)
         }else{
-            phoneMakeMove(context,mode)
+            phoneMakeMove(context,mode,marks)
         }
     }
 
@@ -215,35 +217,35 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
         saveMovesToSharedPreferences(context)
     }
 
-    private fun phoneMakeMove(context:Context, mode:Int) {
+    private fun phoneMakeMove(context:Context, mode:Int, marks: Marks) {
 
         when (mode){
-            EASY_GAME -> move(context,PhoneMoveEasy(board).makeMove(),mode)
-            NORMAL_GAME -> move(context, PhoneMoveNormal(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove(),mode)
-            HARD_GAME -> move(context, PhoneMoveHard(board,_game.value!!.getMainPlayerMark(),_game.value!!.getOpponentMark()).makeMove(),mode)
+            EASY_GAME -> move(context,PhoneMoveEasy(board).makeMove(),mode,marks)
+            NORMAL_GAME -> move(context, PhoneMoveNormal(board,marks.playerMark,marks.opponentMark).makeMove(),mode,marks)
+            HARD_GAME -> move(context, PhoneMoveHard(board,marks.playerMark,marks.opponentMark).makeMove(),mode,marks)
         }
 
     }
 
-    private fun move(context: Context, move:Int,mode:Int){
+    private fun move(context: Context, move:Int,mode:Int, marks:Marks){
         when(move){
-            TOP_LEFT -> setFieldPhone(context,board.getTopLeft(),mode)
-            TOP_MID -> setFieldPhone(context,board.getTopMid(),mode)
-            TOP_RIGHT -> setFieldPhone(context,board.getTopRight(),mode)
-            MID_LEFT -> setFieldPhone(context,board.getMidLeft(),mode)
-            MID_MID -> setFieldPhone(context,board.getMidMid(),mode)
-            MID_RIGHT -> setFieldPhone(context,board.getMidRight(),mode)
-            BOTTOM_LEFT -> setFieldPhone(context,board.getBottomLeft(),mode)
-            BOTTOM_MID -> setFieldPhone(context,board.getBottomMid(),mode)
-            BOTTOM_RIGHT -> setFieldPhone(context,board.getBottomRight(),mode)
-            else -> phoneMakeMove(context,mode)
+            TOP_LEFT -> setFieldPhone(context,board.getTopLeft(),mode,marks)
+            TOP_MID -> setFieldPhone(context,board.getTopMid(),mode,marks)
+            TOP_RIGHT -> setFieldPhone(context,board.getTopRight(),mode,marks)
+            MID_LEFT -> setFieldPhone(context,board.getMidLeft(),mode,marks)
+            MID_MID -> setFieldPhone(context,board.getMidMid(),mode,marks)
+            MID_RIGHT -> setFieldPhone(context,board.getMidRight(),mode,marks)
+            BOTTOM_LEFT -> setFieldPhone(context,board.getBottomLeft(),mode,marks)
+            BOTTOM_MID -> setFieldPhone(context,board.getBottomMid(),mode,marks)
+            BOTTOM_RIGHT -> setFieldPhone(context,board.getBottomRight(),mode,marks)
+            else -> phoneMakeMove(context,mode,marks)
         }
     }
 
-    private fun setField(context: Context,field: MutableLiveData<Int>){
+    private fun setField(context: Context,field: MutableLiveData<Int>,marks:Marks){
         if(play.value==true){
             val marked = board.setField(
-                if(turn.value!!) _game.value!!.getMainPlayerMark() else _game.value!!.getOpponentMark(),
+                if(turn.value!!) marks.playerMark else marks.opponentMark,
                 field
             )
             if(marked){
@@ -253,15 +255,15 @@ class GameViewModel(private val opponentDao: OpponentDao) : ViewModel() {
                     winingMark = board.getWinningMark()
                     _play.value = false
                     when(winingMark){
-                        _game.value!!.getMainPlayerMark() -> addWinToMainPlayer()
-                        _game.value!!.getOpponentMark() -> addWinToOpponent()
+                        marks.playerMark -> addWinToMainPlayer()
+                        marks.opponentMark -> addWinToOpponent()
                         else -> clearWinningMark()
                     }
                     _win.value = true
                 } else {
                     changePerson()
                 }
-                _buttonSwitch.value = board.setSwitchButtonEnable()
+//                _buttonSwitch.value = board.setSwitchButtonEnable()
             }
         }
     }

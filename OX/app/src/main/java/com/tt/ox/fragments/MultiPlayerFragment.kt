@@ -27,29 +27,21 @@ import com.tt.ox.MAIN_PLAYER
 import com.tt.ox.NOTHING
 import com.tt.ox.O
 import com.tt.ox.OPPONENT
-import com.tt.ox.OPPONENT_MARK_PRESSED
 import com.tt.ox.OXApplication
-import com.tt.ox.PLAYER_MARK_PRESSED
 import com.tt.ox.R
 import com.tt.ox.TEST
 import com.tt.ox.X
-import com.tt.ox.database.Opponent
-import com.tt.ox.databinding.AlertDialogChangeMarkColorBinding
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
-import com.tt.ox.drawables.ButtonWithTextDrawable
-import com.tt.ox.drawables.LeftArrowDrawable
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
 import com.tt.ox.drawables.PointerUpperDrawable
 import com.tt.ox.drawables.ResetButtonDrawable
-import com.tt.ox.drawables.RightArrowDrawable
-import com.tt.ox.drawables.SwitchDrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.AlertDialogAddMoves
-import com.tt.ox.helpers.MarkColors
+import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
@@ -65,7 +57,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private var width = 0
     private var fPlay = false
     private var fMoves = false
-    private var fSwitch = false
+//    private var fSwitch = false
     private val resetHandler = Handler(Looper.getMainLooper())
     private val winningLineHandler = Handler(Looper.getMainLooper())
     private val navArgs: MultiPlayerFragmentArgs by navArgs()
@@ -74,6 +66,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
             (activity?.application as OXApplication).database.opponentDao()
         )
     }
+    private var marks = Marks()
     private var id = 0
     private var addMovesDialog:AlertDialog? = null
     private var mRewardedAd : RewardedAd? = null
@@ -85,6 +78,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         id = navArgs.opponentId
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
         prepareRewardedAd()
+        readMarks()
     }
 
     override fun onCreateView(
@@ -107,6 +101,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
                 prepareUI()
                 setObserves()
                 clicks()
+                displayMarks()
             }
         }
     }
@@ -130,200 +125,202 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     private fun clicks() {
 
-        binding.mainPlayerMark.setOnClickListener {
-            if(fSwitch){
-                openChangeColorAlertDialog(PLAYER_MARK_PRESSED)
-            }
-        }
+//        binding.mainPlayerMark.setOnClickListener {
+//            if(fSwitch){
+//                openChangeColorAlertDialog(PLAYER_MARK_PRESSED)
+//            }
+//        }
 
-        binding.opponentPlayerMark.setOnClickListener {
-            if(fSwitch){
-                openChangeColorAlertDialog(OPPONENT_MARK_PRESSED)
-            }
-        }
+//        binding.opponentPlayerMark.setOnClickListener {
+//            if(fSwitch){
+//                openChangeColorAlertDialog(OPPONENT_MARK_PRESSED)
+//            }
+//        }
 
 //        binding.addMoves.setOnClickListener {
 //            gameViewModel.addMoves(requireContext())
 //        }
 
         binding.topLeftField.setOnClickListener {
-            gameViewModel.setTopLeft(requireContext())
+            gameViewModel.setTopLeft(requireContext(),marks)
 
         }
         binding.topMidField.setOnClickListener {
-            gameViewModel.setTopMid(requireContext())
+            gameViewModel.setTopMid(requireContext(),marks)
 
         }
         binding.topRightField.setOnClickListener {
-            gameViewModel.setTopRight(requireContext())
+            gameViewModel.setTopRight(requireContext(),marks)
 
         }
 
         binding.midLeftField.setOnClickListener {
-            gameViewModel.setMidLeft(requireContext())
+            gameViewModel.setMidLeft(requireContext(),marks)
 
         }
         binding.midMidField.setOnClickListener {
-            gameViewModel.setMidMid(requireContext())
+            gameViewModel.setMidMid(requireContext(),marks)
 
         }
         binding.midRightField.setOnClickListener {
-            gameViewModel.setMidRight(requireContext())
+            gameViewModel.setMidRight(requireContext(),marks)
 
         }
 
         binding.bottomLeftField.setOnClickListener {
-            gameViewModel.setBottomLeft(requireContext())
+            gameViewModel.setBottomLeft(requireContext(),marks)
 
         }
         binding.bottomMidField.setOnClickListener {
-            gameViewModel.setBottomMid(requireContext())
+            gameViewModel.setBottomMid(requireContext(),marks)
 
         }
         binding.bottomRightField.setOnClickListener {
-            gameViewModel.setBottomRight(requireContext())
+            gameViewModel.setBottomRight(requireContext(),marks)
 
         }
 
         binding.reset.setOnClickListener {
             gameViewModel.initialize(false)
+            readMarks()
+            displayMarks()
         }
-        binding.switchMarks.setOnClickListener {
-            gameViewModel.switchMarks()
-            launch {
-                gameViewModel.updateOpponent(
-                    gameViewModel.game.value!!.getOpponent()
-                )
-            }
-        }
+//        binding.switchMarks.setOnClickListener {
+//            gameViewModel.switchMarks()
+//            launch {
+//                gameViewModel.updateOpponent(
+//                    gameViewModel.game.value!!.getOpponent()
+//                )
+//            }
+//        }
     }
 
-    private fun openChangeColorAlertDialog(mark:Int) {
-        val opponent = gameViewModel.game.value!!.getOpponent()
-        val builder = AlertDialog.Builder(requireContext())
-        val alertDialog = AlertDialogChangeMarkColorBinding.inflate(layoutInflater)
-        val currentColor = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
-        val colors = MarkColors(currentColor)
-        var leftColor = colors.getLeftColor()
-        var rightColor = colors.getRightColor()
+//    private fun openChangeColorAlertDialog(mark:Int) {
+//        val opponent = gameViewModel.game.value!!.getOpponent()
+//        val builder = AlertDialog.Builder(requireContext())
+//        val alertDialog = AlertDialogChangeMarkColorBinding.inflate(layoutInflater)
+//        val currentColor = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
+//        val colors = MarkColors(currentColor)
+//        var leftColor = colors.getLeftColor()
+//        var rightColor = colors.getRightColor()
+//
+//        displayAlertDialogUI(alertDialog,mark,opponent,leftColor,rightColor)
+//
+//        builder.setView(alertDialog.root)
+//        val dialog = builder.create()
+//
+//        alertDialog.cancelButton.setOnClickListener {
+//            dialog.dismiss()
+//        }
+//
+//        alertDialog.arrowLeft.setOnClickListener {
+//            colors.decreasePointer()
+//            val color = colors.getColor()
+//            leftColor = colors.getLeftColor()
+//            rightColor = colors.getRightColor()
+//            if(mark== MAIN_PLAYER){
+//                opponent.setPlayerColor(color)
+//            }else{
+//                opponent.setOpponentColor(color)
+//            }
+//            displayAlertDialogUI(alertDialog,mark,opponent,leftColor, rightColor)
+//
+//        }
+//
+//        alertDialog.arrowRight.setOnClickListener {
+//            colors.increasePointer()
+//            val color = colors.getColor()
+//            leftColor = colors.getLeftColor()
+//            rightColor = colors.getRightColor()
+//            if(mark== MAIN_PLAYER){
+//                opponent.setPlayerColor(color)
+//            }else{
+//                opponent.setOpponentColor(color)
+//            }
+//            displayAlertDialogUI(alertDialog,mark,opponent,leftColor, rightColor)
+//
+//        }
+//
+//        alertDialog.saveButton.setOnClickListener {
+//            gameViewModel.setMainPlayerMarkColor(opponent.getMainPlayerMarkColor())
+//            gameViewModel.setOpponentMarkColor(opponent.getOpponentMarkColor())
+//            launch {
+//                gameViewModel.updateOpponent(
+//                    gameViewModel.game.value!!.getOpponent()
+//                )
+//            }
+//            dialog.dismiss()
+//        }
+//
+//        dialog.show()
+//    }
 
-        displayAlertDialogUI(alertDialog,mark,opponent,leftColor,rightColor)
-
-        builder.setView(alertDialog.root)
-        val dialog = builder.create()
-
-        alertDialog.cancelButton.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        alertDialog.arrowLeft.setOnClickListener {
-            colors.decreasePointer()
-            val color = colors.getColor()
-            leftColor = colors.getLeftColor()
-            rightColor = colors.getRightColor()
-            if(mark== MAIN_PLAYER){
-                opponent.setPlayerColor(color)
-            }else{
-                opponent.setOpponentColor(color)
-            }
-            displayAlertDialogUI(alertDialog,mark,opponent,leftColor, rightColor)
-
-        }
-
-        alertDialog.arrowRight.setOnClickListener {
-            colors.increasePointer()
-            val color = colors.getColor()
-            leftColor = colors.getLeftColor()
-            rightColor = colors.getRightColor()
-            if(mark== MAIN_PLAYER){
-                opponent.setPlayerColor(color)
-            }else{
-                opponent.setOpponentColor(color)
-            }
-            displayAlertDialogUI(alertDialog,mark,opponent,leftColor, rightColor)
-
-        }
-
-        alertDialog.saveButton.setOnClickListener {
-            gameViewModel.setMainPlayerMarkColor(opponent.getMainPlayerMarkColor())
-            gameViewModel.setOpponentMarkColor(opponent.getOpponentMarkColor())
-            launch {
-                gameViewModel.updateOpponent(
-                    gameViewModel.game.value!!.getOpponent()
-                )
-            }
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
-
-    private fun displayAlertDialogUI(alertDialog: AlertDialogChangeMarkColorBinding,mark:Int,opponent: Opponent,leftColor:Int, rightColor:Int) {
-        alertDialog.title.text = "change color"
-        alertDialog.title.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
-        val fMark = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMark() else opponent.getOpponentMark()
-        val color = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
-        val markSize = 4*unit
-        alertDialog.imageView.layoutParams = ConstraintLayout.LayoutParams(markSize,markSize)
-        alertDialog.imageView.setImageDrawable(if(fMark==X) XDrawable(requireContext(),color,false) else ODrawable(requireContext(),color,false))
-        alertDialog.arrowLeft.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
-        alertDialog.arrowRight.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
-        alertDialog.arrowLeft.setImageDrawable(LeftArrowDrawable(requireContext(),leftColor))
-        alertDialog.arrowRight.setImageDrawable(RightArrowDrawable(requireContext(),rightColor))
-
-        alertDialog.saveButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-        alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-
-        alertDialog.saveButton.background = ButtonBackground(requireContext())
-        alertDialog.cancelButton.background = ButtonBackground(requireContext())
-        alertDialog.arrowRight.background = ButtonBackground(requireContext())
-        alertDialog.arrowLeft.background = ButtonBackground(requireContext())
-
-        alertDialog.saveButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"SAVE"))
-        alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"CANCEL"))
-
-        setAlertDialogConstraints(alertDialog)
-
-    }
+//    private fun displayAlertDialogUI(alertDialog: AlertDialogChangeMarkColorBinding,mark:Int,opponent: Opponent,leftColor:Int, rightColor:Int) {
+//        alertDialog.title.text = "change color"
+//        alertDialog.title.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
+//        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
+//        val fMark = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMark() else opponent.getOpponentMark()
+//        val color = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
+//        val markSize = 4*unit
+//        alertDialog.imageView.layoutParams = ConstraintLayout.LayoutParams(markSize,markSize)
+//        alertDialog.imageView.setImageDrawable(if(fMark==X) XDrawable(requireContext(),color,false) else ODrawable(requireContext(),color,false))
+//        alertDialog.arrowLeft.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
+//        alertDialog.arrowRight.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
+//        alertDialog.arrowLeft.setImageDrawable(LeftArrowDrawable(requireContext(),leftColor))
+//        alertDialog.arrowRight.setImageDrawable(RightArrowDrawable(requireContext(),rightColor))
+//
+//        alertDialog.saveButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+//        alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
+//
+//        alertDialog.saveButton.background = ButtonBackground(requireContext())
+//        alertDialog.cancelButton.background = ButtonBackground(requireContext())
+//        alertDialog.arrowRight.background = ButtonBackground(requireContext())
+//        alertDialog.arrowLeft.background = ButtonBackground(requireContext())
+//
+//        alertDialog.saveButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"SAVE"))
+//        alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"CANCEL"))
+//
+//        setAlertDialogConstraints(alertDialog)
+//
+//    }
 
 
-    private fun setAlertDialogConstraints(alertDialog: AlertDialogChangeMarkColorBinding) {
-        val set = ConstraintSet()
-        set.clone(alertDialog.layout)
-
-        set.connect(alertDialog.title.id, ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
-        set.connect(alertDialog.title.id, ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
-        set.connect(alertDialog.title.id, ConstraintSet.TOP,alertDialog.layout.id,ConstraintSet.TOP,0)
-
-        set.connect(alertDialog.imageView.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
-        set.connect(alertDialog.imageView.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
-        set.connect(alertDialog.imageView.id,ConstraintSet.TOP,alertDialog.title.id,ConstraintSet.BOTTOM,0)
-
-        set.connect(alertDialog.arrowLeft.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
-        set.connect(alertDialog.arrowLeft.id,ConstraintSet.RIGHT,alertDialog.middleDivider.id,ConstraintSet.LEFT,0)
-        set.connect(alertDialog.arrowLeft.id,ConstraintSet.TOP,alertDialog.imageView.id,ConstraintSet.BOTTOM,0)
-
-        set.connect(alertDialog.arrowRight.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
-        set.connect(alertDialog.arrowRight.id,ConstraintSet.LEFT,alertDialog.middleDivider.id,ConstraintSet.RIGHT,0)
-        set.connect(alertDialog.arrowRight.id,ConstraintSet.TOP,alertDialog.imageView.id,ConstraintSet.BOTTOM,0)
-
-        set.connect(alertDialog.cancelButton.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
-        set.connect(alertDialog.cancelButton.id,ConstraintSet.RIGHT,alertDialog.middleDivider.id,ConstraintSet.LEFT,0)
-        set.connect(alertDialog.cancelButton.id,ConstraintSet.TOP,alertDialog.arrowLeft.id,ConstraintSet.BOTTOM,unit)
-        set.connect(alertDialog.cancelButton.id,ConstraintSet.BOTTOM,alertDialog.layout.id,ConstraintSet.BOTTOM,
-            (width*0.1).toInt()
-        )
-
-        set.connect(alertDialog.saveButton.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
-        set.connect(alertDialog.saveButton.id,ConstraintSet.LEFT,alertDialog.middleDivider.id,ConstraintSet.RIGHT,0)
-        set.connect(alertDialog.saveButton.id,ConstraintSet.TOP,alertDialog.arrowRight.id,ConstraintSet.BOTTOM,unit)
-        set.connect(alertDialog.saveButton.id,ConstraintSet.BOTTOM,alertDialog.layout.id,ConstraintSet.BOTTOM,
-            (width*0.1).toInt()
-        )
-
-        set.applyTo(alertDialog.layout)
-    }
+//    private fun setAlertDialogConstraints(alertDialog: AlertDialogChangeMarkColorBinding) {
+//        val set = ConstraintSet()
+//        set.clone(alertDialog.layout)
+//
+//        set.connect(alertDialog.title.id, ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
+//        set.connect(alertDialog.title.id, ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
+//        set.connect(alertDialog.title.id, ConstraintSet.TOP,alertDialog.layout.id,ConstraintSet.TOP,0)
+//
+//        set.connect(alertDialog.imageView.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
+//        set.connect(alertDialog.imageView.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
+//        set.connect(alertDialog.imageView.id,ConstraintSet.TOP,alertDialog.title.id,ConstraintSet.BOTTOM,0)
+//
+//        set.connect(alertDialog.arrowLeft.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
+//        set.connect(alertDialog.arrowLeft.id,ConstraintSet.RIGHT,alertDialog.middleDivider.id,ConstraintSet.LEFT,0)
+//        set.connect(alertDialog.arrowLeft.id,ConstraintSet.TOP,alertDialog.imageView.id,ConstraintSet.BOTTOM,0)
+//
+//        set.connect(alertDialog.arrowRight.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
+//        set.connect(alertDialog.arrowRight.id,ConstraintSet.LEFT,alertDialog.middleDivider.id,ConstraintSet.RIGHT,0)
+//        set.connect(alertDialog.arrowRight.id,ConstraintSet.TOP,alertDialog.imageView.id,ConstraintSet.BOTTOM,0)
+//
+//        set.connect(alertDialog.cancelButton.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
+//        set.connect(alertDialog.cancelButton.id,ConstraintSet.RIGHT,alertDialog.middleDivider.id,ConstraintSet.LEFT,0)
+//        set.connect(alertDialog.cancelButton.id,ConstraintSet.TOP,alertDialog.arrowLeft.id,ConstraintSet.BOTTOM,unit)
+//        set.connect(alertDialog.cancelButton.id,ConstraintSet.BOTTOM,alertDialog.layout.id,ConstraintSet.BOTTOM,
+//            (width*0.1).toInt()
+//        )
+//
+//        set.connect(alertDialog.saveButton.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
+//        set.connect(alertDialog.saveButton.id,ConstraintSet.LEFT,alertDialog.middleDivider.id,ConstraintSet.RIGHT,0)
+//        set.connect(alertDialog.saveButton.id,ConstraintSet.TOP,alertDialog.arrowRight.id,ConstraintSet.BOTTOM,unit)
+//        set.connect(alertDialog.saveButton.id,ConstraintSet.BOTTOM,alertDialog.layout.id,ConstraintSet.BOTTOM,
+//            (width*0.1).toInt()
+//        )
+//
+//        set.applyTo(alertDialog.layout)
+//    }
 
 
     private fun updateWins(){
@@ -346,6 +343,23 @@ class MultiPlayerFragment : FragmentCoroutine() {
         }
     }
 
+    private fun readMarks(){
+        marks.initialize(requireContext())
+    }
+
+    private fun displayMarks(){
+        if(marks.opponentMark==X){
+            binding.opponentPlayerMark.setImageDrawable(XDrawable(requireContext(),marks.opponentColor,true))
+        } else{
+            binding.opponentPlayerMark.setImageDrawable(ODrawable(requireContext(),marks.opponentColor,true))
+        }
+        if(marks.playerMark==X){
+            binding.mainPlayerMark.setImageDrawable(XDrawable(requireContext(),marks.playerColor,true))
+        } else{
+            binding.mainPlayerMark.setImageDrawable(ODrawable(requireContext(),marks.playerColor,true))
+        }
+
+    }
     private fun setObserves() {
 
         gameViewModel.board.topLeft.observe(this.viewLifecycleOwner){
@@ -397,20 +411,20 @@ class MultiPlayerFragment : FragmentCoroutine() {
             binding.opponentPlayerName.text = it.getOpponentName()
             binding.mainPlayerWins.text = it.getWins().toString()
             binding.opponentPlayerWins.text = it.getLoses().toString()
-            binding.opponentPlayerMark.setImageDrawable(
-                if(it.getOpponentMark()==X){
-                    XDrawable(requireContext(),it.getOpponentMarkColor(),true)
-                }else{
-                    ODrawable(requireContext(),it.getOpponentMarkColor(),true)
-                }
-            )
-            binding.mainPlayerMark.setImageDrawable(
-                if(it.getMainPlayerMark()==X){
-                    XDrawable(requireContext(),it.getMainPlayerMarkColor(),true)
-                }else{
-                    ODrawable(requireContext(),it.getMainPlayerMarkColor(),true)
-                }
-            )
+//            binding.opponentPlayerMark.setImageDrawable(
+//                if(it.getMarks().opponentMark==X){
+//                    XDrawable(requireContext(),it.getMarks().opponentColor,true)
+//                }else{
+//                    ODrawable(requireContext(),it.getMarks().opponentColor,true)
+//                }
+//            )
+//            binding.mainPlayerMark.setImageDrawable(
+//                if(it.getMarks().playerMark==X){
+//                    XDrawable(requireContext(),it.getMarks().playerColor,true)
+//                }else{
+//                    ODrawable(requireContext(),it.getMarks().playerColor,true)
+//                }
+//            )
         }
 
 
@@ -430,14 +444,14 @@ class MultiPlayerFragment : FragmentCoroutine() {
             }
         }
 
-        gameViewModel.buttonSwitch.observe(this.viewLifecycleOwner){
-            fSwitch = it
-            if(it){
-                binding.switchMarks.visibility = View.VISIBLE
-            }else{
-                binding.switchMarks.visibility = View.GONE
-            }
-        }
+//        gameViewModel.buttonSwitch.observe(this.viewLifecycleOwner){
+//            fSwitch = it
+//            if(it){
+//                binding.switchMarks.visibility = View.VISIBLE
+//            }else{
+//                binding.switchMarks.visibility = View.GONE
+//            }
+//        }
     }
 
     private fun displayUI(){
@@ -541,8 +555,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
         )
     }
 
-    private fun setMark(view:ImageView, mark:Int){
-        val color = if(mark == gameViewModel.game.value!!.getMainPlayerMark()) gameViewModel.game.value!!.getMainPlayerMarkColor() else gameViewModel.game.value!!.getOpponentMarkColor()
+    private fun setMark(view: ImageView, mark:Int){
+        val color = if(mark == marks.playerMark) marks.playerColor else marks.opponentColor
 
         when(mark){
             NOTHING -> view.setImageDrawable(null)
@@ -571,15 +585,15 @@ class MultiPlayerFragment : FragmentCoroutine() {
         binding.mainPlayerPointerUpper.setImageDrawable(PointerUpperDrawable(requireContext()))
         binding.opponentPointerUpper.setImageDrawable(PointerUpperDrawable(requireContext()))
 
-        binding.switchMarks.setImageDrawable(SwitchDrawable(requireContext()))
+//        binding.switchMarks.setImageDrawable(SwitchDrawable(requireContext()))
 
         binding.reset.setImageDrawable(ResetButtonDrawable(requireContext()))
 
 //        binding.addMoves.setImageDrawable(AddMovesButton(requireContext()))
 
-        binding.mainPlayerMark.background = ButtonBackground(requireContext())
-        binding.opponentPlayerMark.background = ButtonBackground(requireContext())
-        binding.switchMarks.background = ButtonBackground(requireContext())
+//        binding.mainPlayerMark.background = ButtonBackground(requireContext())
+//        binding.opponentPlayerMark.background = ButtonBackground(requireContext())
+//        binding.switchMarks.background = ButtonBackground(requireContext())
         binding.reset.background = ButtonBackground(requireContext())
 //        binding.addMoves.background = ButtonBackground(requireContext())
     }
@@ -617,7 +631,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
         binding.mainPlayerMark.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.opponentPlayerMark.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
 
-        binding.switchMarks.layoutParams = ConstraintLayout.LayoutParams(fieldSize,unit)
+//        binding.switchMarks.layoutParams = ConstraintLayout.LayoutParams(fieldSize,unit)
 
         binding.moves.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit*0.9f)
 
@@ -836,18 +850,18 @@ class MultiPlayerFragment : FragmentCoroutine() {
         set.connect(binding.opponentPointerUpper.id,ConstraintSet.LEFT,binding.opponentPlayerWins.id,ConstraintSet.LEFT,0)
         set.connect(binding.opponentPointerUpper.id,ConstraintSet.RIGHT,binding.opponentPlayerWins.id,ConstraintSet.RIGHT,0)
 
-        set.connect(binding.switchMarks.id,
-            ConstraintSet.LEFT,binding.mainPlayerMark.id,
-            ConstraintSet.RIGHT,0)
-        set.connect(binding.switchMarks.id,
-            ConstraintSet.TOP,binding.mainPlayerMark.id,
-            ConstraintSet.TOP,0)
-        set.connect(binding.switchMarks.id,
-            ConstraintSet.BOTTOM,binding.mainPlayerMark.id,
-            ConstraintSet.BOTTOM,0)
-        set.connect(binding.switchMarks.id,
-            ConstraintSet.RIGHT,binding.opponentPlayerMark.id,
-            ConstraintSet.LEFT,0)
+//        set.connect(binding.switchMarks.id,
+//            ConstraintSet.LEFT,binding.mainPlayerMark.id,
+//            ConstraintSet.RIGHT,0)
+//        set.connect(binding.switchMarks.id,
+//            ConstraintSet.TOP,binding.mainPlayerMark.id,
+//            ConstraintSet.TOP,0)
+//        set.connect(binding.switchMarks.id,
+//            ConstraintSet.BOTTOM,binding.mainPlayerMark.id,
+//            ConstraintSet.BOTTOM,0)
+//        set.connect(binding.switchMarks.id,
+//            ConstraintSet.RIGHT,binding.opponentPlayerMark.id,
+//            ConstraintSet.LEFT,0)
 
 
 

@@ -46,12 +46,11 @@ import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUser
 import com.tt.ox.helpers.HORIZONTAL_MID_LINE
 import com.tt.ox.helpers.LEFT_LINE
+import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.NONE
 import com.tt.ox.helpers.OUT_OF_TIME
-import com.tt.ox.helpers.OnlineMarks
 import com.tt.ox.helpers.RIGHT_LINE
 import com.tt.ox.helpers.ScreenMetricsCompat
-import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.helpers.TOP_LINE
 import com.tt.ox.helpers.VERTICAL_MID_LINE
 import java.text.DecimalFormat
@@ -76,7 +75,7 @@ class OnlineBattleFragment : Fragment() {
     private var opponentId:String = ""
     private var request:FirebaseRequests? = null
     private var score:FirebaseHistory? = null
-    private lateinit var marks: OnlineMarks
+    private val marks = Marks()
     private var battleListener: ValueEventListener? = null
     private lateinit var onlineBattle: FirebaseBattle
     private var myTurn = false
@@ -246,7 +245,8 @@ class OnlineBattleFragment : Fragment() {
     }
 
     private fun displayMarks() {
-        marks = SharedPreferences.readOnlineMarks(requireContext())
+        marks.initialize(requireContext())
+//        marks = SharedPreferences.readMarks(requireContext())
         binding.mainPlayerMark.setImageDrawable(
             if(marks.playerMark == X) XDrawable(requireContext(),marks.playerColor,true) else ODrawable(requireContext(),marks.playerColor,true)
         )

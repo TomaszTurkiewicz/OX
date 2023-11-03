@@ -9,20 +9,24 @@ class Game(context: Context,private val opponent: Opponent) {
     private var opponentPlayerName:String
     private var wins:Int
     private var loses:Int
-    private var mainPlayerMark:Int
-    private var mainPlayerMarkColor:Int
-    private var opponentMark:Int
-    private var opponentMarkColor:Int
+//    private var marks:Marks = Marks()
+//    private var mainPlayerMark:Int
+//    private var mainPlayerMarkColor:Int
+//    private var opponentMark:Int
+//    private var opponentMarkColor:Int
 
     init {
        this.mainPlayerName = SharedPreferences.readPlayerName(context)
         this.opponentPlayerName = opponent.getName()
         this.wins = opponent.getWins()
         this.loses = opponent.getLoses()
-        this.mainPlayerMark = opponent.getMainPlayerMark()
-        this.mainPlayerMarkColor = opponent.getMainPlayerMarkColor()
-        this.opponentMark = opponent.getOpponentMark()
-        this.opponentMarkColor = opponent.getOpponentMarkColor()
+//            this.marks.initialize(context)
+
+
+//        this.mainPlayerMark = opponent.getMainPlayerMark()
+//        this.mainPlayerMarkColor = opponent.getMainPlayerMarkColor()
+//        this.opponentMark = opponent.getOpponentMark()
+//        this.opponentMarkColor = opponent.getOpponentMarkColor()
     }
 
     fun addWin(){
@@ -38,11 +42,11 @@ class Game(context: Context,private val opponent: Opponent) {
             id = opponent.getId(),
             name = opponent.getName(),
             wins = wins,
-            loses = loses,
-            mainPlayerMark = mainPlayerMark,
-            mainPlayerMarkColor = mainPlayerMarkColor,
-            opponentMark = opponentMark,
-            opponentMarkColor = opponentMarkColor
+            loses = loses
+//            mainPlayerMark = mainPlayerMark,
+//            mainPlayerMarkColor = mainPlayerMarkColor,
+//            opponentMark = opponentMark,
+//            opponentMarkColor = opponentMarkColor
         )
     }
 
@@ -62,33 +66,37 @@ class Game(context: Context,private val opponent: Opponent) {
         return this.loses
     }
 
-    fun switchMarks(){
-        val tMark = this.opponentMark
-        this.opponentMark = mainPlayerMark
-        this.mainPlayerMark = tMark
-    }
+//    fun getMarks():Marks{
+//        return this.marks
+//    }
 
-    fun getMainPlayerMark():Int{
-        return this.mainPlayerMark
-    }
+//    fun switchMarks(){
+//        val tMark = this.opponentMark
+//        this.opponentMark = mainPlayerMark
+//        this.mainPlayerMark = tMark
+//    }
 
-    fun getOpponentMark():Int{
-        return this.opponentMark
-    }
+//    fun getMainPlayerMark():Int{
+//        return this.mainPlayerMark
+//    }
+//
+//    fun getOpponentMark():Int{
+//        return this.opponentMark
+//    }
 
-    fun getMainPlayerMarkColor():Int{
-        return this.mainPlayerMarkColor
-    }
+//    fun getMainPlayerMarkColor():Int{
+//        return this.mainPlayerMarkColor
+//    }
+//
+//    fun getOpponentMarkColor():Int{
+//        return this.opponentMarkColor
+//    }
 
-    fun getOpponentMarkColor():Int{
-        return this.opponentMarkColor
-    }
+//    fun setOpponentMarkColor(color:Int){
+//        this.opponentMarkColor = color
+//    }
 
-    fun setOpponentMarkColor(color:Int){
-        this.opponentMarkColor = color
-    }
-
-    fun setPlayerMarkColor(color:Int){
-        this.mainPlayerMarkColor = color
-    }
+//    fun setPlayerMarkColor(color:Int){
+//        this.mainPlayerMarkColor = color
+//    }
 }

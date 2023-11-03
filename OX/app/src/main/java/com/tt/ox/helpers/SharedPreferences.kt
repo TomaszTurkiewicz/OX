@@ -71,16 +71,26 @@ class SharedPreferences {
             return moves
         }
 
-        fun readOnlineMarks(context: Context):OnlineMarks{
-            val onlineMarks = OnlineMarks()
+        fun readMarks(context: Context):Marks{
+            val marks = Marks()
             context.let {
-                val sharedPreferences = it.getSharedPreferences("OnlineMarks",Context.MODE_PRIVATE)
-                onlineMarks.playerMark = sharedPreferences.getInt("playerMark", X)
-                onlineMarks.playerColor = sharedPreferences.getInt("playerColor", COLOR_BLACK)
-                onlineMarks.opponentMark = sharedPreferences.getInt("opponentMark", O)
-                onlineMarks.opponentColor = sharedPreferences.getInt("opponentColor", COLOR_BLACK)
+                val sharedPreferences = it.getSharedPreferences("Marks",Context.MODE_PRIVATE)
+                marks.playerMark = sharedPreferences.getInt("playerMark", X)
+                marks.playerColor = sharedPreferences.getInt("playerColor", COLOR_BLUE)
+                marks.opponentMark = sharedPreferences.getInt("opponentMark", O)
+                marks.opponentColor = sharedPreferences.getInt("opponentColor", COLOR_RED)
             }
-            return onlineMarks
+            return marks
         }
+
+        fun readRandomMarks(context: Context):Boolean{
+            var random:Boolean
+            context.let {
+                val sp = it.getSharedPreferences("Random",Context.MODE_PRIVATE)
+                random = sp.getBoolean("random",true)
+            }
+            return random
+        }
+
     }
 }

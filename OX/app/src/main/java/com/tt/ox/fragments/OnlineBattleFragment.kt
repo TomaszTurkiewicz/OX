@@ -86,6 +86,13 @@ class OnlineBattleFragment : Fragment() {
     private var clockStarted = false
     private var dialog:AlertDialog? = null
 
+    private var turnPointer = 0.5
+    private var turnPointerLeft = false
+    private val pointerJump = 0.05
+    private val pointerLeft = 0.25
+    private val pointerRight = 0.75
+    private val turnHandler = Handler(Looper.getMainLooper())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
@@ -659,9 +666,11 @@ class OnlineBattleFragment : Fragment() {
                 myTurn = onlineBattle.turn == currentUser!!.uid
                 play = onlineBattle.win == NONE
                 if(myTurn){
-                    binding.turn.setImageDrawable(TurnDrawable(requireContext(),0.25))
+                    turnPointerLeft = true
+                    turnHandler.postDelayed(movePointer(),0)
                 }else{
-                    binding.turn.setImageDrawable(TurnDrawable(requireContext(),0.75))
+                    turnPointerLeft = false
+                    turnHandler.postDelayed(movePointer(),0)
                 }
             }
             request!!.opponentId -> {
@@ -743,6 +752,38 @@ class OnlineBattleFragment : Fragment() {
 
     }
 
+    private fun movePointer():Runnable = kotlinx.coroutines.Runnable {
+        val delay = 10L
+        if (turnPointerLeft) {
+            // move left
+            if (turnPointer > pointerLeft) {
+                turnPointer -= pointerJump
+                displayPointer()
+                turnHandler.postDelayed(movePointer(), delay)
+            } else {
+                turnPointer = pointerLeft
+                displayPointer()
+                turnHandler.removeCallbacksAndMessages(null)
+            }
+        } else {
+            //move right
+            if (turnPointer < pointerRight) {
+                turnPointer += pointerJump
+                displayPointer()
+                turnHandler.postDelayed(movePointer(), delay)
+            } else {
+                turnPointer = pointerRight
+                displayPointer()
+                turnHandler.removeCallbacksAndMessages(null)
+            }
+        }
+    }
+
+    private fun displayPointer(){
+        view?.let {
+            binding.turn.setImageDrawable(TurnDrawable(requireContext(),turnPointer))
+        }
+    }
 
 
     private fun prepareUI() {

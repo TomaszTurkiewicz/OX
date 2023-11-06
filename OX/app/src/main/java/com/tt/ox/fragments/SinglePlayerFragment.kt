@@ -643,43 +643,25 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
     private fun setSizes(){
         val fieldSize = 3*unit
-
-
         binding.backgroundField.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
-
         binding.topLeftField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.topMidField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.topRightField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-
         binding.midLeftField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.midMidField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.midRightField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-
         binding.bottomLeftField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.bottomMidField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.bottomRightField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-
         binding.winLine.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
-
         binding.reset.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-//        binding.addMoves.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-
         binding.turn.layoutParams = ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT,4*unit)
-//        binding.mainPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
-//        binding.opponentPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
         binding.mainPlayerWins.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
         binding.opponentPlayerWins.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
-//        binding.mainPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
-//        binding.opponentPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
-
         binding.mainPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
         binding.opponentPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
-
         binding.mainPlayerMark.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.opponentPlayerMark.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
-
-//        binding.switchMarks.layoutParams = ConstraintLayout.LayoutParams(fieldSize,unit)
-
         binding.moves.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit*0.9f)
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -754,26 +736,14 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
     private fun setDrawables(){
         binding.singlePlayerLayout.background = BackgroundColorDrawable(requireContext())
-
         binding.backgroundField.setImageDrawable(MeshDrawable(requireContext()))
-
         binding.moves.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
         binding.mainPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
         binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
         binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
         binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-
-//        binding.switchMarks.setImageDrawable(SwitchDrawable(requireContext()))
-
         binding.reset.setImageDrawable(ResetButtonDrawable(requireContext()))
-
-//        binding.addMoves.setImageDrawable(AddMovesButton(requireContext()))
-
-//        binding.mainPlayerMark.background = ButtonBackground(requireContext())
-//        binding.opponentPlayerMark.background = ButtonBackground(requireContext())
-//        binding.switchMarks.background = ButtonBackground(requireContext())
         binding.reset.background = ButtonBackground(requireContext())
-//        binding.addMoves.background = ButtonBackground(requireContext())
     }
 
     private fun setConstraint() {

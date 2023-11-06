@@ -13,10 +13,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import com.tt.ox.R
+import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentOptionsBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
-import com.tt.ox.helpers.AlertDialogChangeName
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 
@@ -63,6 +63,8 @@ class OptionsFragment : Fragment() {
             layoutInflater,
             cancelButtonEnable = true,
             readNameFromMemory = true,
+            title = "Change Your name",
+            message = "Change your name here. Between 2 and 14 characters",
             dismissClick = {
                 alertDialog?.dismiss()
             },
@@ -73,7 +75,6 @@ class OptionsFragment : Fragment() {
             }
         ).create()
         alertDialog.show()
-        //todo create alert dialog !!!
     }
 
 
@@ -88,7 +89,7 @@ class OptionsFragment : Fragment() {
         setConstraints()
     }
     private fun setSizes(){
-        binding.userName.layoutParams = ConstraintLayout.LayoutParams(width,unit)
+        binding.userName.layoutParams = ConstraintLayout.LayoutParams((width*0.8).toInt(),unit)
 
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){

@@ -47,9 +47,9 @@ import com.tt.ox.drawables.SearchDrawable
 import com.tt.ox.drawables.UpdateListDrawable
 import com.tt.ox.helpers.ACCEPTED
 import com.tt.ox.helpers.AVAILABLE
-import com.tt.ox.helpers.AlertDialogAddMoves
-import com.tt.ox.helpers.AlertDialogLogin
-import com.tt.ox.helpers.AlertDialogWaiting
+import com.tt.ox.alertDialogs.AlertDialogAddMoves
+import com.tt.ox.alertDialogs.AlertDialogLogin
+import com.tt.ox.alertDialogs.AlertDialogWaiting
 import com.tt.ox.helpers.DateUtils
 import com.tt.ox.helpers.FirebaseBattle
 import com.tt.ox.helpers.FirebaseRequests

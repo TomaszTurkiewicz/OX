@@ -1,4 +1,4 @@
-package com.tt.ox.helpers
+package com.tt.ox.alertDialogs
 
 import android.app.AlertDialog
 import android.content.Context
@@ -19,6 +19,9 @@ import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogInvitationBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
+import com.tt.ox.helpers.FirebaseRequests
+import com.tt.ox.helpers.FirebaseUser
+import com.tt.ox.helpers.ScreenMetricsCompat
 
 class AlertDialogWaiting(
     private val context: Context,

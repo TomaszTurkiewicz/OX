@@ -1,4 +1,4 @@
-package com.tt.ox.helpers
+package com.tt.ox.alertDialogs
 
 import android.app.AlertDialog
 import android.content.Context
@@ -13,12 +13,16 @@ import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogAddOpponentBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
+import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.SharedPreferences
 
 class AlertDialogChangeName(
     private val context: Context,
     layoutInflater: LayoutInflater,
     private val cancelButtonEnable:Boolean,
     private val readNameFromMemory:Boolean,
+    private val title:String,
+    private val message:String,
     private val dismissClick: () -> Unit,
     private val saveClick: (String) -> Unit
 ) {
@@ -63,8 +67,8 @@ class AlertDialogChangeName(
     }
 
     private fun displayAlertDialogUI(alertDialog: AlertDialogAddOpponentBinding){
-        alertDialog.title.text = "What's your nickname"
-        alertDialog.message.text = "Type your nickname. Between 2 and 14 characters."
+        alertDialog.title.text = title
+        alertDialog.message.text = message
 
         setAlertDialogColors(alertDialog)
         setAlertDialogSizes(alertDialog)

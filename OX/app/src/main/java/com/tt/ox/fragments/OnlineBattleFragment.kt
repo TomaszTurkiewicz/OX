@@ -38,7 +38,7 @@ import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ANGLE_DOWN_LINE
 import com.tt.ox.helpers.ANGLE_UP_LINE
-import com.tt.ox.helpers.AlertDialogEndGameOnlineBattle
+import com.tt.ox.alertDialogs.AlertDialogEndGameOnlineBattle
 import com.tt.ox.helpers.BOTTOM_LINE
 import com.tt.ox.helpers.END_DRAW
 import com.tt.ox.helpers.FirebaseBattle

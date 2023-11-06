@@ -42,7 +42,7 @@ import com.tt.ox.drawables.ResetButtonDrawable
 import com.tt.ox.drawables.TurnDrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
-import com.tt.ox.helpers.AlertDialogAddMoves
+import com.tt.ox.alertDialogs.AlertDialogAddMoves
 import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel

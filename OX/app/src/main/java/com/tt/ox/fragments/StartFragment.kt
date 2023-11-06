@@ -24,6 +24,8 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.tt.ox.OXApplication
+import com.tt.ox.alertDialogs.AlertDialogChangeName
+import com.tt.ox.alertDialogs.AlertDialogLogin
 import com.tt.ox.databinding.FragmentStartBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
@@ -31,8 +33,6 @@ import com.tt.ox.drawables.MultiPlayerButtonDrawable
 import com.tt.ox.drawables.OnlinePlayerButtonDrawable
 import com.tt.ox.drawables.SettingButtonDrawable
 import com.tt.ox.drawables.SinglePlayerButtonDrawable
-import com.tt.ox.helpers.AlertDialogChangeName
-import com.tt.ox.helpers.AlertDialogLogin
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.viewModel.GameViewModel
@@ -164,6 +164,8 @@ class StartFragment : Fragment() {
             layoutInflater,
             cancelButtonEnable = false,
             readNameFromMemory = false,
+            title = "What's Your name?",
+            message = "Type here your name. Between 2 and 14 characters",
             dismissClick = {
 
             },

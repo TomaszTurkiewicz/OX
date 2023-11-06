@@ -1,4 +1,4 @@
-package com.tt.ox.helpers
+package com.tt.ox.alertDialogs
 
 import android.app.AlertDialog
 import android.content.Context
@@ -11,6 +11,7 @@ import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogAddMovesBinding
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
+import com.tt.ox.helpers.ScreenMetricsCompat
 
 class AlertDialogAddMoves(
     private val context: Context,

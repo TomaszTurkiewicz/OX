@@ -31,9 +31,6 @@ const val BOTTOM_LEFT = 7
 const val BOTTOM_MID = 8
 const val BOTTOM_RIGHT = 9
 
-const val PLAYER_MARK_PRESSED = 1
-const val OPPONENT_MARK_PRESSED = 2
-
 const val EASY_GAME = 1
 const val NORMAL_GAME = 2
 const val HARD_GAME = 3
@@ -41,6 +38,10 @@ const val HARD_GAME = 3
 const val MOVES = 10
 
 const val TEST = true
+
+const val DARK_MODE_AUTO = 0
+const val DARK_MODE_ON = 1
+const val DARK_MODE_OFF = 2
 
 class MainActivity : AppCompatActivity() {
 
@@ -129,7 +130,7 @@ class MainActivity : AppCompatActivity() {
 }
 /*todo
 *  better buttons and layouts ui
-*  settings: (change user name, dark mode, choose marks, sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
+*  settings: (dark mode CURRENT!!!!, choose marks, sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
 *  sounds?
 *  online show progress bar when checking last activity and downloading users from firebase
  */

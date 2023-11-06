@@ -8,7 +8,7 @@ import android.graphics.PixelFormat
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
+import com.tt.ox.helpers.Theme
 
 class BackgroundColorDrawable (private val context: Context) : Drawable(){
     private val paint = Paint()
@@ -16,7 +16,8 @@ class BackgroundColorDrawable (private val context: Context) : Drawable(){
         paint.style = Paint.Style.FILL_AND_STROKE
         paint.strokeWidth = 0f
         paint.isAntiAlias = true
-        paint.color = ContextCompat.getColor(context, R.color.white)
+        paint.color = ContextCompat.getColor(context, Theme(context).getBackgroundColor())
+
 
         val rect = RectF(0f,0f, bounds.width().toFloat(), bounds.height().toFloat())
 

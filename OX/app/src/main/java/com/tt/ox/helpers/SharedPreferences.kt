@@ -1,6 +1,7 @@
 package com.tt.ox.helpers
 
 import android.content.Context
+import com.tt.ox.DARK_MODE_AUTO
 import com.tt.ox.MOVES
 import com.tt.ox.O
 import com.tt.ox.X
@@ -90,6 +91,24 @@ class SharedPreferences {
                 random = sp.getBoolean("random",true)
             }
             return random
+        }
+
+        fun saveDarkMode(context: Context?,darkMode:Int){
+            context?.let {
+                val sharedPreferences = context.getSharedPreferences("DARK_MODE",Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putInt("dark_mode",darkMode)
+                editor.apply()
+            }
+        }
+
+        fun readDarkMode(context: Context?):Int{
+            var darkMode = 0
+            context?.let {
+                val sharedPreferences = context.getSharedPreferences("DARK_MODE",Context.MODE_PRIVATE)
+                darkMode = sharedPreferences.getInt("dark_mode",DARK_MODE_AUTO)
+            }
+            return darkMode
         }
 
     }

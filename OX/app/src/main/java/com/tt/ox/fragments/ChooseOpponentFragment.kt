@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tt.ox.OXApplication
 import com.tt.ox.adapters.ChooseOpponentAdapter
+import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
 import com.tt.ox.drawables.AddDrawable
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.BinDrawable
 import com.tt.ox.drawables.ButtonBackground
-import com.tt.ox.helpers.AlertDialogChangeName
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
@@ -102,6 +102,8 @@ class ChooseOpponentFragment : Fragment() {
             layoutInflater,
             cancelButtonEnable = true,
             readNameFromMemory = false,
+            title = "Opponent name",
+            message = "Type opponent name here. Between 2 and 14 characters",
             dismissClick = {
                 alertDialogAddOpponent?.dismiss()
             },

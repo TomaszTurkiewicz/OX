@@ -53,10 +53,6 @@ class ChooseOpponentAdapter(
         holder.playerWin.text = current.getWins().toString()
         val playerName = SharedPreferences.readPlayerName(context)
         holder.playerName.text = playerName
-//            holder.playerName.setImageDrawable(TextDrawable(context,playerName))
-
-//        holder.playerMark.setImageDrawable(if(current.getMainPlayerMark()==X) XDrawable(context,current.getMainPlayerMarkColor()) else ODrawable(context,current.getMainPlayerMarkColor()))
-//        holder.opponentMark.setImageDrawable(if(current.getOpponentMark()==X) XDrawable(context,current.getOpponentMarkColor()) else ODrawable(context,current.getOpponentMarkColor()))
 
         setSizes(holder)
 

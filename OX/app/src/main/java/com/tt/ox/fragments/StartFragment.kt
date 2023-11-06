@@ -9,6 +9,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -253,12 +254,14 @@ class StartFragment : Fragment() {
 
         alertDialog.saveButton.setOnClickListener {
             val string = alertDialog.inputName.text
-            string?.let {editable ->
-                if(editable.toString().trim().isNotBlank()){
+            string?.let {
+                if(it.toString().length>1){
                     gameViewModel.addNewOpponent("PHONE")
-                    SharedPreferences.saveMainPlayer(requireContext(),editable.toString())
+                    SharedPreferences.saveMainPlayer(requireContext(),it.toString())
                     clicks()
                     dialog.dismiss()
+                }else{
+                    Toast.makeText(requireContext(),"Name too short", Toast.LENGTH_LONG).show()
                 }
             }
         }

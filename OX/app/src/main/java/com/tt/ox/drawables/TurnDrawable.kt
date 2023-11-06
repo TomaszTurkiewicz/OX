@@ -17,16 +17,12 @@ class TurnDrawable(private val context: Context, private val center: Double) : D
         val sizeW = bounds.height()*0.55f
         paint.strokeWidth=bounds.height()*0.03f
         paint.style = Paint.Style.STROKE
-        paint.color = ContextCompat.getColor(context, R.color.green)
+        paint.color = ContextCompat.getColor(context, R.color.blue_dark)
         paint.isAntiAlias = true
         val radius = bounds.height()*0.1f
         val middle = (bounds.width()*center).toFloat()
-
         val rect = RectF(middle-sizeW,bounds.centerY()-sizeH,middle+sizeW,bounds.centerY()+sizeH)
         canvas.drawRoundRect(rect,radius,radius,paint)
-
-
-
     }
 
     override fun setAlpha(p0: Int) {

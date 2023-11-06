@@ -39,6 +39,7 @@ import com.tt.ox.R
 import com.tt.ox.TEST
 import com.tt.ox.adapters.OnlineListAdapter
 import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
+import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.EditTextBackground
 import com.tt.ox.drawables.LogoutDrawable
@@ -278,6 +279,8 @@ class OnlineChooseOpponentFragment : Fragment() {
     }
 
     private fun setDrawables() {
+        binding.layout.background = BackgroundColorDrawable(requireContext())
+
         binding.logout.background = ButtonBackground(requireContext())
         binding.updateList.background = ButtonBackground(requireContext())
         binding.searchButton.background = ButtonBackground(requireContext())

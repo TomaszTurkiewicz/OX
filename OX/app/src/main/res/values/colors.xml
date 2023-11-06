@@ -10,5 +10,6 @@
     <color name="red">#FF0000</color>
     <color name="green">#44FF00</color>
     <color name="blue">#00A6FF</color>
+    <color name="blue_dark">#0066FF</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

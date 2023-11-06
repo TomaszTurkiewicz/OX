@@ -129,9 +129,7 @@ class MainActivity : AppCompatActivity() {
 }
 /*todo
 *  better buttons and layouts ui
-*  settings: (dark mode, choose marks, sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
+*  settings: (change user name, dark mode, choose marks, sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
 *  sounds?
-*  better showing player turn online battle CURRENT !!!!
-*  change user name
 *  online show progress bar when checking last activity and downloading users from firebase
  */

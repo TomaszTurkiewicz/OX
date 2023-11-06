@@ -23,6 +23,7 @@ import com.tt.ox.adapters.ChooseOpponentAdapter
 import com.tt.ox.databinding.AlertDialogAddOpponentBinding
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
 import com.tt.ox.drawables.AddDrawable
+import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.BinDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
@@ -261,6 +262,7 @@ class ChooseOpponentFragment : Fragment() {
     }
 
     private fun setDrawables() {
+        binding.chooseOpponentFragmentLayout.background = BackgroundColorDrawable(requireContext())
         binding.addOpponent.setImageDrawable(AddDrawable(requireContext()))
         binding.deleteOpponent.setImageDrawable(BinDrawable(requireContext(),deletable))
         binding.addOpponent.background = ButtonBackground(requireContext())

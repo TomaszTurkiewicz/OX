@@ -1,11 +1,9 @@
 package com.tt.ox.adapters
 
-import android.app.ActionBar
 import android.content.Context
 import android.os.Build
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -21,6 +19,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.tt.ox.R
 import com.tt.ox.databinding.OnlineListItemBinding
+import com.tt.ox.drawables.ActiveCircleDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ListItemBackgroundDrawable
 import com.tt.ox.drawables.SendInvitationDrawable
@@ -58,23 +57,32 @@ class OnlineListAdapter(
         )
         holder.name.text = current.userName
 
+
+
         val user = Firebase.database.getReference("Users").child(current.id!!)
-        user.addListenerForSingleValueEvent(object : ValueEventListener{
+//        user.addListenerForSingleValueEvent(object : ValueEventListener{
+        user.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
                     val u = snapshot.getValue(FirebaseUser::class.java)
                     holder.activity.text = DateUtils().getLastActivity(u!!.unixTime)
+                    holder.activeImage.setImageDrawable(ActiveCircleDrawable(context,DateUtils().getActivityBoolean(u!!.unixTime)))
+
 
                     val dbHistory = Firebase.database.getReference("History").child(userId).child(current.id!!)
                     dbHistory.addListenerForSingleValueEvent(object : ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
                             if(snapshot.exists()){
                                 val history = snapshot.getValue(FirebaseHistory::class.java)
-                                holder.wins.text = "${history!!.wins} (${u.wins})"
-                                holder.loses.text = "${history!!.loses} (${u.loses})"
+                                holder.generalStat.text = "${u.wins}-${u.loses}"
+                                holder.personalStat.text = "${history!!.wins}-${history.loses}"
+//                                holder.wins.text = "${history!!.wins} (${u.wins})"
+//                                holder.loses.text = "${history!!.loses} (${u.loses})"
                             }else{
-                                holder.wins.text = "0 (${u.wins})"
-                                holder.loses.text = "0 (${u.loses})"
+                                holder.generalStat.text = "${u.wins}-${u.loses}"
+                                holder.personalStat.text = "0-0"
+//                                holder.wins.text = "0 (${u.wins})"
+//                                holder.loses.text = "0 (${u.loses})"
                             }
                         }
 
@@ -89,8 +97,8 @@ class OnlineListAdapter(
 
         setSizes(holder)
         setColors(holder)
-        setDrawables(holder,current)
         setConstraint(holder)
+        setDrawables(holder,current)
         val dbRequests = Firebase.database.getReference("Requests").child(current.id!!)
         dbRequests.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -123,28 +131,40 @@ class OnlineListAdapter(
         set.connect(holder.background.id, ConstraintSet.TOP, holder.layout.id, ConstraintSet.TOP, 0)
         set.connect(holder.background.id, ConstraintSet.BOTTOM, holder.layout.id, ConstraintSet.BOTTOM, 0)
 
-        set.connect(holder.name.id, ConstraintSet.BOTTOM, holder.background.id, ConstraintSet.BOTTOM, (height/3).toInt())
-        set.connect(holder.name.id, ConstraintSet.LEFT, holder.background.id, ConstraintSet.LEFT, (width*0.1).toInt())
-        set.connect(holder.name.id, ConstraintSet.TOP, holder.background.id, ConstraintSet.TOP,0)
-
-        set.connect(holder.wins.id, ConstraintSet.TOP,holder.name.id,ConstraintSet.BOTTOM,0)
-        set.connect(holder.wins.id, ConstraintSet.LEFT,holder.name.id,ConstraintSet.LEFT,0)
-
-        set.connect(holder.line.id, ConstraintSet.TOP,holder.wins.id,ConstraintSet.TOP,0)
-        set.connect(holder.line.id, ConstraintSet.BOTTOM,holder.wins.id,ConstraintSet.BOTTOM,0)
-        set.connect(holder.line.id, ConstraintSet.LEFT,holder.wins.id,ConstraintSet.RIGHT, 0)
-
-        set.connect(holder.loses.id, ConstraintSet.TOP,holder.line.id,ConstraintSet.TOP,0)
-        set.connect(holder.loses.id, ConstraintSet.BOTTOM,holder.line.id,ConstraintSet.BOTTOM,0)
-        set.connect(holder.loses.id, ConstraintSet.LEFT,holder.line.id,ConstraintSet.RIGHT, 0)
-
-        set.connect(holder.activity.id, ConstraintSet.TOP,holder.wins.id,ConstraintSet.TOP,0)
-        set.connect(holder.activity.id, ConstraintSet.BOTTOM,holder.wins.id,ConstraintSet.BOTTOM,0)
-        set.connect(holder.activity.id, ConstraintSet.RIGHT,holder.background.id,ConstraintSet.RIGHT, height.toInt())
-
         set.connect(holder.sendInvitation.id,ConstraintSet.TOP,holder.layout.id,ConstraintSet.TOP,0)
         set.connect(holder.sendInvitation.id,ConstraintSet.BOTTOM,holder.layout.id,ConstraintSet.BOTTOM,0)
         set.connect(holder.sendInvitation.id,ConstraintSet.RIGHT,holder.layout.id,ConstraintSet.RIGHT, (height/3).toInt())
+
+//        set.connect(holder.name.id, ConstraintSet.BOTTOM, holder.background.id, ConstraintSet.BOTTOM, (height/3).toInt())
+        set.connect(holder.name.id, ConstraintSet.LEFT, holder.background.id, ConstraintSet.LEFT, (width*0.1).toInt())
+        set.connect(holder.name.id, ConstraintSet.TOP, holder.background.id, ConstraintSet.TOP,
+            (height*0.15).toInt()
+        )
+
+        set.connect(holder.generalStat.id, ConstraintSet.BOTTOM,holder.name.id,ConstraintSet.BOTTOM,0)
+        set.connect(holder.generalStat.id, ConstraintSet.TOP,holder.name.id,ConstraintSet.TOP,0)
+        set.connect(holder.generalStat.id, ConstraintSet.LEFT,holder.name.id,ConstraintSet.RIGHT,0)
+        set.connect(holder.generalStat.id, ConstraintSet.RIGHT,holder.sendInvitation.id,ConstraintSet.LEFT,0)
+
+//        set.connect(holder.line.id, ConstraintSet.TOP,holder.wins.id,ConstraintSet.TOP,0)
+//        set.connect(holder.line.id, ConstraintSet.BOTTOM,holder.wins.id,ConstraintSet.BOTTOM,0)
+//        set.connect(holder.line.id, ConstraintSet.LEFT,holder.wins.id,ConstraintSet.RIGHT, 0)
+
+        set.connect(holder.personalStat.id, ConstraintSet.TOP,holder.name.id,ConstraintSet.BOTTOM,(height*0.02).toInt())
+        set.connect(holder.personalStat.id, ConstraintSet.LEFT,holder.name.id,ConstraintSet.LEFT, 0)
+
+        set.connect(holder.activeImage.id,ConstraintSet.TOP,holder.personalStat.id,ConstraintSet.TOP,0)
+        set.connect(holder.activeImage.id,ConstraintSet.BOTTOM,holder.personalStat.id,ConstraintSet.BOTTOM,0)
+        set.connect(holder.activeImage.id,ConstraintSet.LEFT,holder.personalStat.id,ConstraintSet.RIGHT,
+            (height*0.1).toInt()
+        )
+
+        set.connect(holder.activity.id, ConstraintSet.TOP,holder.activeImage.id,ConstraintSet.TOP,0)
+        set.connect(holder.activity.id, ConstraintSet.BOTTOM,holder.activeImage.id,ConstraintSet.BOTTOM,0)
+        set.connect(holder.activity.id, ConstraintSet.LEFT,holder.activeImage.id,ConstraintSet.RIGHT,(height*0.02).toInt())
+
+
+
 
         set.applyTo(holder.layout)
     }
@@ -158,26 +178,29 @@ class OnlineListAdapter(
 
     private fun setColors(holder: OnlineListViewHolder) {
         holder.name.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.wins.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.loses.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.line.setTextColor(ContextCompat.getColor(context, R.color.black))
+        holder.generalStat.setTextColor(ContextCompat.getColor(context, R.color.black))
+        holder.personalStat.setTextColor(ContextCompat.getColor(context, R.color.black))
+//        holder.line.setTextColor(ContextCompat.getColor(context, R.color.black))
         holder.activity.setTextColor(ContextCompat.getColor(context, R.color.black))
     }
 
     private fun setSizes(holder: OnlineListViewHolder) {
         holder.background.layoutParams =
-            ConstraintLayout.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, height.toInt())
+            ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, height.toInt())
         holder.name.layoutParams =
-            ConstraintLayout.LayoutParams((width * 0.4).toInt(), (width * 0.1).toInt())
+            ConstraintLayout.LayoutParams((width * 0.45).toInt(), (width * 0.1).toInt())
         holder.sendInvitation.layoutParams =
             ConstraintLayout.LayoutParams((width * 0.15).toInt(), (width * 0.15).toInt())
-        holder.notUsedImage.visibility = View.GONE
 //        holder.line.setTextSize(TypedValue.COMPLEX_UNIT_DIP, (width*0.1).toFloat())
 
-        holder.wins.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.07).toFloat())
-        holder.line.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.07).toFloat())
-        holder.loses.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.07).toFloat())
-        holder.activity.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.04).toFloat())
+//        holder.generalStat.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.04).toFloat())
+        holder.generalStat.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.15).toInt(), (width * 0.1).toInt())
+//        holder.line.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.07).toFloat())
+        holder.personalStat.layoutParams =
+            ConstraintLayout.LayoutParams((width * 0.35).toInt(), (width * 0.1).toInt())
+        holder.activeImage.layoutParams = ConstraintLayout.LayoutParams((width*0.04).toInt(), (width*0.04).toInt())
+        holder.activity.layoutParams = ConstraintLayout.LayoutParams((width*0.15).toInt(), (width*0.04).toInt())
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -196,18 +219,69 @@ class OnlineListAdapter(
                 TypedValue.COMPLEX_UNIT_DIP
             )
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            holder.generalStat.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                20,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else {
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.generalStat,
+                1,
+                20,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            holder.personalStat.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                100,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else {
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.personalStat,
+                1,
+                100,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            holder.activity.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                100,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else {
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                holder.activity,
+                1,
+                100,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        }
     }
 
     class OnlineListViewHolder(binding: OnlineListItemBinding) : RecyclerView.ViewHolder(binding.root){
         val layout = binding.onlineListLayout
         val background = binding.background
         val name = binding.name
-        val line = binding.line
-        val wins = binding.wins
-        val loses = binding.loses
+//        val line = binding.line
+        val generalStat = binding.generalStat
+        val personalStat = binding.personalStat
         val activity = binding.activity
         val sendInvitation = binding.imageView1
-        val notUsedImage = binding.imageView2
+        val activeImage = binding.imageView2
     }
 
     companion object{

@@ -128,10 +128,10 @@ class MainActivity : AppCompatActivity() {
 
 }
 /*todo
-*  settings: (dark mode, choose marks, sounds?, clear statistics?, send game, other games, delete user from firebase if logged in)
+*  better buttons and layouts ui
+*  settings: (dark mode, choose marks, sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
 *  sounds?
 *  better showing player turn
 *  change user name
-*  recycler view better ui for multiplayer and online
 *  online show progress bar when checking last activity and downloading users from firebase
  */

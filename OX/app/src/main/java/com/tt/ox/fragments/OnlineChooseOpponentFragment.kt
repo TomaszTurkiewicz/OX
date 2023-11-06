@@ -102,7 +102,7 @@ class OnlineChooseOpponentFragment : Fragment() {
     private val noUsers:LiveData<Boolean> = _noUsers
     private var mRewardedAd : RewardedAd? = null
 
-    private val handler = Handler(Looper.getMainLooper())
+//    private val handler = Handler(Looper.getMainLooper())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,7 +143,7 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         stage.observe(this.viewLifecycleOwner){
             binding.infoText.text = when(it){
-                DATES -> "CHECKING LAST MONTH ACTIVITIES"
+                DATES -> "CHECKING ACTIVITIES"
                 USERS -> "DOWNLOADING USERS"
                 FILTERING -> "FILTERING USERS"
                 else -> "ELSE"
@@ -428,7 +428,8 @@ class OnlineChooseOpponentFragment : Fragment() {
     private fun prepareList(){
         _stage.value = DATES
         idList.clear()
-        val dates = DateUtils().getLastMonth()
+ //       val dates = DateUtils().getLastMonth()
+        val dates = DateUtils().getActive()
         datesListSize = dates.size
         currentPosition = 0
         readListFromFirebaseNew(dates)
@@ -565,20 +566,20 @@ class OnlineChooseOpponentFragment : Fragment() {
         })
     }
 
-    private fun moveToOnlineBattle():Runnable = Runnable {
-        handler.removeCallbacksAndMessages(null)
-        try {
-            invitationsDbRef?.removeEventListener(invitationsListener!!)
-            invitationsDbRef= null
-            val action = OnlineChooseOpponentFragmentDirections.actionOnlineChooseOpponentFragmentToOnlineBattle()
-            findNavController().navigate(action)
-        }
-        catch (e:Exception){
-            val current = findNavController().currentDestination?.displayName
-            Toast.makeText(requireContext(),current,Toast.LENGTH_SHORT).show()
-            handler.postDelayed(moveToOnlineBattle(),1000)
-        }
-    }
+//    private fun moveToOnlineBattle():Runnable = Runnable {
+//        handler.removeCallbacksAndMessages(null)
+//        try {
+//            invitationsDbRef?.removeEventListener(invitationsListener!!)
+//            invitationsDbRef= null
+//            val action = OnlineChooseOpponentFragmentDirections.actionOnlineChooseOpponentFragmentToOnlineBattle()
+//            findNavController().navigate(action)
+//        }
+//        catch (e:Exception){
+//            val current = findNavController().currentDestination?.displayName
+//            Toast.makeText(requireContext(),current,Toast.LENGTH_SHORT).show()
+//            handler.postDelayed(moveToOnlineBattle(),1000)
+//        }
+//    }
 
 
     private fun moveToOnlineBattleFragment() {

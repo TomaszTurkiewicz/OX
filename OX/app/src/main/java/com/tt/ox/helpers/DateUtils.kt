@@ -73,6 +73,16 @@ class DateUtils {
         return list
     }
 
+    fun getActive(): MutableList<Int> {
+        val list:MutableList<Int> = mutableListOf()
+        for(i in 5 downTo 1){
+            list.add(getFutureDay(i))
+        }
+        list.add(getCurrentDate())
+        list.add(getPastDay(1))
+        return list
+    }
+
     fun getLastActivity(unixTime:Long):String{
         val currentUnixTime = System.currentTimeMillis()
 
@@ -98,5 +108,14 @@ class DateUtils {
         }
 
         return "Active now"
+    }
+
+    fun getActivityBoolean(unixTime: Long):Boolean{
+        val currentUnixTime = System.currentTimeMillis()
+
+        val dif = currentUnixTime-unixTime
+        val seconds = dif/1000
+        val minutes = seconds/60
+        return minutes<5
     }
 }

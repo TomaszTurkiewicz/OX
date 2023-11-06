@@ -455,6 +455,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
     }
 
     private fun displayUI(){
+        val a =100
         if(fPlay){
             binding.winLine.setImageDrawable(null)
             binding.winLine.visibility = View.GONE

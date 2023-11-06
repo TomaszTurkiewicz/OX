@@ -655,6 +655,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
         binding.bottomRightField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.winLine.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
         binding.reset.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
+
         binding.turn.layoutParams = ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT,4*unit)
         binding.mainPlayerWins.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
         binding.opponentPlayerWins.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)

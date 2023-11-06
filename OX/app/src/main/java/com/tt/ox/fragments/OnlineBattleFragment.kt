@@ -17,6 +17,7 @@ import androidx.activity.addCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
@@ -32,7 +33,7 @@ import com.tt.ox.databinding.FragmentOnlineBattleBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
-import com.tt.ox.drawables.PointerUpperDrawable
+import com.tt.ox.drawables.TurnDrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ANGLE_DOWN_LINE
@@ -658,11 +659,9 @@ class OnlineBattleFragment : Fragment() {
                 myTurn = onlineBattle.turn == currentUser!!.uid
                 play = onlineBattle.win == NONE
                 if(myTurn){
-                    binding.mainPlayerPointerUpper.visibility = View.VISIBLE
-                    binding.opponentPointerUpper.visibility = View.GONE
+                    binding.turn.setImageDrawable(TurnDrawable(requireContext(),0.25))
                 }else{
-                    binding.mainPlayerPointerUpper.visibility = View.GONE
-                    binding.opponentPointerUpper.visibility = View.VISIBLE
+                    binding.turn.setImageDrawable(TurnDrawable(requireContext(),0.75))
                 }
             }
             request!!.opponentId -> {
@@ -750,8 +749,6 @@ class OnlineBattleFragment : Fragment() {
         setSizes()
         setDrawables()
         setConstraint()
-        binding.mainPlayerPointerUpper.visibility = View.GONE
-        binding.opponentPointerUpper.visibility = View.GONE
     }
 
     private fun setConstraint() {
@@ -874,8 +871,12 @@ class OnlineBattleFragment : Fragment() {
             ConstraintSet.RIGHT,binding.onlineBattleLayout.id,
             ConstraintSet.RIGHT,0)
 
+        set.connect(binding.time.id,ConstraintSet.TOP,binding.onlineBattleLayout.id,ConstraintSet.TOP,unit/4)
+        set.connect(binding.time.id,ConstraintSet.LEFT,binding.onlineBattleLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.time.id,ConstraintSet.RIGHT,binding.onlineBattleLayout.id,ConstraintSet.RIGHT,0)
+
         set.connect(binding.mainPlayerWins.id,
-            ConstraintSet.TOP,binding.onlineBattleLayout.id,
+            ConstraintSet.TOP,binding.time.id,
             ConstraintSet.TOP, (unit*1.5).toInt())
         set.connect(binding.mainPlayerWins.id,
             ConstraintSet.LEFT,binding.onlineBattleLayout.id,
@@ -904,7 +905,7 @@ class OnlineBattleFragment : Fragment() {
             ConstraintSet.LEFT,0)
 
         set.connect(binding.opponentPlayerWins.id,
-            ConstraintSet.TOP,binding.onlineBattleLayout.id,
+            ConstraintSet.TOP,binding.time.id,
             ConstraintSet.TOP,(unit*1.5).toInt())
         set.connect(binding.opponentPlayerWins.id,
             ConstraintSet.RIGHT,binding.onlineBattleLayout.id,
@@ -933,29 +934,8 @@ class OnlineBattleFragment : Fragment() {
             ConstraintSet.LEFT,binding.divider.id,
             ConstraintSet.RIGHT,0)
 
-        set.connect(binding.mainPlayerPointerUpper.id,
-            ConstraintSet.BOTTOM,binding.mainPlayerWins.id,
-            ConstraintSet.TOP,0)
-        set.connect(binding.mainPlayerPointerUpper.id,
-            ConstraintSet.LEFT,binding.mainPlayerWins.id,
-            ConstraintSet.LEFT,0)
-        set.connect(binding.mainPlayerPointerUpper.id,
-            ConstraintSet.RIGHT,binding.mainPlayerWins.id,
-            ConstraintSet.RIGHT,0)
-
-        set.connect(binding.opponentPointerUpper.id,
-            ConstraintSet.BOTTOM,binding.opponentPlayerWins.id,
-            ConstraintSet.TOP,0)
-        set.connect(binding.opponentPointerUpper.id,
-            ConstraintSet.LEFT,binding.opponentPlayerWins.id,
-            ConstraintSet.LEFT,0)
-        set.connect(binding.opponentPointerUpper.id,
-            ConstraintSet.RIGHT,binding.opponentPlayerWins.id,
-            ConstraintSet.RIGHT,0)
-
-        set.connect(binding.time.id,ConstraintSet.TOP,binding.onlineBattleLayout.id,ConstraintSet.TOP,unit/4)
-        set.connect(binding.time.id,ConstraintSet.LEFT,binding.onlineBattleLayout.id,ConstraintSet.LEFT,0)
-        set.connect(binding.time.id,ConstraintSet.RIGHT,binding.onlineBattleLayout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.turn.id,ConstraintSet.TOP,binding.mainPlayerWins.id,ConstraintSet.TOP,0)
+        set.connect(binding.turn.id,ConstraintSet.BOTTOM,binding.mainPlayerMark.id,ConstraintSet.BOTTOM,0)
 
         set.applyTo(binding.onlineBattleLayout)
 
@@ -971,48 +951,42 @@ class OnlineBattleFragment : Fragment() {
         binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.time.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
 
-        binding.mainPlayerPointerUpper.setImageDrawable(PointerUpperDrawable(requireContext()))
-        binding.opponentPointerUpper.setImageDrawable(PointerUpperDrawable(requireContext()))
         
     }
 
     private fun setSizes() {
         val fieldSize = 3*unit
-
         binding.backgroundField.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
-
         binding.topLeftField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.topMidField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.topRightField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-
         binding.midLeftField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.midMidField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.midRightField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-
         binding.bottomLeftField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.bottomMidField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
         binding.bottomRightField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
-
         binding.winLine.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
-
-        binding.mainPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
-        binding.opponentPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
-
         binding.time.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
 
-        binding.mainPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
-        binding.opponentPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
-
-        binding.mainPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,
-            ActionBar.LayoutParams.WRAP_CONTENT)
-        binding.opponentPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,
-            ActionBar.LayoutParams.WRAP_CONTENT)
-
+        binding.turn.layoutParams = ConstraintLayout.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,4*unit)
+        binding.mainPlayerWins.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
+        binding.opponentPlayerWins.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
+        binding.mainPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
+        binding.opponentPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
         binding.mainPlayerMark.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.opponentPlayerMark.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             binding.mainPlayerName.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else {
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                binding.mainPlayerName,
                 1,
                 200,
                 1,
@@ -1027,10 +1001,50 @@ class OnlineBattleFragment : Fragment() {
                 1,
                 TypedValue.COMPLEX_UNIT_DIP
             )
+        } else{
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                binding.opponentPlayerName,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
         }
 
-        binding.mainPlayerPointerUpper.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
-        binding.opponentPointerUpper.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            binding.mainPlayerWins.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else{
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                binding.mainPlayerWins,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            binding.opponentPlayerWins.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else{
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                binding.opponentPlayerWins,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        }
+
     }
 
 }

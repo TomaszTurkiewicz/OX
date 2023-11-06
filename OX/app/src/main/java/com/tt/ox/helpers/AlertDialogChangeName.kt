@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -16,6 +17,8 @@ import com.tt.ox.drawables.ButtonWithTextDrawable
 class AlertDialogChangeName(
     private val context: Context,
     layoutInflater: LayoutInflater,
+    private val cancelButtonEnable:Boolean,
+    private val readNameFromMemory:Boolean,
     private val dismissClick: () -> Unit,
     private val saveClick: (String) -> Unit
 ) {
@@ -25,8 +28,16 @@ class AlertDialogChangeName(
 
     fun create():AlertDialog{
         displayAlertDialogUI(alertDialog)
-        val name = SharedPreferences.readPlayerName(context)
-        alertDialog.inputName.setText(name)
+        if(readNameFromMemory) {
+            val name = SharedPreferences.readPlayerName(context)
+            alertDialog.inputName.setText(name)
+        }else{
+            alertDialog.inputName.setText("")
+        }
+        if(!cancelButtonEnable){
+            alertDialog.cancelButton.visibility = View.GONE
+        }
+
         builder.setView(alertDialog.root)
 
         alertDialog.cancelButton.setOnClickListener {

@@ -30,7 +30,7 @@ class SharedPreferences {
             var name:String
             context.let {
                 val sharedPreferences = it.getSharedPreferences("Player_Name", Context.MODE_PRIVATE)
-                name = sharedPreferences.getString("name","_").toString()
+                name = sharedPreferences.getString("name","").toString()
             }
             return name
         }

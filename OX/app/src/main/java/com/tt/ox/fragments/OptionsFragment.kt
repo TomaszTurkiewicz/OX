@@ -61,10 +61,12 @@ class OptionsFragment : Fragment() {
         alertDialog = AlertDialogChangeName(
             requireContext(),
             layoutInflater,
-            {
+            cancelButtonEnable = true,
+            readNameFromMemory = true,
+            dismissClick = {
                 alertDialog?.dismiss()
             },
-            {
+            saveClick = {
                 SharedPreferences.saveMainPlayer(requireContext(),it)
                 displayUserName()
                 alertDialog?.dismiss()

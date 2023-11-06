@@ -1,5 +1,6 @@
 package com.tt.ox.fragments
 
+import android.app.ActionBar.LayoutParams
 import android.app.AlertDialog
 import android.os.Build
 import android.os.Bundle
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.ads.AdError
@@ -37,8 +39,8 @@ import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.MeshDrawable
 import com.tt.ox.drawables.ODrawable
-import com.tt.ox.drawables.PointerUpperDrawable
 import com.tt.ox.drawables.ResetButtonDrawable
+import com.tt.ox.drawables.TurnDrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.AlertDialogAddMoves
@@ -532,12 +534,9 @@ class SinglePlayerFragment : FragmentCoroutine() {
         gameViewModel.turn.observe(this.viewLifecycleOwner){
             fTurn = it
             if(it){
-                binding.mainPlayerPointerUpper.visibility = View.VISIBLE
-                binding.opponentPointerUpper.visibility = View.GONE
+                binding.turn.setImageDrawable(TurnDrawable(requireContext(),0.25))
             }else{
-
-                binding.mainPlayerPointerUpper.visibility = View.GONE
-                binding.opponentPointerUpper.visibility = View.VISIBLE
+                binding.turn.setImageDrawable(TurnDrawable(requireContext(),0.75))
             }
         }
 
@@ -645,6 +644,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
     private fun setSizes(){
         val fieldSize = 3*unit
 
+
         binding.backgroundField.layoutParams = ConstraintLayout.LayoutParams(3*fieldSize,3*fieldSize)
 
         binding.topLeftField.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
@@ -664,11 +664,13 @@ class SinglePlayerFragment : FragmentCoroutine() {
         binding.reset.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
 //        binding.addMoves.layoutParams = ConstraintLayout.LayoutParams(fieldSize,fieldSize)
 
-        binding.mainPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
-        binding.opponentPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
-
-        binding.mainPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
-        binding.opponentPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
+        binding.turn.layoutParams = ConstraintLayout.LayoutParams(LayoutParams.MATCH_PARENT,4*unit)
+//        binding.mainPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
+//        binding.opponentPlayerWins.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit*0.8f)
+        binding.mainPlayerWins.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
+        binding.opponentPlayerWins.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
+//        binding.mainPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
+//        binding.opponentPlayerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit).toFloat())
 
         binding.mainPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
         binding.opponentPlayerName.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
@@ -687,6 +689,14 @@ class SinglePlayerFragment : FragmentCoroutine() {
                 1,
                 TypedValue.COMPLEX_UNIT_DIP
             )
+        } else {
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                binding.mainPlayerName,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
         }
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -696,10 +706,50 @@ class SinglePlayerFragment : FragmentCoroutine() {
                 1,
                 TypedValue.COMPLEX_UNIT_DIP
             )
+        } else{
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                binding.opponentPlayerName,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
         }
 
-        binding.mainPlayerPointerUpper.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
-        binding.opponentPointerUpper.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            binding.mainPlayerWins.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else{
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                binding.mainPlayerWins,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            binding.opponentPlayerWins.setAutoSizeTextTypeUniformWithConfiguration(
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        } else{
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                binding.opponentPlayerWins,
+                1,
+                200,
+                1,
+                TypedValue.COMPLEX_UNIT_DIP
+            )
+        }
+
     }
 
     private fun setDrawables(){
@@ -712,9 +762,6 @@ class SinglePlayerFragment : FragmentCoroutine() {
         binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
         binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
         binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-
-        binding.mainPlayerPointerUpper.setImageDrawable(PointerUpperDrawable(requireContext()))
-        binding.opponentPointerUpper.setImageDrawable(PointerUpperDrawable(requireContext()))
 
 //        binding.switchMarks.setImageDrawable(SwitchDrawable(requireContext()))
 
@@ -857,7 +904,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
         set.connect(binding.mainPlayerWins.id,
             ConstraintSet.TOP,binding.moves.id,
-            ConstraintSet.BOTTOM,0)
+            ConstraintSet.BOTTOM,unit)
         set.connect(binding.mainPlayerWins.id,
             ConstraintSet.LEFT,binding.singlePlayerLayout.id,
             ConstraintSet.LEFT,0)
@@ -886,7 +933,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
         set.connect(binding.opponentPlayerWins.id,
             ConstraintSet.TOP,binding.moves.id,
-            ConstraintSet.BOTTOM,0)
+            ConstraintSet.BOTTOM,unit)
         set.connect(binding.opponentPlayerWins.id,
             ConstraintSet.RIGHT,binding.singlePlayerLayout.id,
             ConstraintSet.RIGHT,unit)
@@ -914,13 +961,8 @@ class SinglePlayerFragment : FragmentCoroutine() {
             ConstraintSet.LEFT,binding.divider.id,
             ConstraintSet.RIGHT,0)
 
-        set.connect(binding.mainPlayerPointerUpper.id,ConstraintSet.BOTTOM,binding.mainPlayerWins.id,ConstraintSet.TOP,0)
-        set.connect(binding.mainPlayerPointerUpper.id,ConstraintSet.LEFT,binding.mainPlayerWins.id,ConstraintSet.LEFT,0)
-        set.connect(binding.mainPlayerPointerUpper.id,ConstraintSet.RIGHT,binding.mainPlayerWins.id,ConstraintSet.RIGHT,0)
-
-        set.connect(binding.opponentPointerUpper.id,ConstraintSet.BOTTOM,binding.opponentPlayerWins.id,ConstraintSet.TOP,0)
-        set.connect(binding.opponentPointerUpper.id,ConstraintSet.LEFT,binding.opponentPlayerWins.id,ConstraintSet.LEFT,0)
-        set.connect(binding.opponentPointerUpper.id,ConstraintSet.RIGHT,binding.opponentPlayerWins.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.turn.id,ConstraintSet.TOP,binding.mainPlayerWins.id,ConstraintSet.TOP,0)
+        set.connect(binding.turn.id,ConstraintSet.BOTTOM,binding.mainPlayerMark.id,ConstraintSet.BOTTOM,0)
 
 //        set.connect(binding.switchMarks.id,
 //            ConstraintSet.LEFT,binding.mainPlayerMark.id,

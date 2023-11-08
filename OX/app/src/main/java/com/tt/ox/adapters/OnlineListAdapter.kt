@@ -17,7 +17,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.tt.ox.R
 import com.tt.ox.databinding.OnlineListItemBinding
 import com.tt.ox.drawables.ActiveCircleDrawable
 import com.tt.ox.drawables.ButtonBackground
@@ -29,6 +28,7 @@ import com.tt.ox.helpers.FirebaseHistory
 import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUser
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.Theme
 
 class OnlineListAdapter(
     private val context:Context,
@@ -60,7 +60,6 @@ class OnlineListAdapter(
 
 
         val user = Firebase.database.getReference("Users").child(current.id!!)
-//        user.addListenerForSingleValueEvent(object : ValueEventListener{
         user.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
@@ -76,13 +75,9 @@ class OnlineListAdapter(
                                 val history = snapshot.getValue(FirebaseHistory::class.java)
                                 holder.generalStat.text = "${u.wins}-${u.loses}"
                                 holder.personalStat.text = "${history!!.wins}-${history.loses}"
-//                                holder.wins.text = "${history!!.wins} (${u.wins})"
-//                                holder.loses.text = "${history!!.loses} (${u.loses})"
                             }else{
                                 holder.generalStat.text = "${u.wins}-${u.loses}"
                                 holder.personalStat.text = "0-0"
-//                                holder.wins.text = "0 (${u.wins})"
-//                                holder.loses.text = "0 (${u.loses})"
                             }
                         }
 
@@ -135,7 +130,6 @@ class OnlineListAdapter(
         set.connect(holder.sendInvitation.id,ConstraintSet.BOTTOM,holder.layout.id,ConstraintSet.BOTTOM,0)
         set.connect(holder.sendInvitation.id,ConstraintSet.RIGHT,holder.layout.id,ConstraintSet.RIGHT, (height/3).toInt())
 
-//        set.connect(holder.name.id, ConstraintSet.BOTTOM, holder.background.id, ConstraintSet.BOTTOM, (height/3).toInt())
         set.connect(holder.name.id, ConstraintSet.LEFT, holder.background.id, ConstraintSet.LEFT, (width*0.1).toInt())
         set.connect(holder.name.id, ConstraintSet.TOP, holder.background.id, ConstraintSet.TOP,
             (height*0.15).toInt()
@@ -145,10 +139,6 @@ class OnlineListAdapter(
         set.connect(holder.generalStat.id, ConstraintSet.TOP,holder.name.id,ConstraintSet.TOP,0)
         set.connect(holder.generalStat.id, ConstraintSet.LEFT,holder.name.id,ConstraintSet.RIGHT,0)
         set.connect(holder.generalStat.id, ConstraintSet.RIGHT,holder.sendInvitation.id,ConstraintSet.LEFT,0)
-
-//        set.connect(holder.line.id, ConstraintSet.TOP,holder.wins.id,ConstraintSet.TOP,0)
-//        set.connect(holder.line.id, ConstraintSet.BOTTOM,holder.wins.id,ConstraintSet.BOTTOM,0)
-//        set.connect(holder.line.id, ConstraintSet.LEFT,holder.wins.id,ConstraintSet.RIGHT, 0)
 
         set.connect(holder.personalStat.id, ConstraintSet.TOP,holder.name.id,ConstraintSet.BOTTOM,(height*0.02).toInt())
         set.connect(holder.personalStat.id, ConstraintSet.LEFT,holder.name.id,ConstraintSet.LEFT, 0)
@@ -177,11 +167,10 @@ class OnlineListAdapter(
     }
 
     private fun setColors(holder: OnlineListViewHolder) {
-        holder.name.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.generalStat.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.personalStat.setTextColor(ContextCompat.getColor(context, R.color.black))
-//        holder.line.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.activity.setTextColor(ContextCompat.getColor(context, R.color.black))
+        holder.name.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        holder.generalStat.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        holder.personalStat.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        holder.activity.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
     }
 
     private fun setSizes(holder: OnlineListViewHolder) {
@@ -191,12 +180,8 @@ class OnlineListAdapter(
             ConstraintLayout.LayoutParams((width * 0.45).toInt(), (width * 0.1).toInt())
         holder.sendInvitation.layoutParams =
             ConstraintLayout.LayoutParams((width * 0.15).toInt(), (width * 0.15).toInt())
-//        holder.line.setTextSize(TypedValue.COMPLEX_UNIT_DIP, (width*0.1).toFloat())
-
-//        holder.generalStat.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.04).toFloat())
         holder.generalStat.layoutParams =
             ConstraintLayout.LayoutParams((width * 0.15).toInt(), (width * 0.1).toInt())
-//        holder.line.setTextSize(TypedValue.COMPLEX_UNIT_PX, (width*0.07).toFloat())
         holder.personalStat.layoutParams =
             ConstraintLayout.LayoutParams((width * 0.35).toInt(), (width * 0.1).toInt())
         holder.activeImage.layoutParams = ConstraintLayout.LayoutParams((width*0.04).toInt(), (width*0.04).toInt())
@@ -276,7 +261,6 @@ class OnlineListAdapter(
         val layout = binding.onlineListLayout
         val background = binding.background
         val name = binding.name
-//        val line = binding.line
         val generalStat = binding.generalStat
         val personalStat = binding.personalStat
         val activity = binding.activity

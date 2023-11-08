@@ -30,21 +30,72 @@ class Theme(val context:Context) {
 
     private val theme = if(darkModeBoolean) DarkMode() else LightMode()
 
+    fun getGrayColor() = theme.getGrayColor()
     fun getBackgroundColor() = theme.getBackgroundColor()
+    fun getAccentColor() = theme.getAccentColor()
+    fun getGreenColor() = theme.getGreenColor()
+    fun getRedColor() = theme.getReadColor()
+    fun getBlueColor() = theme.getBlueColor()
+
     private open class LightMode{
         open val background = R.color.white
+        open val accent = R.color.black
+        open val green = R.color.green
+        open val red = R.color.red
+        open val blue = R.color.blue
+        open val gray = R.color.gray
 
+        open fun getGrayColor():Int{
+            return gray
+        }
+        open fun getBlueColor():Int{
+            return blue
+        }
+        open fun getReadColor():Int{
+            return red
+        }
+        open fun getGreenColor():Int{
+            return green
+        }
         open fun getBackgroundColor():Int{
             return background
+        }
+
+        open fun getAccentColor():Int{
+            return accent
         }
 
     }
 
     private class DarkMode : LightMode(){
         override val background = R.color.black
+        override val accent = R.color.gray_dark
+        override val green = R.color.green_dark
+        override val red = R.color.red_dark
+        override val blue = R.color.blue_dark
+        override val gray = R.color.gray_dark
+
+        override fun getGrayColor():Int{
+            return gray
+        }
+        override fun getBlueColor(): Int {
+            return blue
+        }
+
+        override fun getReadColor(): Int {
+            return red
+        }
+
+        override fun getGreenColor(): Int {
+            return green
+        }
 
         override fun getBackgroundColor(): Int {
             return background
+        }
+
+        override fun getAccentColor(): Int {
+            return accent
         }
     }
 }

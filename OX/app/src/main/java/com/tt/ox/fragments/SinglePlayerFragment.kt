@@ -34,6 +34,7 @@ import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.TEST
 import com.tt.ox.X
+import com.tt.ox.alertDialogs.AlertDialogAddMoves
 import com.tt.ox.databinding.FragmentSinglePlayerBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
@@ -43,9 +44,9 @@ import com.tt.ox.drawables.ResetButtonDrawable
 import com.tt.ox.drawables.TurnDrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
-import com.tt.ox.alertDialogs.AlertDialogAddMoves
 import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.Theme
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
 import kotlinx.coroutines.Runnable
@@ -104,12 +105,12 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        prepareUI()
         gameViewModel.initializeMoves(requireContext())
         gameViewModel.initialize(true)
         gameViewModel.getOpponentMultiPlayer(1).observe(this.viewLifecycleOwner){
                 mainPlayer ->
             gameViewModel.initializeGame(requireContext(),mainPlayer)
-            prepareUI()
             setObserves()
             click()
             displayMarks()
@@ -575,11 +576,11 @@ class SinglePlayerFragment : FragmentCoroutine() {
     private fun setDrawables(){
         binding.singlePlayerLayout.background = BackgroundColorDrawable(requireContext())
         binding.backgroundField.setImageDrawable(MeshDrawable(requireContext()))
-        binding.moves.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        binding.mainPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
+        binding.moves.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+        binding.mainPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+        binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+        binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+        binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
         binding.reset.setImageDrawable(ResetButtonDrawable(requireContext()))
         binding.reset.background = ButtonBackground(requireContext())
     }

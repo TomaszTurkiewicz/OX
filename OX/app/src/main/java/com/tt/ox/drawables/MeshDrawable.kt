@@ -8,8 +8,8 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class MeshDrawable(private val context: Context) : Drawable() {
     private val paint = Paint()
@@ -18,7 +18,7 @@ class MeshDrawable(private val context: Context) : Drawable() {
         val y = bounds.height()/3
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = (bounds.width()*0.02).toFloat()
-        paint.color = ContextCompat.getColor(context, R.color.black)
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
         paint.isAntiAlias = true
         paint.strokeCap = Paint.Cap.ROUND
 

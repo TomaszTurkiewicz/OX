@@ -10,9 +10,9 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.Functions
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -22,7 +22,7 @@ class OnlinePlayerButtonDrawable (private val context: Context) : Drawable() {
     override fun draw(canvas: Canvas) {
         val stroke = 0f
         paint.strokeWidth = stroke
-        paint.color = ContextCompat.getColor(context, R.color.black)
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
         paint.style = Paint.Style.FILL
         paint.isAntiAlias = true
         val leftCenter = bounds.width()*0.2
@@ -45,7 +45,7 @@ class OnlinePlayerButtonDrawable (private val context: Context) : Drawable() {
         val difHorizontal = bounds.height()*0.2
         val difVertical = bounds.height()*0.1
 
-        paint.color = ContextCompat.getColor(context, R.color.green)
+        paint.color = ContextCompat.getColor(context, Theme(context).getGreenColor())
         paint.style = Paint.Style.FILL
         paint.strokeWidth = 0f
 
@@ -96,7 +96,7 @@ class OnlinePlayerButtonDrawable (private val context: Context) : Drawable() {
     private fun makePerson(leftCenter:Double, canvas: Canvas){
         paint.style = Paint.Style.FILL
         paint.strokeWidth = 0f
-        paint.color = ContextCompat.getColor(context, R.color.black)
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
         val bodyDif = bounds.height()*0.15
         val difHorizontal = bounds.height()*0.05
         val difHorizontalAdd = bounds.height()*0.06
@@ -119,7 +119,7 @@ class OnlinePlayerButtonDrawable (private val context: Context) : Drawable() {
 
         canvas.drawRect(loverBody,paint)
 
-        paint.color = ContextCompat.getColor(context, R.color.white)
+        paint.color = ContextCompat.getColor(context, Theme(context).getBackgroundColor())
 
         val down = Point(leftCenter.toInt(),bounds.centerY())
         val left = Point((leftCenter-bodyDif).toInt(), (bounds.height()*0.3).toInt())
@@ -135,7 +135,7 @@ class OnlinePlayerButtonDrawable (private val context: Context) : Drawable() {
 
         canvas.drawPath(neck,paint)
 
-        paint.color = ContextCompat.getColor(context, R.color.black)
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
 
         canvas.drawCircle(leftCenter.toFloat(),
             (bounds.height()*0.33).toFloat(), (bounds.height()*0.07).toFloat(),paint)
@@ -149,7 +149,7 @@ class OnlinePlayerButtonDrawable (private val context: Context) : Drawable() {
         val radius = bounds.height()*0.18f
         canvas.drawCircle(rightCenter.toFloat(), bounds.centerY().toFloat(),radius,paint)
 
-        paint.color = ContextCompat.getColor(context,R.color.black)
+        paint.color = ContextCompat.getColor(context,Theme(context).getAccentColor())
         val a = Point((rightCenter-radius).toInt(),bounds.centerY())
         val b = Point((rightCenter+radius).toInt(),bounds.centerY())
         val curvedAB1 = Functions.curvedPath(a,b,radius/2,false)
@@ -213,18 +213,6 @@ class OnlinePlayerButtonDrawable (private val context: Context) : Drawable() {
 
         canvas.drawPath(path1,paint)
 
-
-    }
-
-    private fun makePhoneButton(canvas: Canvas, positionX:Int, positionY:Int){
-        val buttonSize = bounds.height()*0.05
-        val button = Rect(
-            (positionX - buttonSize/2).toInt(),
-            (positionY - buttonSize/2).toInt(),
-            (positionX + buttonSize/2).toInt(),
-            (positionY + buttonSize/2).toInt(),
-        )
-        canvas.drawRect(button,paint)
     }
 
     override fun setAlpha(p0: Int) {
@@ -235,5 +223,8 @@ class OnlinePlayerButtonDrawable (private val context: Context) : Drawable() {
         paint.colorFilter = p0
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 }

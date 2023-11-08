@@ -8,12 +8,12 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.COLOR_BLACK
 import com.tt.ox.helpers.COLOR_BLUE
 import com.tt.ox.helpers.COLOR_GREEN
 import com.tt.ox.helpers.COLOR_RED
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class XDrawable  (private val context: Context, private val color:Int, private val thick:Boolean) : Drawable(){
     private val paint = Paint()
@@ -22,10 +22,10 @@ class XDrawable  (private val context: Context, private val color:Int, private v
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = if(thick) (bounds.width()*0.04).toFloat() else (bounds.width()*0.02).toFloat()
         when(color){
-            COLOR_BLACK -> paint.color = ContextCompat.getColor(context, R.color.black)
-            COLOR_RED -> paint.color = ContextCompat.getColor(context, R.color.red)
-            COLOR_GREEN -> paint.color = ContextCompat.getColor(context, R.color.green)
-            COLOR_BLUE -> paint.color = ContextCompat.getColor(context, R.color.blue)
+            COLOR_BLACK -> paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
+            COLOR_RED -> paint.color = ContextCompat.getColor(context, Theme(context).getRedColor())
+            COLOR_GREEN -> paint.color = ContextCompat.getColor(context, Theme(context).getGreenColor())
+            COLOR_BLUE -> paint.color = ContextCompat.getColor(context, Theme(context).getBlueColor())
         }
         paint.isAntiAlias = true
 

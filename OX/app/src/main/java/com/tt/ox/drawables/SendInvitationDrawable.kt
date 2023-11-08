@@ -10,8 +10,8 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class SendInvitationDrawable (private val context: Context, private val enable:Boolean) : Drawable(){
     private val paint = Paint()
@@ -19,7 +19,7 @@ class SendInvitationDrawable (private val context: Context, private val enable:B
     override fun draw(canvas: Canvas) {
         paint.strokeWidth =(bounds.width()*0.04).toFloat()
 
-        color = if(enable) ContextCompat.getColor(context, R.color.green) else ContextCompat.getColor(context, R.color.red)
+        color = if(enable) ContextCompat.getColor(context, Theme(context).getGreenColor()) else ContextCompat.getColor(context, Theme(context).getRedColor())
         paint.isAntiAlias = true
 
         makeLeftPerson(bounds.centerX().toDouble(),canvas)
@@ -73,7 +73,7 @@ class SendInvitationDrawable (private val context: Context, private val enable:B
 
         canvas.drawRect(loverBody,paint)
 
-        paint.color = ContextCompat.getColor(context,R.color.white)
+        paint.color = ContextCompat.getColor(context,Theme(context).getBackgroundColor())
 
         val down = Point(leftCenter.toInt(),bounds.centerY())
         val left = Point((leftCenter-bodyDif).toInt(), (bounds.height()*0.3).toInt())
@@ -100,6 +100,9 @@ class SendInvitationDrawable (private val context: Context, private val enable:B
         paint.alpha=alpha
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 
     override fun setColorFilter(colorFilter: ColorFilter?) {

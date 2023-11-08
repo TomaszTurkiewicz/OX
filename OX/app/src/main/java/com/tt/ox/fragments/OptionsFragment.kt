@@ -12,13 +12,13 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
-import com.tt.ox.R
 import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentOptionsBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
+import com.tt.ox.helpers.Theme
 
 
 class OptionsFragment : Fragment() {
@@ -112,7 +112,7 @@ class OptionsFragment : Fragment() {
 
     private fun setDrawables(){
         binding.layout.background = BackgroundColorDrawable(requireContext())
-        binding.userName.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.userName.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.userName.background = ButtonBackground(requireContext())
     }
 

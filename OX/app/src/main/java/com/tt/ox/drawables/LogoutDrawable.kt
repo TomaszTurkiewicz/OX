@@ -10,8 +10,8 @@ import android.graphics.Point
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class LogoutDrawable (private val context: Context) : Drawable() {
     private val paint = Paint()
@@ -19,7 +19,7 @@ class LogoutDrawable (private val context: Context) : Drawable() {
         val stroke = bounds.width()*0.1f
         paint.strokeWidth = stroke
         paint.style = Paint.Style.STROKE
-        paint.color = ContextCompat.getColor(context, R.color.red)
+        paint.color = ContextCompat.getColor(context, Theme(context).getRedColor())
         paint.isAntiAlias = true
 
         val radius = bounds.width()*0.1f
@@ -31,7 +31,7 @@ class LogoutDrawable (private val context: Context) : Drawable() {
 
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
-        paint.color = ContextCompat.getColor(context, R.color.white)
+        paint.color = ContextCompat.getColor(context, Theme(context).getBackgroundColor())
         val blank = MyPath()
         val w = Point((bounds.width()*0.3).toInt(), (bounds.height()*0.4).toInt())
         val x = Point((bounds.width()*0.5).toInt(), (bounds.height()*0.4).toInt())
@@ -47,7 +47,7 @@ class LogoutDrawable (private val context: Context) : Drawable() {
         canvas.drawPath(blank,paint)
 
 
-        paint.color = ContextCompat.getColor(context, R.color.red)
+        paint.color = ContextCompat.getColor(context, Theme(context).getRedColor())
 
 
         val rad = radius/2
@@ -92,5 +92,8 @@ class LogoutDrawable (private val context: Context) : Drawable() {
         paint.colorFilter = p0
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 }

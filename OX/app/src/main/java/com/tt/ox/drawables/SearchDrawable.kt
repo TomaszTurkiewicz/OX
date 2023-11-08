@@ -8,15 +8,15 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class SearchDrawable (private val context: Context, private val active:Boolean) : Drawable(){
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
         paint.strokeWidth = bounds.width()*0.1f
         paint.style = Paint.Style.STROKE
-        paint.color = if(active) ContextCompat.getColor(context, R.color.blue) else ContextCompat.getColor(context, R.color.gray)
+        paint.color = if(active) ContextCompat.getColor(context, Theme(context).getBlueColor()) else ContextCompat.getColor(context, Theme(context).getGrayColor())
         paint.isAntiAlias = true
         paint.strokeCap = Paint.Cap.ROUND
         val dif = 0
@@ -32,11 +32,11 @@ class SearchDrawable (private val context: Context, private val active:Boolean) 
 
         val radius = bounds.width()*0.25
         paint.style = Paint.Style.FILL
-        paint.color = ContextCompat.getColor(context,R.color.white)
+        paint.color = ContextCompat.getColor(context,Theme(context).getBackgroundColor())
         canvas.drawCircle(middle.x.toFloat(), middle.y.toFloat(), radius.toFloat(),paint)
 
         paint.style = Paint.Style.STROKE
-        paint.color = if(active) ContextCompat.getColor(context, R.color.blue) else ContextCompat.getColor(context, R.color.gray)
+        paint.color = if(active) ContextCompat.getColor(context, Theme(context).getBlueColor()) else ContextCompat.getColor(context, Theme(context).getGrayColor())
         canvas.drawCircle(middle.x.toFloat(), middle.y.toFloat(), radius.toFloat(),paint)
 
 
@@ -47,6 +47,9 @@ class SearchDrawable (private val context: Context, private val active:Boolean) 
         paint.alpha=alpha
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 
     override fun setColorFilter(colorFilter: ColorFilter?) {

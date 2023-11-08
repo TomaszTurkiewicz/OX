@@ -9,15 +9,15 @@ import android.graphics.Point
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class BinDrawable (private val context: Context,private val deletable:Boolean): Drawable() {
     private val paint = Paint()
 
     override fun draw(canvas: Canvas) {
 
-        paint.color = if(deletable) ContextCompat.getColor(context, R.color.red) else ContextCompat.getColor(context, R.color.black)
+        paint.color = if(deletable) ContextCompat.getColor(context, Theme(context).getRedColor()) else ContextCompat.getColor(context, Theme(context).getAccentColor())
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
         val radius = bounds.right*0.1f
@@ -56,5 +56,8 @@ class BinDrawable (private val context: Context,private val deletable:Boolean): 
         paint.colorFilter = p0
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 }

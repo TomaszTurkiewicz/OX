@@ -38,6 +38,9 @@ import com.tt.ox.MOVES
 import com.tt.ox.R
 import com.tt.ox.TEST
 import com.tt.ox.adapters.OnlineListAdapter
+import com.tt.ox.alertDialogs.AlertDialogAddMoves
+import com.tt.ox.alertDialogs.AlertDialogLogin
+import com.tt.ox.alertDialogs.AlertDialogWaiting
 import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
@@ -47,9 +50,6 @@ import com.tt.ox.drawables.SearchDrawable
 import com.tt.ox.drawables.UpdateListDrawable
 import com.tt.ox.helpers.ACCEPTED
 import com.tt.ox.helpers.AVAILABLE
-import com.tt.ox.alertDialogs.AlertDialogAddMoves
-import com.tt.ox.alertDialogs.AlertDialogLogin
-import com.tt.ox.alertDialogs.AlertDialogWaiting
 import com.tt.ox.helpers.DateUtils
 import com.tt.ox.helpers.FirebaseBattle
 import com.tt.ox.helpers.FirebaseRequests
@@ -60,6 +60,7 @@ import com.tt.ox.helpers.REJECTED
 import com.tt.ox.helpers.SEND
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
+import com.tt.ox.helpers.Theme
 import kotlin.random.Random
 
 private const val DATES = 0
@@ -102,9 +103,6 @@ class OnlineChooseOpponentFragment : Fragment() {
     private val _noUsers = MutableLiveData<Boolean>()
     private val noUsers:LiveData<Boolean> = _noUsers
     private var mRewardedAd : RewardedAd? = null
-
-//    private val handler = Handler(Looper.getMainLooper())
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -287,10 +285,10 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         binding.logout.setImageDrawable(LogoutDrawable(requireContext()))
 
-        binding.moves.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.infoText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.noUsers.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.searchEditText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.moves.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.infoText.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.noUsers.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.searchEditText.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
 
         binding.searchEditText.background = EditTextBackground(requireContext())
 
@@ -323,7 +321,6 @@ class OnlineChooseOpponentFragment : Fragment() {
         super.onPause()
         invitationsDbRef?.removeEventListener(invitationsListener!!)
         invitationsDbRef= null
-//        movesDbRef?.removeEventListener(movesListener!!)
         listHandler.removeCallbacksAndMessages(null)
     }
 
@@ -404,7 +401,6 @@ class OnlineChooseOpponentFragment : Fragment() {
 
     private fun startFragment(){
         checkIfFragmentAttached {
-//            _moves.value = SharedPreferences.readOnlineMoves(requireContext())
             if (_moves.value!! <= 0) {
                 displayAddMovesAlertDialog()
             } else {
@@ -431,7 +427,6 @@ class OnlineChooseOpponentFragment : Fragment() {
     private fun prepareList(){
         _stage.value = DATES
         idList.clear()
- //       val dates = DateUtils().getLastMonth()
         val dates = DateUtils().getActive()
         datesListSize = dates.size
         currentPosition = 0
@@ -568,22 +563,6 @@ class OnlineChooseOpponentFragment : Fragment() {
 
         })
     }
-
-//    private fun moveToOnlineBattle():Runnable = Runnable {
-//        handler.removeCallbacksAndMessages(null)
-//        try {
-//            invitationsDbRef?.removeEventListener(invitationsListener!!)
-//            invitationsDbRef= null
-//            val action = OnlineChooseOpponentFragmentDirections.actionOnlineChooseOpponentFragmentToOnlineBattle()
-//            findNavController().navigate(action)
-//        }
-//        catch (e:Exception){
-//            val current = findNavController().currentDestination?.displayName
-//            Toast.makeText(requireContext(),current,Toast.LENGTH_SHORT).show()
-//            handler.postDelayed(moveToOnlineBattle(),1000)
-//        }
-//    }
-
 
     private fun moveToOnlineBattleFragment() {
         val temp = _moves.value!!-1

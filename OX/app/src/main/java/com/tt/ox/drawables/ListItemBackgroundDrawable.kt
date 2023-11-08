@@ -8,7 +8,7 @@ import android.graphics.PixelFormat
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
+import com.tt.ox.helpers.Theme
 
 class ListItemBackgroundDrawable (private val context: Context) : Drawable(){
     private val paint = Paint()
@@ -16,7 +16,7 @@ class ListItemBackgroundDrawable (private val context: Context) : Drawable(){
 
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = (bounds.height()*0.01).toFloat()
-        paint.color = ContextCompat.getColor(context, R.color.black)
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
         paint.isAntiAlias = true
 
         val margin = bounds.height()*0.1f
@@ -31,6 +31,9 @@ class ListItemBackgroundDrawable (private val context: Context) : Drawable(){
         paint.alpha=alpha
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 
     override fun setColorFilter(colorFilter: ColorFilter?) {

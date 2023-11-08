@@ -33,6 +33,7 @@ import com.tt.ox.OXApplication
 import com.tt.ox.R
 import com.tt.ox.TEST
 import com.tt.ox.X
+import com.tt.ox.alertDialogs.AlertDialogAddMoves
 import com.tt.ox.databinding.FragmentMultiPlayerBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
@@ -42,9 +43,9 @@ import com.tt.ox.drawables.ResetButtonDrawable
 import com.tt.ox.drawables.TurnDrawable
 import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
-import com.tt.ox.alertDialogs.AlertDialogAddMoves
 import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.Theme
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
 import kotlinx.coroutines.launch
@@ -59,7 +60,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private var width = 0
     private var fPlay = false
     private var fMoves = false
-//    private var fSwitch = false
     private val resetHandler = Handler(Looper.getMainLooper())
     private val winningLineHandler = Handler(Looper.getMainLooper())
     private val navArgs: MultiPlayerFragmentArgs by navArgs()
@@ -134,22 +134,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
 
     private fun clicks() {
 
-//        binding.mainPlayerMark.setOnClickListener {
-//            if(fSwitch){
-//                openChangeColorAlertDialog(PLAYER_MARK_PRESSED)
-//            }
-//        }
-
-//        binding.opponentPlayerMark.setOnClickListener {
-//            if(fSwitch){
-//                openChangeColorAlertDialog(OPPONENT_MARK_PRESSED)
-//            }
-//        }
-
-//        binding.addMoves.setOnClickListener {
-//            gameViewModel.addMoves(requireContext())
-//        }
-
         binding.topLeftField.setOnClickListener {
             gameViewModel.setTopLeft(requireContext(),marks)
 
@@ -194,144 +178,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
             readMarks()
             displayMarks()
         }
-//        binding.switchMarks.setOnClickListener {
-//            gameViewModel.switchMarks()
-//            launch {
-//                gameViewModel.updateOpponent(
-//                    gameViewModel.game.value!!.getOpponent()
-//                )
-//            }
-//        }
     }
-
-//    private fun openChangeColorAlertDialog(mark:Int) {
-//        val opponent = gameViewModel.game.value!!.getOpponent()
-//        val builder = AlertDialog.Builder(requireContext())
-//        val alertDialog = AlertDialogChangeMarkColorBinding.inflate(layoutInflater)
-//        val currentColor = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
-//        val colors = MarkColors(currentColor)
-//        var leftColor = colors.getLeftColor()
-//        var rightColor = colors.getRightColor()
-//
-//        displayAlertDialogUI(alertDialog,mark,opponent,leftColor,rightColor)
-//
-//        builder.setView(alertDialog.root)
-//        val dialog = builder.create()
-//
-//        alertDialog.cancelButton.setOnClickListener {
-//            dialog.dismiss()
-//        }
-//
-//        alertDialog.arrowLeft.setOnClickListener {
-//            colors.decreasePointer()
-//            val color = colors.getColor()
-//            leftColor = colors.getLeftColor()
-//            rightColor = colors.getRightColor()
-//            if(mark== MAIN_PLAYER){
-//                opponent.setPlayerColor(color)
-//            }else{
-//                opponent.setOpponentColor(color)
-//            }
-//            displayAlertDialogUI(alertDialog,mark,opponent,leftColor, rightColor)
-//
-//        }
-//
-//        alertDialog.arrowRight.setOnClickListener {
-//            colors.increasePointer()
-//            val color = colors.getColor()
-//            leftColor = colors.getLeftColor()
-//            rightColor = colors.getRightColor()
-//            if(mark== MAIN_PLAYER){
-//                opponent.setPlayerColor(color)
-//            }else{
-//                opponent.setOpponentColor(color)
-//            }
-//            displayAlertDialogUI(alertDialog,mark,opponent,leftColor, rightColor)
-//
-//        }
-//
-//        alertDialog.saveButton.setOnClickListener {
-//            gameViewModel.setMainPlayerMarkColor(opponent.getMainPlayerMarkColor())
-//            gameViewModel.setOpponentMarkColor(opponent.getOpponentMarkColor())
-//            launch {
-//                gameViewModel.updateOpponent(
-//                    gameViewModel.game.value!!.getOpponent()
-//                )
-//            }
-//            dialog.dismiss()
-//        }
-//
-//        dialog.show()
-//    }
-
-//    private fun displayAlertDialogUI(alertDialog: AlertDialogChangeMarkColorBinding,mark:Int,opponent: Opponent,leftColor:Int, rightColor:Int) {
-//        alertDialog.title.text = "change color"
-//        alertDialog.title.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-//        alertDialog.title.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
-//        val fMark = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMark() else opponent.getOpponentMark()
-//        val color = if(mark== PLAYER_MARK_PRESSED) opponent.getMainPlayerMarkColor() else opponent.getOpponentMarkColor()
-//        val markSize = 4*unit
-//        alertDialog.imageView.layoutParams = ConstraintLayout.LayoutParams(markSize,markSize)
-//        alertDialog.imageView.setImageDrawable(if(fMark==X) XDrawable(requireContext(),color,false) else ODrawable(requireContext(),color,false))
-//        alertDialog.arrowLeft.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
-//        alertDialog.arrowRight.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
-//        alertDialog.arrowLeft.setImageDrawable(LeftArrowDrawable(requireContext(),leftColor))
-//        alertDialog.arrowRight.setImageDrawable(RightArrowDrawable(requireContext(),rightColor))
-//
-//        alertDialog.saveButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-//        alertDialog.cancelButton.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
-//
-//        alertDialog.saveButton.background = ButtonBackground(requireContext())
-//        alertDialog.cancelButton.background = ButtonBackground(requireContext())
-//        alertDialog.arrowRight.background = ButtonBackground(requireContext())
-//        alertDialog.arrowLeft.background = ButtonBackground(requireContext())
-//
-//        alertDialog.saveButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"SAVE"))
-//        alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(requireContext(),"CANCEL"))
-//
-//        setAlertDialogConstraints(alertDialog)
-//
-//    }
-
-
-//    private fun setAlertDialogConstraints(alertDialog: AlertDialogChangeMarkColorBinding) {
-//        val set = ConstraintSet()
-//        set.clone(alertDialog.layout)
-//
-//        set.connect(alertDialog.title.id, ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
-//        set.connect(alertDialog.title.id, ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
-//        set.connect(alertDialog.title.id, ConstraintSet.TOP,alertDialog.layout.id,ConstraintSet.TOP,0)
-//
-//        set.connect(alertDialog.imageView.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
-//        set.connect(alertDialog.imageView.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
-//        set.connect(alertDialog.imageView.id,ConstraintSet.TOP,alertDialog.title.id,ConstraintSet.BOTTOM,0)
-//
-//        set.connect(alertDialog.arrowLeft.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
-//        set.connect(alertDialog.arrowLeft.id,ConstraintSet.RIGHT,alertDialog.middleDivider.id,ConstraintSet.LEFT,0)
-//        set.connect(alertDialog.arrowLeft.id,ConstraintSet.TOP,alertDialog.imageView.id,ConstraintSet.BOTTOM,0)
-//
-//        set.connect(alertDialog.arrowRight.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
-//        set.connect(alertDialog.arrowRight.id,ConstraintSet.LEFT,alertDialog.middleDivider.id,ConstraintSet.RIGHT,0)
-//        set.connect(alertDialog.arrowRight.id,ConstraintSet.TOP,alertDialog.imageView.id,ConstraintSet.BOTTOM,0)
-//
-//        set.connect(alertDialog.cancelButton.id,ConstraintSet.LEFT,alertDialog.layout.id,ConstraintSet.LEFT,0)
-//        set.connect(alertDialog.cancelButton.id,ConstraintSet.RIGHT,alertDialog.middleDivider.id,ConstraintSet.LEFT,0)
-//        set.connect(alertDialog.cancelButton.id,ConstraintSet.TOP,alertDialog.arrowLeft.id,ConstraintSet.BOTTOM,unit)
-//        set.connect(alertDialog.cancelButton.id,ConstraintSet.BOTTOM,alertDialog.layout.id,ConstraintSet.BOTTOM,
-//            (width*0.1).toInt()
-//        )
-//
-//        set.connect(alertDialog.saveButton.id,ConstraintSet.RIGHT,alertDialog.layout.id,ConstraintSet.RIGHT,0)
-//        set.connect(alertDialog.saveButton.id,ConstraintSet.LEFT,alertDialog.middleDivider.id,ConstraintSet.RIGHT,0)
-//        set.connect(alertDialog.saveButton.id,ConstraintSet.TOP,alertDialog.arrowRight.id,ConstraintSet.BOTTOM,unit)
-//        set.connect(alertDialog.saveButton.id,ConstraintSet.BOTTOM,alertDialog.layout.id,ConstraintSet.BOTTOM,
-//            (width*0.1).toInt()
-//        )
-//
-//        set.applyTo(alertDialog.layout)
-//    }
-
-
     private fun updateWins(){
         val winningPerson = gameViewModel.getWiningPerson()
         if (winningPerson == MAIN_PLAYER) {
@@ -420,20 +267,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
             binding.opponentPlayerName.text = it.getOpponentName()
             binding.mainPlayerWins.text = it.getWins().toString()
             binding.opponentPlayerWins.text = it.getLoses().toString()
-//            binding.opponentPlayerMark.setImageDrawable(
-//                if(it.getMarks().opponentMark==X){
-//                    XDrawable(requireContext(),it.getMarks().opponentColor,true)
-//                }else{
-//                    ODrawable(requireContext(),it.getMarks().opponentColor,true)
-//                }
-//            )
-//            binding.mainPlayerMark.setImageDrawable(
-//                if(it.getMarks().playerMark==X){
-//                    XDrawable(requireContext(),it.getMarks().playerColor,true)
-//                }else{
-//                    ODrawable(requireContext(),it.getMarks().playerColor,true)
-//                }
-//            )
         }
 
 
@@ -488,12 +321,10 @@ class MultiPlayerFragment : FragmentCoroutine() {
     }
 
     private fun displayUI(){
-        val a =100
         if(fPlay){
             binding.winLine.setImageDrawable(null)
             binding.winLine.visibility = View.GONE
             binding.reset.visibility = View.GONE
-//            binding.addMoves.visibility = View.GONE
         }else{
             binding.winLine.visibility = View.VISIBLE
             winningLineHandler.postDelayed(showWinningLine,500)
@@ -508,10 +339,8 @@ class MultiPlayerFragment : FragmentCoroutine() {
             if(!fPlay){
                 displayAddMoves()
             }
-//            binding.addMoves.visibility = View.VISIBLE
         } else {
             binding.reset.visibility = View.VISIBLE
-//            binding.addMoves.visibility = View.GONE
         }
     }
 
@@ -533,8 +362,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
                 }else{
                     Toast.makeText(requireContext(),"POOR INTERNET", Toast.LENGTH_SHORT).show()
                 }
-//                gameViewModel.addMoves(requireContext())
-
             }.create()
             addMovesDialog?.show()
         }
@@ -608,11 +435,11 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private fun setDrawables(){
         binding.multiPlayerLayout.background = BackgroundColorDrawable(requireContext())
         binding.backgroundField.setImageDrawable(MeshDrawable(requireContext()))
-        binding.moves.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        binding.mainPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
-        binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
+        binding.moves.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+        binding.mainPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+        binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+        binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+        binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
         binding.reset.setImageDrawable(ResetButtonDrawable(requireContext()))
         binding.reset.background = ButtonBackground(requireContext())
     }
@@ -895,21 +722,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
         set.connect(binding.turn.id,ConstraintSet.TOP,binding.mainPlayerWins.id,ConstraintSet.TOP,0)
         set.connect(binding.turn.id,ConstraintSet.BOTTOM,binding.mainPlayerMark.id,ConstraintSet.BOTTOM,0)
 
-//        set.connect(binding.switchMarks.id,
-//            ConstraintSet.LEFT,binding.mainPlayerMark.id,
-//            ConstraintSet.RIGHT,0)
-//        set.connect(binding.switchMarks.id,
-//            ConstraintSet.TOP,binding.mainPlayerMark.id,
-//            ConstraintSet.TOP,0)
-//        set.connect(binding.switchMarks.id,
-//            ConstraintSet.BOTTOM,binding.mainPlayerMark.id,
-//            ConstraintSet.BOTTOM,0)
-//        set.connect(binding.switchMarks.id,
-//            ConstraintSet.RIGHT,binding.opponentPlayerMark.id,
-//            ConstraintSet.LEFT,0)
-
-
-
         set.connect(binding.reset.id,
             ConstraintSet.BOTTOM, binding.multiPlayerLayout.id,
             ConstraintSet.BOTTOM,0)
@@ -919,16 +731,6 @@ class MultiPlayerFragment : FragmentCoroutine() {
         set.connect(binding.reset.id,
             ConstraintSet.RIGHT, binding.multiPlayerLayout.id,
             ConstraintSet.RIGHT,0)
-
-//        set.connect(binding.addMoves.id,
-//            ConstraintSet.BOTTOM, binding.multiPlayerLayout.id,
-//            ConstraintSet.BOTTOM,0)
-//        set.connect(binding.addMoves.id,
-//            ConstraintSet.LEFT, binding.multiPlayerLayout.id,
-//            ConstraintSet.LEFT,0)
-//        set.connect(binding.addMoves.id,
-//            ConstraintSet.RIGHT, binding.multiPlayerLayout.id,
-//            ConstraintSet.RIGHT,0)
 
         set.applyTo(binding.multiPlayerLayout)
 

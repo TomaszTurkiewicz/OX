@@ -27,8 +27,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.tt.ox.R
 import com.tt.ox.X
+import com.tt.ox.alertDialogs.AlertDialogEndGameOnlineBattle
 import com.tt.ox.databinding.FragmentOnlineBattleBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.MeshDrawable
@@ -38,7 +38,6 @@ import com.tt.ox.drawables.WinLineDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.ANGLE_DOWN_LINE
 import com.tt.ox.helpers.ANGLE_UP_LINE
-import com.tt.ox.alertDialogs.AlertDialogEndGameOnlineBattle
 import com.tt.ox.helpers.BOTTOM_LINE
 import com.tt.ox.helpers.END_DRAW
 import com.tt.ox.helpers.FirebaseBattle
@@ -53,6 +52,7 @@ import com.tt.ox.helpers.OUT_OF_TIME
 import com.tt.ox.helpers.RIGHT_LINE
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.TOP_LINE
+import com.tt.ox.helpers.Theme
 import com.tt.ox.helpers.VERTICAL_MID_LINE
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -254,7 +254,6 @@ class OnlineBattleFragment : Fragment() {
 
     private fun displayMarks() {
         marks.initialize(requireContext())
-//        marks = SharedPreferences.readMarks(requireContext())
         binding.mainPlayerMark.setImageDrawable(
             if(marks.playerMark == X) XDrawable(requireContext(),marks.playerColor,true) else ODrawable(requireContext(),marks.playerColor,true)
         )
@@ -490,8 +489,6 @@ class OnlineBattleFragment : Fragment() {
                         )
                 )
             ){
-//            dbRefBattle!!.child("win").setValue(currentUser.uid)
-//            dbRefBattle!!.child("winningLine").setValue(TOP_LINE)
             onlineBattle.winningLine = TOP_LINE
             endGame = WIN
         }
@@ -502,8 +499,6 @@ class OnlineBattleFragment : Fragment() {
                             )
                     )
         ){
-//            dbRefBattle!!.child("win").setValue(currentUser.uid)
-//            dbRefBattle!!.child("winningLine").setValue(HORIZONTAL_MID_LINE)
             onlineBattle.winningLine = HORIZONTAL_MID_LINE
             endGame = WIN
         }
@@ -514,8 +509,6 @@ class OnlineBattleFragment : Fragment() {
                             )
                     )
         ){
-//            dbRefBattle!!.child("win").setValue(currentUser.uid)
-//            dbRefBattle!!.child("winningLine").setValue(BOTTOM_LINE)
             onlineBattle.winningLine = BOTTOM_LINE
             endGame = WIN
         }
@@ -526,8 +519,6 @@ class OnlineBattleFragment : Fragment() {
                             )
                     )
         ){
-//            dbRefBattle!!.child("win").setValue(currentUser.uid)
-//            dbRefBattle!!.child("winningLine").setValue(LEFT_LINE)
             onlineBattle.winningLine = LEFT_LINE
             endGame = WIN
         }
@@ -538,8 +529,6 @@ class OnlineBattleFragment : Fragment() {
                             )
                     )
         ){
-//            dbRefBattle!!.child("win").setValue(currentUser.uid)
-//            dbRefBattle!!.child("winningLine").setValue(VERTICAL_MID_LINE)
             onlineBattle.winningLine = VERTICAL_MID_LINE
             endGame = WIN
         }
@@ -550,8 +539,6 @@ class OnlineBattleFragment : Fragment() {
                             )
                     )
         ){
-//            dbRefBattle!!.child("win").setValue(currentUser.uid)
-//            dbRefBattle!!.child("winningLine").setValue(RIGHT_LINE)
             onlineBattle.winningLine = RIGHT_LINE
             endGame = WIN
         }
@@ -562,8 +549,6 @@ class OnlineBattleFragment : Fragment() {
                             )
                     )
         ){
-//            dbRefBattle!!.child("win").setValue(currentUser.uid)
-//            dbRefBattle!!.child("winningLine").setValue(ANGLE_DOWN_LINE)
             onlineBattle.winningLine = ANGLE_DOWN_LINE
             endGame = WIN
         }
@@ -574,8 +559,6 @@ class OnlineBattleFragment : Fragment() {
                             )
                     )
         ){
-//            dbRefBattle!!.child("win").setValue(currentUser.uid)
-//            dbRefBattle!!.child("winningLine").setValue(ANGLE_UP_LINE)
             onlineBattle.winningLine = ANGLE_UP_LINE
             endGame = WIN
         }
@@ -986,11 +969,11 @@ class OnlineBattleFragment : Fragment() {
         binding.onlineBattleLayout.background = BackgroundColorDrawable(requireContext())
 
         binding.backgroundField.setImageDrawable(MeshDrawable(requireContext()))
-        binding.mainPlayerWins.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.time.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.mainPlayerWins.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.opponentPlayerWins.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.mainPlayerName.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.opponentPlayerName.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.time.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
 
         
     }
@@ -1085,7 +1068,5 @@ class OnlineBattleFragment : Fragment() {
                 TypedValue.COMPLEX_UNIT_DIP
             )
         }
-
     }
-
 }

@@ -14,13 +14,13 @@ import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.tt.ox.R
 import com.tt.ox.database.Opponent
 import com.tt.ox.databinding.ChooseOpponentListItemBinding
 import com.tt.ox.drawables.BinDrawable
 import com.tt.ox.drawables.ListItemBackgroundDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
+import com.tt.ox.helpers.Theme
 
 class ChooseOpponentAdapter(
     private val context: Context,
@@ -102,11 +102,11 @@ class ChooseOpponentAdapter(
     }
 
     private fun setColors(holder: ChooseOpponentViewHolder) {
-        holder.vs.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.playerName.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.opponentName.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.playerWin.setTextColor(ContextCompat.getColor(context, R.color.black))
-        holder.opponentWin.setTextColor(ContextCompat.getColor(context, R.color.black))
+        holder.vs.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        holder.playerName.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        holder.opponentName.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        holder.playerWin.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        holder.opponentWin.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
     }
 
     private fun setSizes(holder: ChooseOpponentViewHolder) {

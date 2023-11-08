@@ -8,7 +8,7 @@ import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
+import com.tt.ox.helpers.Theme
 
 class ButtonWithTextDrawable (private val context: Context, private val text:String) : Drawable(){
     private val paint = Paint()
@@ -19,7 +19,7 @@ class ButtonWithTextDrawable (private val context: Context, private val text:Str
         paint.strokeWidth = (bounds.height()*0.02).toFloat()
         textPaint.textSize = bounds.height()*0.7f
         textPaint.isAntiAlias = true
-        textPaint.color = ContextCompat.getColor(context,R.color.black)
+        textPaint.color = ContextCompat.getColor(context,Theme(context).getAccentColor())
         textPaint.textAlign = Paint.Align.CENTER
         val textBounds = Rect()
         textPaint.getTextBounds(text,0,text.length,textBounds)
@@ -31,6 +31,9 @@ class ButtonWithTextDrawable (private val context: Context, private val text:Str
         paint.alpha=alpha
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 
     override fun setColorFilter(colorFilter: ColorFilter?) {

@@ -8,8 +8,8 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class WinLineDrawable (private val context: Context,
                        private val horizontalTop:Boolean,
@@ -24,7 +24,7 @@ class WinLineDrawable (private val context: Context,
     override fun draw(canvas: Canvas) {
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = (bounds.width()*0.02).toFloat()
-        paint.color = ContextCompat.getColor(context, R.color.red)
+        paint.color = ContextCompat.getColor(context, Theme(context).getRedColor())
         paint.isAntiAlias = true
         paint.strokeCap = Paint.Cap.ROUND
 
@@ -72,6 +72,9 @@ class WinLineDrawable (private val context: Context,
         paint.alpha=alpha
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 
     override fun setColorFilter(colorFilter: ColorFilter?) {

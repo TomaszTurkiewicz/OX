@@ -8,8 +8,8 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class ResetButtonDrawable (private val context: Context) : Drawable(){
     private val paint = Paint()
@@ -17,11 +17,11 @@ class ResetButtonDrawable (private val context: Context) : Drawable(){
         paint.style = Paint.Style.STROKE
         paint.isAntiAlias = true
         paint.strokeWidth = bounds.width()*0.06f
-        paint.color = ContextCompat.getColor(context,R.color.green)
+        paint.color = ContextCompat.getColor(context,Theme(context).getGreenColor())
         canvas.drawCircle(bounds.centerX().toFloat(),
             bounds.centerY().toFloat(),bounds.width()*0.25f,paint)
 
-        paint.color = ContextCompat.getColor(context,R.color.white)
+        paint.color = ContextCompat.getColor(context,Theme(context).getBackgroundColor())
         paint.strokeWidth = bounds.width()*0.1f
         val erase = MyPath()
         erase.move(Point((bounds.width()*0.9).toInt(), (bounds.height()*0.1).toInt()))
@@ -29,7 +29,7 @@ class ResetButtonDrawable (private val context: Context) : Drawable(){
 
         canvas.drawPath(erase,paint)
 
-        paint.color = ContextCompat.getColor(context,R.color.green)
+        paint.color = ContextCompat.getColor(context,Theme(context).getGreenColor())
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
 
@@ -63,6 +63,9 @@ class ResetButtonDrawable (private val context: Context) : Drawable(){
         paint.alpha=alpha
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 
     override fun setColorFilter(colorFilter: ColorFilter?) {

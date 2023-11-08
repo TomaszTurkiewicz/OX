@@ -10,15 +10,15 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
         val stroke = 0f
         paint.strokeWidth = stroke
-        paint.color = ContextCompat.getColor(context, R.color.black)
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
         paint.style = Paint.Style.FILL
         paint.isAntiAlias = true
         val leftCenter = bounds.width()*0.3
@@ -36,7 +36,7 @@ class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
         val difHorizontal = bounds.height()*0.2
         val difVertical = bounds.height()*0.1
 
-        paint.color = ContextCompat.getColor(context,R.color.green)
+        paint.color = ContextCompat.getColor(context,Theme(context).getGreenColor())
         paint.style = Paint.Style.FILL
         paint.strokeWidth = 0f
 
@@ -87,7 +87,7 @@ class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
     private fun makeLeftPerson(leftCenter:Double, canvas:Canvas){
         paint.style = Paint.Style.FILL
         paint.strokeWidth = 0f
-        paint.color = ContextCompat.getColor(context,R.color.black)
+        paint.color = ContextCompat.getColor(context,Theme(context).getAccentColor())
         val bodyDif = bounds.height()*0.15
         val difHorizontal = bounds.height()*0.05
         val difHorizontalAdd = bounds.height()*0.06
@@ -110,7 +110,7 @@ class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
 
         canvas.drawRect(loverBody,paint)
 
-        paint.color = ContextCompat.getColor(context,R.color.white)
+        paint.color = ContextCompat.getColor(context,Theme(context).getBackgroundColor())
 
         val down = Point(leftCenter.toInt(),bounds.centerY())
         val left = Point((leftCenter-bodyDif).toInt(), (bounds.height()*0.3).toInt())
@@ -126,7 +126,7 @@ class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
 
         canvas.drawPath(neck,paint)
 
-        paint.color = ContextCompat.getColor(context,R.color.black)
+        paint.color = ContextCompat.getColor(context,Theme(context).getAccentColor())
 
         canvas.drawCircle(leftCenter.toFloat(),
             (bounds.height()*0.33).toFloat(), (bounds.height()*0.07).toFloat(),paint)
@@ -138,7 +138,7 @@ class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
         paint.style = Paint.Style.FILL
         paint.strokeWidth = 0f
 
-        paint.color = ContextCompat.getColor(context,R.color.black)
+        paint.color = ContextCompat.getColor(context,Theme(context).getAccentColor())
         val difHorizontal = bounds.height()*0.15
         val difVertical = bounds.height()*0.2
         val radius = bounds.height()*0.04f
@@ -148,7 +148,7 @@ class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
 
         canvas.drawRoundRect(rectF,radius,radius,paint)
 
-        paint.color = ContextCompat.getColor(context,R.color.white)
+        paint.color = ContextCompat.getColor(context,Theme(context).getBackgroundColor())
         val screenWidth = bounds.height()*0.2f
         val screen = Rect((rightCenter-screenWidth/2).toInt(),
             (bounds.centerY()-bounds.height()*0.15).toInt(),
@@ -191,6 +191,9 @@ class SinglePlayerButtonDrawable (private val context: Context) : Drawable() {
         paint.colorFilter = p0
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 }
 

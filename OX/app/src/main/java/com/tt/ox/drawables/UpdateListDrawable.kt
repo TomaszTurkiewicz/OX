@@ -8,8 +8,8 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class UpdateListDrawable (private val context: Context, private val active:Boolean) : Drawable(){
     private val paint = Paint()
@@ -17,11 +17,11 @@ class UpdateListDrawable (private val context: Context, private val active:Boole
         paint.style = Paint.Style.STROKE
         paint.isAntiAlias = true
         paint.strokeWidth = bounds.width()*0.06f
-        paint.color = if(active) ContextCompat.getColor(context, R.color.green) else ContextCompat.getColor(context, R.color.gray)
+        paint.color = if(active) ContextCompat.getColor(context, Theme(context).getGreenColor()) else ContextCompat.getColor(context, Theme(context).getGrayColor())
         canvas.drawCircle(bounds.centerX().toFloat(),
             bounds.centerY().toFloat(),bounds.width()*0.25f,paint)
 
-        paint.color = ContextCompat.getColor(context, R.color.white)
+        paint.color = ContextCompat.getColor(context, Theme(context).getBackgroundColor())
         paint.strokeWidth = bounds.width()*0.1f
         val erase = MyPath()
         erase.move(Point((bounds.width()*0.9).toInt(), (bounds.height()*0.1).toInt()))
@@ -29,7 +29,7 @@ class UpdateListDrawable (private val context: Context, private val active:Boole
 
         canvas.drawPath(erase,paint)
 
-        paint.color = if(active) ContextCompat.getColor(context, R.color.green) else ContextCompat.getColor(context, R.color.gray)
+        paint.color = if(active) ContextCompat.getColor(context, Theme(context).getGreenColor()) else ContextCompat.getColor(context, Theme(context).getGrayColor())
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
 
@@ -65,6 +65,9 @@ class UpdateListDrawable (private val context: Context, private val active:Boole
         paint.alpha=alpha
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 
     override fun setColorFilter(colorFilter: ColorFilter?) {

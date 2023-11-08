@@ -8,9 +8,9 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.Functions
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 import java.lang.Math.PI
 
 class SettingButtonDrawable (private val context: Context) : Drawable() {
@@ -20,7 +20,7 @@ class SettingButtonDrawable (private val context: Context) : Drawable() {
         paint.strokeWidth = stroke
         paint.style = Paint.Style.FILL
 
-        paint.color = ContextCompat.getColor(context, R.color.black)
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
 
         canvas.drawCircle(
             bounds.centerX().toFloat(),
@@ -29,7 +29,7 @@ class SettingButtonDrawable (private val context: Context) : Drawable() {
             paint
         )
 
-        paint.color = ContextCompat.getColor(context,R.color.white)
+        paint.color = ContextCompat.getColor(context,Theme(context).getBackgroundColor())
         val middle = Point(bounds.centerX(),bounds.centerY())
         val radiusSmall = bounds.width()*0.15
         val radiusBig = bounds.width()*0.4
@@ -48,7 +48,7 @@ class SettingButtonDrawable (private val context: Context) : Drawable() {
         angle += PI/3
         makeCut(middle,radiusSmall,radiusBig,angle,canvas)
 
-        paint.color = ContextCompat.getColor(context, R.color.black)
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
 
         canvas.drawCircle(
             bounds.centerX().toFloat(),
@@ -57,7 +57,7 @@ class SettingButtonDrawable (private val context: Context) : Drawable() {
             paint
         )
 
-        paint.color = ContextCompat.getColor(context,R.color.white)
+        paint.color = ContextCompat.getColor(context,Theme(context).getBackgroundColor())
 
         canvas.drawCircle(
             bounds.centerX().toFloat(),
@@ -69,8 +69,8 @@ class SettingButtonDrawable (private val context: Context) : Drawable() {
 
     private fun makeCut(middle:Point, radiusSmall:Double, radiusBig:Double, angle:Double, canvas:Canvas){
         val dif = PI/8
-        var angleDec = angle - dif
-        var angleInc = angle + dif
+        val angleDec = angle - dif
+        val angleInc = angle + dif
 
         val a = Functions.orthogonalPoint(middle,radiusSmall,angle)
         val b = Functions.orthogonalPoint(middle,radiusBig,angleDec)
@@ -94,5 +94,8 @@ class SettingButtonDrawable (private val context: Context) : Drawable() {
         paint.colorFilter = p0
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 }

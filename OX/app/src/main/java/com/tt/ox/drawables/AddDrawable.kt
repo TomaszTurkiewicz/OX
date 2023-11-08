@@ -8,8 +8,8 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.helpers.MyPath
+import com.tt.ox.helpers.Theme
 
 class AddDrawable (private val context: Context) : Drawable() {
     private val paint = Paint()
@@ -17,7 +17,7 @@ class AddDrawable (private val context: Context) : Drawable() {
         val stroke = bounds.right*0.1f
         paint.strokeWidth = stroke
         paint.style = Paint.Style.STROKE
-        paint.color = ContextCompat.getColor(context, R.color.green)
+        paint.color = ContextCompat.getColor(context, Theme(context).getGreenColor())
 
         val dMax = 0.85f
         val dMin = 0.15f
@@ -46,5 +46,8 @@ class AddDrawable (private val context: Context) : Drawable() {
         paint.colorFilter = p0
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 }

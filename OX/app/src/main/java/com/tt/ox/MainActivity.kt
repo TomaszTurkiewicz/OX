@@ -11,6 +11,7 @@ import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.tt.ox.databinding.ActivityMainBinding
+import com.tt.ox.drawables.BackgroundColorDrawable
 import java.util.concurrent.atomic.AtomicBoolean
 
 const val NOTHING = 0
@@ -55,6 +56,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.mainActivityLayout.background = BackgroundColorDrawable(this)
 
 //        MobileAds.initialize(this)
         requestConsentForm()
@@ -129,6 +132,7 @@ class MainActivity : AppCompatActivity() {
 
 }
 /*todo
+*  alert dialogs night mode as well
 *  better buttons and layouts ui
 *  settings: (dark mode CURRENT!!!!, choose marks, sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
 *  sounds?

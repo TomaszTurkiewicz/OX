@@ -15,13 +15,14 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogInvitationBinding
+import com.tt.ox.drawables.AlertDialogBackgroundDrawableColor
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.FirebaseRequests
 import com.tt.ox.helpers.FirebaseUser
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.Theme
 
 class AlertDialogWaiting(
     private val context: Context,
@@ -74,6 +75,7 @@ class AlertDialogWaiting(
     }
 
     private fun setButtonsUI(alertDialog: AlertDialogInvitationBinding) {
+        alertDialog.layout.background = AlertDialogBackgroundDrawableColor(context)
         alertDialog.positiveButton.background = ButtonBackground(context)
         alertDialog.negativeButton.background = ButtonBackground(context)
         alertDialog.positiveButton.setImageDrawable(ButtonWithTextDrawable(context,positiveButtonText))
@@ -121,10 +123,10 @@ class AlertDialogWaiting(
     }
 
     private fun setAlertDialogColors(alertDialog: AlertDialogInvitationBinding) {
-        alertDialog.title.setTextColor(ContextCompat.getColor(context, R.color.black))
-        alertDialog.message.setTextColor(ContextCompat.getColor(context, R.color.black))
-        alertDialog.userName.setTextColor(ContextCompat.getColor(context, R.color.black))
-        alertDialog.time.setTextColor(ContextCompat.getColor(context, R.color.black))
+        alertDialog.title.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        alertDialog.message.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        alertDialog.userName.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        alertDialog.time.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
 
     }
 

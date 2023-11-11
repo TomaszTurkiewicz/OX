@@ -7,11 +7,12 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogAddMovesBinding
+import com.tt.ox.drawables.AlertDialogBackgroundDrawableColor
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.Theme
 
 class AlertDialogAddMoves(
     private val context: Context,
@@ -116,7 +117,8 @@ class AlertDialogAddMoves(
     }
 
     private fun setAlertDialogColors(alertDialog: AlertDialogAddMovesBinding) {
-        alertDialog.title.setTextColor(ContextCompat.getColor(context, R.color.black))
-        alertDialog.message.setTextColor(ContextCompat.getColor(context, R.color.black))
+        alertDialog.layout.background = AlertDialogBackgroundDrawableColor(context)
+        alertDialog.title.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        alertDialog.message.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
     }
 }

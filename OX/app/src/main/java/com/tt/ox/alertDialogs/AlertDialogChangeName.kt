@@ -9,12 +9,13 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogAddOpponentBinding
+import com.tt.ox.drawables.AlertDialogBackgroundDrawableColor
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
+import com.tt.ox.helpers.Theme
 
 class AlertDialogChangeName(
     private val context: Context,
@@ -116,6 +117,7 @@ class AlertDialogChangeName(
     }
 
     private fun setAlertDialogDrawables(alertDialog: AlertDialogAddOpponentBinding) {
+        alertDialog.alertDialogAddOpponentLayout.background = AlertDialogBackgroundDrawableColor(context)
         alertDialog.saveButton.setImageDrawable(ButtonWithTextDrawable(context,"SAVE"))
         alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(context,"CANCEL"))
         alertDialog.saveButton.background = ButtonBackground(context)
@@ -135,8 +137,10 @@ class AlertDialogChangeName(
     }
 
     private fun setAlertDialogColors(alertDialog: AlertDialogAddOpponentBinding) {
-        alertDialog.title.setTextColor(ContextCompat.getColor(context, R.color.black))
-        alertDialog.message.setTextColor(ContextCompat.getColor(context, R.color.black))
+        alertDialog.title.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        alertDialog.message.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        alertDialog.inputName.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        alertDialog.inputName.setHintTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
     }
 
 }

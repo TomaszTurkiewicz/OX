@@ -59,7 +59,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.mainActivityLayout.background = BackgroundColorDrawable(this)
 
-//        MobileAds.initialize(this)
         requestConsentForm()
     }
 

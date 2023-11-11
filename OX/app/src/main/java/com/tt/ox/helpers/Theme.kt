@@ -37,6 +37,8 @@ class Theme(val context:Context) {
     fun getRedColor() = theme.getReadColor()
     fun getBlueColor() = theme.getBlueColor()
 
+    fun getAlertDialogBackgroundColor() = theme.getAlertDialogBackgroundColor()
+
     private open class LightMode{
         open val background = R.color.white
         open val accent = R.color.black
@@ -44,6 +46,11 @@ class Theme(val context:Context) {
         open val red = R.color.red
         open val blue = R.color.blue
         open val gray = R.color.gray
+        open val alertDialogBackground = R.color.white
+
+        open fun getAlertDialogBackgroundColor():Int{
+            return alertDialogBackground
+        }
 
         open fun getGrayColor():Int{
             return gray
@@ -74,7 +81,11 @@ class Theme(val context:Context) {
         override val red = R.color.red_dark
         override val blue = R.color.blue_dark
         override val gray = R.color.gray_dark
+        override val alertDialogBackground = R.color.black_light
 
+        override fun getAlertDialogBackgroundColor(): Int {
+            return alertDialogBackground
+        }
         override fun getGrayColor():Int{
             return gray
         }

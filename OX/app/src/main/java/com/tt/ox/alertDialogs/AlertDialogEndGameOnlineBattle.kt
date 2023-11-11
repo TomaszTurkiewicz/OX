@@ -7,11 +7,12 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogEndGameOnlineBattleBinding
+import com.tt.ox.drawables.AlertDialogBackgroundDrawableColor
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.Theme
 
 class AlertDialogEndGameOnlineBattle(
     private val context: Context,
@@ -66,6 +67,7 @@ class AlertDialogEndGameOnlineBattle(
     }
 
     private fun setSizes(alertDialog: AlertDialogEndGameOnlineBattleBinding) {
+        alertDialog.layout.background = AlertDialogBackgroundDrawableColor(context)
         alertDialog.message.setTextSize(TypedValue.COMPLEX_UNIT_PX,width*0.1f)
         alertDialog.button.layoutParams = ConstraintLayout.LayoutParams((width*0.4).toInt(),(width*0.1).toInt())
     }
@@ -76,6 +78,6 @@ class AlertDialogEndGameOnlineBattle(
     }
 
     private fun setColors(alertDialog: AlertDialogEndGameOnlineBattleBinding) {
-        alertDialog.message.setTextColor(ContextCompat.getColor(context, R.color.black))
+        alertDialog.message.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
     }
 }

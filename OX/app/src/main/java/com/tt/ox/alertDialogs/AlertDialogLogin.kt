@@ -7,11 +7,12 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import com.tt.ox.R
 import com.tt.ox.databinding.AlertDialogLogInBinding
+import com.tt.ox.drawables.AlertDialogBackgroundDrawableColor
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ButtonWithTextDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.Theme
 
 class AlertDialogLogin(
     private val context: Context,
@@ -117,6 +118,7 @@ class AlertDialogLogin(
         alertDialog: AlertDialogLogInBinding,
         positiveText: String
     ) {
+        alertDialog.alertDialogLogIn.background = AlertDialogBackgroundDrawableColor(context)
         alertDialog.loginButton.setImageDrawable(ButtonWithTextDrawable(context,positiveText))
         alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(context,"CANCEL"))
         alertDialog.loginButton.background = ButtonBackground(context)
@@ -132,7 +134,7 @@ class AlertDialogLogin(
     }
 
     private fun setAlertDialogColors(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.setTextColor(ContextCompat.getColor(context, R.color.black))
-        alertDialog.message.setTextColor(ContextCompat.getColor(context, R.color.black))
+        alertDialog.title.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        alertDialog.message.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
     }
 }

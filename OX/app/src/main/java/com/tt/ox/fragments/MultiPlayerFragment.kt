@@ -278,9 +278,11 @@ class MultiPlayerFragment : FragmentCoroutine() {
         gameViewModel.turn.observe(this.viewLifecycleOwner){
             if(it){
                 turnPointerLeft = true
+                turnHandler.removeCallbacksAndMessages(null)
                 turnHandler.postDelayed(movePointer(),0)
             }else{
                 turnPointerLeft = false
+                turnHandler.removeCallbacksAndMessages(null)
                 turnHandler.postDelayed(movePointer(),0)
             }
         }

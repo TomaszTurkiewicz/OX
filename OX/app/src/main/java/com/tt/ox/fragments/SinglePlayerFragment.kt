@@ -348,10 +348,12 @@ class SinglePlayerFragment : FragmentCoroutine() {
             fTurn = it
             if(it){
                 turnPointerLeft = true
+                turnHandler.removeCallbacksAndMessages(null)
                 turnHandler.postDelayed(movePointer(),0)
 //                binding.turn.setImageDrawable(TurnDrawable(requireContext(),0.25))
             }else{
                 turnPointerLeft = false
+                turnHandler.removeCallbacksAndMessages(null)
                 turnHandler.postDelayed(movePointer(),0)
 //                binding.turn.setImageDrawable(TurnDrawable(requireContext(),0.75))
             }

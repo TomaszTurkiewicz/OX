@@ -19,6 +19,7 @@ import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentOptionsBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
+import com.tt.ox.drawables.ChooserBackground
 import com.tt.ox.drawables.ChooserDrawable
 import com.tt.ox.drawables.DarkModeChooserBackground
 import com.tt.ox.drawables.DividerLine
@@ -55,7 +56,19 @@ class OptionsFragment : Fragment() {
         prepareUI()
         displayUserName()
         displayTexts()
+        displayMarksSelection()
         clicks()
+    }
+
+    private fun displayMarksSelection() {
+        val random = SharedPreferences.readRandomMarks(requireContext())
+        binding.marksCustomSelector.setImageDrawable(null)
+        binding.marksRandomSelector.setImageDrawable(null)
+        if(random){
+            binding.marksRandomSelector.setImageDrawable(ChooserDrawable(requireContext()))
+        }else{
+            binding.marksCustomSelector.setImageDrawable(ChooserDrawable(requireContext()))
+        }
     }
 
     private fun displayTexts() {
@@ -63,6 +76,9 @@ class OptionsFragment : Fragment() {
         binding.darkModeOnTv.text = "ON"
         binding.darkModeOffTv.text = "OFF"
         binding.darkModeAutoTv.text = "AUTO"
+        binding.marksLabel.text = "MARKS"
+        binding.marksRandomTv.text = "RANDOM"
+        binding.marksCustomTv.text = "CUSTOM"
     }
 
     private fun clicks(){
@@ -80,6 +96,14 @@ class OptionsFragment : Fragment() {
         binding.darkModeOffSelector.setOnClickListener {
             SharedPreferences.saveDarkMode(requireContext(), DARK_MODE_OFF)
             setDrawables()
+        }
+        binding.marksRandomSelector.setOnClickListener {
+            SharedPreferences.saveRandomMarks(requireContext(),true)
+            displayMarksSelection()
+        }
+        binding.marksCustomSelector.setOnClickListener {
+            SharedPreferences.saveRandomMarks(requireContext(),false)
+            displayMarksSelection()
         }
     }
 
@@ -136,6 +160,7 @@ class OptionsFragment : Fragment() {
 
         binding.userNameChange.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.userNameDividerLine.layoutParams = ConstraintLayout.LayoutParams(width,(unit*0.05).toInt())
+        binding.darkModeDividerLine.layoutParams = ConstraintLayout.LayoutParams(width,(unit*0.05).toInt())
         binding.darkModeLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.8f)
         binding.darkModeChooserBackground.layoutParams = ConstraintLayout.LayoutParams(width,unit)
         binding.darkModeOnTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
@@ -144,6 +169,11 @@ class OptionsFragment : Fragment() {
         binding.darkModeOnSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.darkModeOffSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.darkModeAutoSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.marksLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.8f)
+        binding.marksRandomSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.marksCustomSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.marksRandomTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.marksCustomTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
     }
 
     private fun setDrawables(){
@@ -158,6 +188,12 @@ class OptionsFragment : Fragment() {
         binding.darkModeOffTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.darkModeAutoTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         setDarkModeChooserDrawable()
+        binding.darkModeDividerLine.setImageDrawable(DividerLine(requireContext()))
+        binding.marksLabel.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.marksRandomSelector.background = ChooserBackground(requireContext())
+        binding.marksCustomSelector.background = ChooserBackground(requireContext())
+        binding.marksRandomTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.marksCustomTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
 
     }
 
@@ -225,6 +261,28 @@ class OptionsFragment : Fragment() {
         set.connect(binding.darkModeOnSelector.id,ConstraintSet.RIGHT,binding.horizontalMiddle.id,ConstraintSet.LEFT,0)
         set.connect(binding.darkModeOnSelector.id,ConstraintSet.TOP,binding.darkModeChooserBackground.id,ConstraintSet.TOP,0)
         set.connect(binding.darkModeOnSelector.id,ConstraintSet.BOTTOM,binding.darkModeChooserBackground.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.darkModeDividerLine.id,ConstraintSet.TOP,binding.darkModeAutoTv.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.darkModeDividerLine.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeDividerLine.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.marksLabel.id,ConstraintSet.TOP,binding.darkModeDividerLine.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.marksLabel.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.marksLabel.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.marksRandomSelector.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,unit)
+        set.connect(binding.marksRandomSelector.id,ConstraintSet.TOP,binding.marksLabel.id,ConstraintSet.BOTTOM,unit/2)
+
+        set.connect(binding.marksCustomSelector.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,unit)
+        set.connect(binding.marksCustomSelector.id,ConstraintSet.TOP,binding.marksRandomSelector.id,ConstraintSet.BOTTOM,unit/2)
+
+        set.connect(binding.marksRandomTv.id, ConstraintSet.LEFT, binding.marksRandomSelector.id, ConstraintSet.RIGHT,unit/2)
+        set.connect(binding.marksRandomTv.id, ConstraintSet.TOP, binding.marksRandomSelector.id, ConstraintSet.TOP,0)
+        set.connect(binding.marksRandomTv.id, ConstraintSet.BOTTOM, binding.marksRandomSelector.id, ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.marksCustomTv.id, ConstraintSet.LEFT, binding.marksCustomSelector.id, ConstraintSet.RIGHT,unit/2)
+        set.connect(binding.marksCustomTv.id, ConstraintSet.TOP, binding.marksCustomSelector.id, ConstraintSet.TOP,0)
+        set.connect(binding.marksCustomTv.id, ConstraintSet.BOTTOM, binding.marksCustomSelector.id, ConstraintSet.BOTTOM,0)
 
         set.applyTo(binding.layout)
     }

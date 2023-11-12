@@ -93,6 +93,15 @@ class SharedPreferences {
             return random
         }
 
+        fun saveRandomMarks(context: Context, random:Boolean){
+            context.let {
+                val sp = it.getSharedPreferences("Random",Context.MODE_PRIVATE)
+                val editor = sp.edit()
+                editor.putBoolean("random",random)
+                editor.apply()
+            }
+        }
+
         fun saveDarkMode(context: Context?,darkMode:Int){
             context?.let {
                 val sharedPreferences = context.getSharedPreferences("DARK_MODE",Context.MODE_PRIVATE)

@@ -1,7 +1,7 @@
 package com.tt.ox.helpers
 
 import android.content.Context
-import com.tt.ox.DARK_MODE_ON
+import com.tt.ox.DARK_MODE_AUTO
 import com.tt.ox.MOVES
 import com.tt.ox.O
 import com.tt.ox.X
@@ -106,7 +106,7 @@ class SharedPreferences {
             var darkMode = 0
             context?.let {
                 val sharedPreferences = context.getSharedPreferences("DARK_MODE",Context.MODE_PRIVATE)
-                darkMode = sharedPreferences.getInt("dark_mode", DARK_MODE_ON)
+                darkMode = sharedPreferences.getInt("dark_mode", DARK_MODE_AUTO)
             }
             return darkMode
         }

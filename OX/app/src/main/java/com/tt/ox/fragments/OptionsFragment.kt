@@ -16,6 +16,7 @@ import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentOptionsBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
+import com.tt.ox.drawables.EditDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.helpers.Theme
@@ -32,7 +33,7 @@ class OptionsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unit = ScreenMetricsCompat().getUnit(requireContext())
-        width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
+        width = ScreenMetricsCompat().getWindowWidth(requireContext())
     }
 
     override fun onCreateView(
@@ -51,7 +52,7 @@ class OptionsFragment : Fragment() {
     }
 
     private fun clicks(){
-        binding.userName.setOnClickListener {
+        binding.userNameChange.setOnClickListener {
             changeNameClick()
         }
     }
@@ -90,8 +91,6 @@ class OptionsFragment : Fragment() {
     }
     private fun setSizes(){
         binding.userName.layoutParams = ConstraintLayout.LayoutParams((width*0.8).toInt(),unit)
-
-
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             binding.userName.setAutoSizeTextTypeUniformWithConfiguration(
                 1,
@@ -108,12 +107,16 @@ class OptionsFragment : Fragment() {
                 TypedValue.COMPLEX_UNIT_DIP
             )
         }
+
+        binding.userNameChange.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
     }
 
     private fun setDrawables(){
         binding.layout.background = BackgroundColorDrawable(requireContext())
         binding.userName.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
-        binding.userName.background = ButtonBackground(requireContext())
+        binding.userNameChange.setImageDrawable(EditDrawable(requireContext()))
+        binding.userNameChange.background = ButtonBackground(requireContext())
+
     }
 
     private fun setConstraints(){
@@ -121,8 +124,13 @@ class OptionsFragment : Fragment() {
         set.clone(binding.layout)
 
         set.connect(binding.userName.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
-        set.connect(binding.userName.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.userName.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,2*unit)
         set.connect(binding.userName.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
+
+        set.connect(binding.userNameChange.id, ConstraintSet.TOP,binding.userName.id,ConstraintSet.TOP,0)
+        set.connect(binding.userNameChange.id, ConstraintSet.BOTTOM,binding.userName.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.userNameChange.id, ConstraintSet.LEFT,binding.userName.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.userNameChange.id, ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
 
         set.applyTo(binding.layout)
     }

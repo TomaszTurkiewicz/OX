@@ -12,10 +12,16 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
+import com.tt.ox.DARK_MODE_AUTO
+import com.tt.ox.DARK_MODE_OFF
+import com.tt.ox.DARK_MODE_ON
 import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentOptionsBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
+import com.tt.ox.drawables.ChooserDrawable
+import com.tt.ox.drawables.DarkModeChooserBackground
+import com.tt.ox.drawables.DividerLine
 import com.tt.ox.drawables.EditDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
@@ -48,12 +54,32 @@ class OptionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         prepareUI()
         displayUserName()
+        displayTexts()
         clicks()
+    }
+
+    private fun displayTexts() {
+        binding.darkModeLabel.text = "DARK MODE"
+        binding.darkModeOnTv.text = "ON"
+        binding.darkModeOffTv.text = "OFF"
+        binding.darkModeAutoTv.text = "AUTO"
     }
 
     private fun clicks(){
         binding.userNameChange.setOnClickListener {
             changeNameClick()
+        }
+        binding.darkModeAutoSelector.setOnClickListener {
+            SharedPreferences.saveDarkMode(requireContext(), DARK_MODE_AUTO)
+            setDrawables()
+        }
+        binding.darkModeOnSelector.setOnClickListener {
+            SharedPreferences.saveDarkMode(requireContext(), DARK_MODE_ON)
+            setDrawables()
+        }
+        binding.darkModeOffSelector.setOnClickListener {
+            SharedPreferences.saveDarkMode(requireContext(), DARK_MODE_OFF)
+            setDrawables()
         }
     }
 
@@ -109,6 +135,15 @@ class OptionsFragment : Fragment() {
         }
 
         binding.userNameChange.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.userNameDividerLine.layoutParams = ConstraintLayout.LayoutParams(width,(unit*0.05).toInt())
+        binding.darkModeLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.8f)
+        binding.darkModeChooserBackground.layoutParams = ConstraintLayout.LayoutParams(width,unit)
+        binding.darkModeOnTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.darkModeOffTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.darkModeAutoTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.darkModeOnSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.darkModeOffSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.darkModeAutoSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
     }
 
     private fun setDrawables(){
@@ -116,7 +151,27 @@ class OptionsFragment : Fragment() {
         binding.userName.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.userNameChange.setImageDrawable(EditDrawable(requireContext()))
         binding.userNameChange.background = ButtonBackground(requireContext())
+        binding.userNameDividerLine.setImageDrawable(DividerLine(requireContext()))
+        binding.darkModeLabel.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.darkModeChooserBackground.setImageDrawable(DarkModeChooserBackground(requireContext()))
+        binding.darkModeOnTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.darkModeOffTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.darkModeAutoTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        setDarkModeChooserDrawable()
 
+    }
+
+    private fun setDarkModeChooserDrawable() {
+        val darkMode = SharedPreferences.readDarkMode(requireContext())
+        binding.darkModeOnSelector.setImageDrawable(null)
+        binding.darkModeOffSelector.setImageDrawable(null)
+        binding.darkModeAutoSelector.setImageDrawable(null)
+
+        when (darkMode){
+            DARK_MODE_ON -> binding.darkModeOnSelector.setImageDrawable(ChooserDrawable(requireContext()))
+            DARK_MODE_OFF -> binding.darkModeOffSelector.setImageDrawable(ChooserDrawable(requireContext()))
+            else -> binding.darkModeAutoSelector.setImageDrawable(ChooserDrawable(requireContext()))
+        }
     }
 
     private fun setConstraints(){
@@ -131,6 +186,45 @@ class OptionsFragment : Fragment() {
         set.connect(binding.userNameChange.id, ConstraintSet.BOTTOM,binding.userName.id,ConstraintSet.BOTTOM,0)
         set.connect(binding.userNameChange.id, ConstraintSet.LEFT,binding.userName.id,ConstraintSet.RIGHT,0)
         set.connect(binding.userNameChange.id, ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.userNameDividerLine.id,ConstraintSet.TOP,binding.userName.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.userNameDividerLine.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.userNameDividerLine.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.darkModeLabel.id,ConstraintSet.TOP,binding.userNameDividerLine.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.darkModeLabel.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeLabel.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.darkModeChooserBackground.id, ConstraintSet.LEFT, binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeChooserBackground.id, ConstraintSet.RIGHT, binding.layout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.darkModeChooserBackground.id, ConstraintSet.TOP, binding.darkModeLabel.id,ConstraintSet.BOTTOM,unit/2)
+
+        set.connect(binding.darkModeAutoTv.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeAutoTv.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.darkModeAutoTv.id,ConstraintSet.TOP,binding.darkModeChooserBackground.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.darkModeOnTv.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeOnTv.id,ConstraintSet.RIGHT,binding.horizontalMiddle.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeOnTv.id,ConstraintSet.TOP,binding.darkModeChooserBackground.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.darkModeOffTv.id,ConstraintSet.LEFT,binding.horizontalMiddle.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.darkModeOffTv.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.darkModeOffTv.id,ConstraintSet.TOP,binding.darkModeChooserBackground.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.darkModeAutoSelector.id,ConstraintSet.LEFT,binding.darkModeChooserBackground.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeAutoSelector.id,ConstraintSet.RIGHT,binding.darkModeChooserBackground.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.darkModeAutoSelector.id,ConstraintSet.TOP,binding.darkModeChooserBackground.id,ConstraintSet.TOP,0)
+        set.connect(binding.darkModeAutoSelector.id,ConstraintSet.BOTTOM,binding.darkModeChooserBackground.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.darkModeOffSelector.id,ConstraintSet.LEFT,binding.horizontalMiddle.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.darkModeOffSelector.id,ConstraintSet.RIGHT,binding.darkModeChooserBackground.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.darkModeOffSelector.id,ConstraintSet.TOP,binding.darkModeChooserBackground.id,ConstraintSet.TOP,0)
+        set.connect(binding.darkModeOffSelector.id,ConstraintSet.BOTTOM,binding.darkModeChooserBackground.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.darkModeOnSelector.id,ConstraintSet.LEFT,binding.darkModeChooserBackground.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeOnSelector.id,ConstraintSet.RIGHT,binding.horizontalMiddle.id,ConstraintSet.LEFT,0)
+        set.connect(binding.darkModeOnSelector.id,ConstraintSet.TOP,binding.darkModeChooserBackground.id,ConstraintSet.TOP,0)
+        set.connect(binding.darkModeOnSelector.id,ConstraintSet.BOTTOM,binding.darkModeChooserBackground.id,ConstraintSet.BOTTOM,0)
 
         set.applyTo(binding.layout)
     }

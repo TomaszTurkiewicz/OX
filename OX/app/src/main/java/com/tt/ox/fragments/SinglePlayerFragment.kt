@@ -275,7 +275,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        handler.removeCallbacks(gameLoop)
+        handler.removeCallbacksAndMessages(null)
     }
 
     private fun setObserves() {

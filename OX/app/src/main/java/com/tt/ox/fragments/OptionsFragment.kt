@@ -3,6 +3,8 @@ package com.tt.ox.fragments
 import android.app.AlertDialog
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,7 @@ import androidx.fragment.app.Fragment
 import com.tt.ox.DARK_MODE_AUTO
 import com.tt.ox.DARK_MODE_OFF
 import com.tt.ox.DARK_MODE_ON
+import com.tt.ox.X
 import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentOptionsBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
@@ -24,9 +27,13 @@ import com.tt.ox.drawables.ChooserDrawable
 import com.tt.ox.drawables.DarkModeChooserBackground
 import com.tt.ox.drawables.DividerLine
 import com.tt.ox.drawables.EditDrawable
+import com.tt.ox.drawables.ODrawable
+import com.tt.ox.drawables.XDrawable
+import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.helpers.Theme
+import kotlinx.coroutines.Runnable
 
 
 class OptionsFragment : Fragment() {
@@ -35,6 +42,9 @@ class OptionsFragment : Fragment() {
     private val binding get() = _binding!!
     private var unit = 0
     private var width = 0
+    private val marks = Marks()
+    private var random = false
+    private val displayMarksHandler = Handler(Looper.getMainLooper())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +71,7 @@ class OptionsFragment : Fragment() {
     }
 
     private fun displayMarksSelection() {
-        val random = SharedPreferences.readRandomMarks(requireContext())
+        random = SharedPreferences.readRandomMarks(requireContext())
         binding.marksCustomSelector.setImageDrawable(null)
         binding.marksRandomSelector.setImageDrawable(null)
         if(random){
@@ -79,6 +89,7 @@ class OptionsFragment : Fragment() {
         binding.marksLabel.text = "MARKS"
         binding.marksRandomTv.text = "RANDOM"
         binding.marksCustomTv.text = "CUSTOM"
+        binding.vsTv.text = "VS"
     }
 
     private fun clicks(){
@@ -100,10 +111,12 @@ class OptionsFragment : Fragment() {
         binding.marksRandomSelector.setOnClickListener {
             SharedPreferences.saveRandomMarks(requireContext(),true)
             displayMarksSelection()
+            displayMarks()
         }
         binding.marksCustomSelector.setOnClickListener {
             SharedPreferences.saveRandomMarks(requireContext(),false)
             displayMarksSelection()
+            displayMarks()
         }
     }
 
@@ -174,6 +187,9 @@ class OptionsFragment : Fragment() {
         binding.marksCustomSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.marksRandomTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
         binding.marksCustomTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.playerMark.layoutParams = ConstraintLayout.LayoutParams(3*unit,3*unit)
+        binding.opponentMark.layoutParams = ConstraintLayout.LayoutParams(3*unit,3*unit)
+        binding.vsTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
     }
 
     private fun setDrawables(){
@@ -194,7 +210,71 @@ class OptionsFragment : Fragment() {
         binding.marksCustomSelector.background = ChooserBackground(requireContext())
         binding.marksRandomTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.marksCustomTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.vsTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        displayMarks()
 
+    }
+
+    private fun displayMarks(){
+        displayMarksHandler.removeCallbacksAndMessages(null)
+        marks.initialize(requireContext())
+        displayMarksDrawable()
+        random = SharedPreferences.readRandomMarks(requireContext())
+        if(random){
+            displayMarksHandler.postDelayed(displayMarksRunnable(),1000)
+        }else{
+
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        displayMarksHandler.removeCallbacksAndMessages(null)
+    }
+    private fun displayMarksRunnable():Runnable = Runnable {
+        marks.initialize(requireContext())
+        displayMarksDrawable()
+        displayMarksHandler.postDelayed(displayMarksRunnable(),1000)
+
+    }
+
+    private fun displayMarksDrawable(){
+        view?.let {
+            if (marks.opponentMark == X) {
+                binding.opponentMark.setImageDrawable(
+                    XDrawable(
+                        requireContext(),
+                        marks.opponentColor,
+                        true
+                    )
+                )
+            } else {
+                binding.opponentMark.setImageDrawable(
+                    ODrawable(
+                        requireContext(),
+                        marks.opponentColor,
+                        true
+                    )
+                )
+            }
+            if (marks.playerMark == X) {
+                binding.playerMark.setImageDrawable(
+                    XDrawable(
+                        requireContext(),
+                        marks.playerColor,
+                        true
+                    )
+                )
+            } else {
+                binding.playerMark.setImageDrawable(
+                    ODrawable(
+                        requireContext(),
+                        marks.playerColor,
+                        true
+                    )
+                )
+            }
+        }
     }
 
     private fun setDarkModeChooserDrawable() {
@@ -283,6 +363,19 @@ class OptionsFragment : Fragment() {
         set.connect(binding.marksCustomTv.id, ConstraintSet.LEFT, binding.marksCustomSelector.id, ConstraintSet.RIGHT,unit/2)
         set.connect(binding.marksCustomTv.id, ConstraintSet.TOP, binding.marksCustomSelector.id, ConstraintSet.TOP,0)
         set.connect(binding.marksCustomTv.id, ConstraintSet.BOTTOM, binding.marksCustomSelector.id, ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.playerMark.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.playerMark.id,ConstraintSet.RIGHT,binding.horizontalMiddle.id,ConstraintSet.LEFT,0)
+        set.connect(binding.playerMark.id,ConstraintSet.TOP,binding.marksCustomSelector.id,ConstraintSet.BOTTOM,unit/2)
+
+        set.connect(binding.opponentMark.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.opponentMark.id,ConstraintSet.LEFT,binding.horizontalMiddle.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.opponentMark.id,ConstraintSet.TOP,binding.marksCustomSelector.id,ConstraintSet.BOTTOM,unit/2)
+
+        set.connect(binding.vsTv.id,ConstraintSet.LEFT,binding.playerMark.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.vsTv.id,ConstraintSet.RIGHT,binding.opponentMark.id,ConstraintSet.LEFT,0)
+        set.connect(binding.vsTv.id,ConstraintSet.TOP,binding.playerMark.id,ConstraintSet.TOP,0)
+        set.connect(binding.vsTv.id,ConstraintSet.BOTTOM,binding.playerMark.id,ConstraintSet.BOTTOM,0)
 
         set.applyTo(binding.layout)
     }

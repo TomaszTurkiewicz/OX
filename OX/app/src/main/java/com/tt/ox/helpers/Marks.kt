@@ -30,6 +30,42 @@ class Marks {
         SharedPreferences.saveMarks(context,this)
     }
 
+    fun decreasePlayerColor(context: Context){
+        if(playerColor==1){
+            this.playerColor = MarkColors().getHighestColor()
+        }else{
+            this.playerColor-=1
+        }
+        SharedPreferences.saveMarks(context,this)
+    }
+
+    fun increasePlayerColor(context: Context){
+        if(playerColor==MarkColors().getHighestColor()){
+            this.playerColor = 1
+        }else{
+            this.playerColor+=1
+        }
+        SharedPreferences.saveMarks(context,this)
+    }
+
+    fun decreaseOpponentColor(context: Context){
+        if(opponentColor==1){
+            this.opponentColor = MarkColors().getHighestColor()
+        }else{
+            this.opponentColor-=1
+        }
+        SharedPreferences.saveMarks(context,this)
+    }
+
+    fun increaseOpponentColor(context: Context){
+        if(opponentColor==MarkColors().getHighestColor()){
+            this.opponentColor = 1
+        }else{
+            this.opponentColor+=1
+        }
+        SharedPreferences.saveMarks(context,this)
+    }
+
     private fun generateRandomMarks(){
         val random = Random.nextBoolean()
         if(random){

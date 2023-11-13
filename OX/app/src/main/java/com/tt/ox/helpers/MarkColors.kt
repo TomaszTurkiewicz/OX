@@ -15,6 +15,10 @@ class MarkColors() {
         COLOR_BLACK
     )
 
+    fun getHighestColor():Int{
+        return colors.size
+    }
+
 
     fun getRandomColor():Int {
         val random = Random.nextInt(colors.size)

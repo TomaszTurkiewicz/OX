@@ -12,10 +12,10 @@ import com.tt.ox.helpers.Functions
 import com.tt.ox.helpers.MyPath
 import com.tt.ox.helpers.Theme
 
-class SwapMarksDrawable (private val context: Context) : Drawable(){
+class SwapMarksDrawable (private val context: Context, private val enable:Boolean) : Drawable(){
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
-        paint.color = ContextCompat.getColor(context,Theme(context).getGreenColor())
+        paint.color = if(enable) ContextCompat.getColor(context,Theme(context).getGreenColor()) else ContextCompat.getColor(context,Theme(context).getControlsDisableColor())
         val strokeWidth = bounds.width()*0.1f
         paint.strokeWidth = strokeWidth
         paint.style = Paint.Style.STROKE
@@ -78,6 +78,9 @@ class SwapMarksDrawable (private val context: Context) : Drawable(){
         paint.alpha=alpha
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("PixelFormat.OPAQUE", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int = PixelFormat.OPAQUE
 
     override fun setColorFilter(colorFilter: ColorFilter?) {

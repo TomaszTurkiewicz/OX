@@ -20,6 +20,8 @@ import com.tt.ox.DARK_MODE_ON
 import com.tt.ox.X
 import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentOptionsBinding
+import com.tt.ox.drawables.ArrowLeftDrawable
+import com.tt.ox.drawables.ArrowRightDrawable
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.ChooserBackground
@@ -85,12 +87,16 @@ class OptionsFragment : Fragment() {
 
     private fun displayControls(){
         controlsEnable = !SharedPreferences.readRandomMarks(requireContext())
-        if(controlsEnable){
-            binding.swapMarks.visibility = View.VISIBLE
-        }
-        else{
-            binding.swapMarks.visibility = View.GONE
-        }
+        binding.swapMarks.background = ButtonBackground(requireContext(),controlsEnable)
+        binding.playerLeftArrow.background = ButtonBackground(requireContext(),controlsEnable)
+        binding.playerRightArrow.background = ButtonBackground(requireContext(),controlsEnable)
+        binding.opponentLeftArrow.background = ButtonBackground(requireContext(),controlsEnable)
+        binding.opponentRightArrow.background = ButtonBackground(requireContext(),controlsEnable)
+        binding.swapMarks.setImageDrawable(SwapMarksDrawable(requireContext(),controlsEnable))
+        binding.playerLeftArrow.setImageDrawable(ArrowLeftDrawable(requireContext(),controlsEnable))
+        binding.opponentLeftArrow.setImageDrawable(ArrowLeftDrawable(requireContext(),controlsEnable))
+        binding.playerRightArrow.setImageDrawable(ArrowRightDrawable(requireContext(),controlsEnable))
+        binding.opponentRightArrow.setImageDrawable(ArrowRightDrawable(requireContext(),controlsEnable))
     }
 
     private fun displayTexts() {
@@ -136,6 +142,34 @@ class OptionsFragment : Fragment() {
         binding.swapMarks.setOnClickListener {
             if(controlsEnable){
                 marks.swapMarks(requireContext())
+                displayMarks()
+            }
+        }
+
+        binding.playerLeftArrow.setOnClickListener {
+            if(controlsEnable){
+                marks.decreasePlayerColor(requireContext())
+                displayMarks()
+            }
+        }
+
+        binding.playerRightArrow.setOnClickListener {
+            if(controlsEnable){
+                marks.increasePlayerColor(requireContext())
+                displayMarks()
+            }
+        }
+
+        binding.opponentLeftArrow.setOnClickListener {
+            if(controlsEnable){
+                marks.decreaseOpponentColor(requireContext())
+                displayMarks()
+            }
+        }
+
+        binding.opponentRightArrow.setOnClickListener {
+            if(controlsEnable){
+                marks.increaseOpponentColor(requireContext())
                 displayMarks()
             }
         }
@@ -213,6 +247,11 @@ class OptionsFragment : Fragment() {
         binding.opponentMark.layoutParams = ConstraintLayout.LayoutParams(3*unit,3*unit)
         binding.vsTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
         binding.swapMarks.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+
+        binding.playerLeftArrow.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.playerRightArrow.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.opponentLeftArrow.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.opponentRightArrow.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
     }
 
     private fun setDrawables(){
@@ -235,8 +274,7 @@ class OptionsFragment : Fragment() {
         binding.marksCustomTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.vsTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         displayMarks()
-        binding.swapMarks.background = ButtonBackground(requireContext())
-        binding.swapMarks.setImageDrawable(SwapMarksDrawable(requireContext()))
+        displayControls()
 
     }
 
@@ -406,6 +444,17 @@ class OptionsFragment : Fragment() {
         set.connect(binding.swapMarks.id,ConstraintSet.RIGHT,binding.opponentMark.id,ConstraintSet.LEFT,0)
         set.connect(binding.swapMarks.id,ConstraintSet.TOP,binding.playerMark.id,ConstraintSet.TOP,0)
 
+        set.connect(binding.playerLeftArrow.id,ConstraintSet.TOP,binding.playerMark.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.playerLeftArrow.id,ConstraintSet.LEFT,binding.playerMark.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.playerRightArrow.id,ConstraintSet.TOP,binding.playerMark.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.playerRightArrow.id,ConstraintSet.RIGHT,binding.playerMark.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.opponentLeftArrow.id,ConstraintSet.TOP,binding.opponentMark.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.opponentLeftArrow.id,ConstraintSet.LEFT,binding.opponentMark.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.opponentRightArrow.id,ConstraintSet.TOP,binding.opponentMark.id,ConstraintSet.BOTTOM,0)
+        set.connect(binding.opponentRightArrow.id,ConstraintSet.RIGHT,binding.opponentMark.id,ConstraintSet.RIGHT,0)
 
         set.applyTo(binding.layout)
     }

@@ -23,6 +23,13 @@ class Marks {
 
     }
 
+    fun swapMarks(context: Context){
+        val t = this.playerMark
+        this.playerMark = this.opponentMark
+        this.opponentMark = t
+        SharedPreferences.saveMarks(context,this)
+    }
+
     private fun generateRandomMarks(){
         val random = Random.nextBoolean()
         if(random){

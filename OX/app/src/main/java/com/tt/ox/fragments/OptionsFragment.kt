@@ -28,6 +28,7 @@ import com.tt.ox.drawables.DarkModeChooserBackground
 import com.tt.ox.drawables.DividerLine
 import com.tt.ox.drawables.EditDrawable
 import com.tt.ox.drawables.ODrawable
+import com.tt.ox.drawables.SwapMarksDrawable
 import com.tt.ox.drawables.XDrawable
 import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.ScreenMetricsCompat
@@ -45,6 +46,7 @@ class OptionsFragment : Fragment() {
     private val marks = Marks()
     private var random = false
     private val displayMarksHandler = Handler(Looper.getMainLooper())
+    private var controlsEnable = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +83,16 @@ class OptionsFragment : Fragment() {
         }
     }
 
+    private fun displayControls(){
+        controlsEnable = !SharedPreferences.readRandomMarks(requireContext())
+        if(controlsEnable){
+            binding.swapMarks.visibility = View.VISIBLE
+        }
+        else{
+            binding.swapMarks.visibility = View.GONE
+        }
+    }
+
     private fun displayTexts() {
         binding.darkModeLabel.text = "DARK MODE"
         binding.darkModeOnTv.text = "ON"
@@ -112,11 +124,20 @@ class OptionsFragment : Fragment() {
             SharedPreferences.saveRandomMarks(requireContext(),true)
             displayMarksSelection()
             displayMarks()
+            displayControls()
         }
         binding.marksCustomSelector.setOnClickListener {
             SharedPreferences.saveRandomMarks(requireContext(),false)
             displayMarksSelection()
             displayMarks()
+            displayControls()
+        }
+
+        binding.swapMarks.setOnClickListener {
+            if(controlsEnable){
+                marks.swapMarks(requireContext())
+                displayMarks()
+            }
         }
     }
 
@@ -151,6 +172,7 @@ class OptionsFragment : Fragment() {
         setSizes()
         setDrawables()
         setConstraints()
+        displayControls()
     }
     private fun setSizes(){
         binding.userName.layoutParams = ConstraintLayout.LayoutParams((width*0.8).toInt(),unit)
@@ -190,6 +212,7 @@ class OptionsFragment : Fragment() {
         binding.playerMark.layoutParams = ConstraintLayout.LayoutParams(3*unit,3*unit)
         binding.opponentMark.layoutParams = ConstraintLayout.LayoutParams(3*unit,3*unit)
         binding.vsTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.swapMarks.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
     }
 
     private fun setDrawables(){
@@ -212,6 +235,8 @@ class OptionsFragment : Fragment() {
         binding.marksCustomTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.vsTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         displayMarks()
+        binding.swapMarks.background = ButtonBackground(requireContext())
+        binding.swapMarks.setImageDrawable(SwapMarksDrawable(requireContext()))
 
     }
 
@@ -376,6 +401,11 @@ class OptionsFragment : Fragment() {
         set.connect(binding.vsTv.id,ConstraintSet.RIGHT,binding.opponentMark.id,ConstraintSet.LEFT,0)
         set.connect(binding.vsTv.id,ConstraintSet.TOP,binding.playerMark.id,ConstraintSet.TOP,0)
         set.connect(binding.vsTv.id,ConstraintSet.BOTTOM,binding.playerMark.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.swapMarks.id,ConstraintSet.LEFT,binding.playerMark.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.swapMarks.id,ConstraintSet.RIGHT,binding.opponentMark.id,ConstraintSet.LEFT,0)
+        set.connect(binding.swapMarks.id,ConstraintSet.TOP,binding.playerMark.id,ConstraintSet.TOP,0)
+
 
         set.applyTo(binding.layout)
     }

@@ -64,9 +64,6 @@ class StartFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        val action = StartFragmentDirections.actionStartFragmentToTestFragment()
-//        findNavController().navigate(action)
-
         unit = ScreenMetricsCompat().getUnit(requireContext())
         windowHeight = ScreenMetricsCompat().getWindowHeight(requireContext())
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()

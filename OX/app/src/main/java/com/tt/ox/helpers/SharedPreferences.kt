@@ -84,6 +84,18 @@ class SharedPreferences {
             return marks
         }
 
+        fun saveMarks(context: Context, marks:Marks){
+            context.let {
+                val sp = it.getSharedPreferences("Marks",Context.MODE_PRIVATE)
+                val editor = sp.edit()
+                editor.putInt("playerMark", marks.playerMark)
+                editor.putInt("playerColor", marks.playerColor)
+                editor.putInt("opponentMark", marks.opponentMark)
+                editor.putInt("opponentColor", marks.opponentColor)
+                editor.apply()
+            }
+        }
+
         fun readRandomMarks(context: Context):Boolean{
             var random:Boolean
             context.let {

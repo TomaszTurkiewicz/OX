@@ -15,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
@@ -67,7 +66,7 @@ private const val DATES = 0
 private const val USERS = 1
 private const val FILTERING = 2
 
-class OnlineChooseOpponentFragment : Fragment() {
+class OnlineChooseOpponentFragment : FragmentCoroutine() {
     private var _binding: FragmentOnlineChooseOpponentBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
@@ -165,17 +164,20 @@ class OnlineChooseOpponentFragment : Fragment() {
         }
 
         binding.logout.setOnClickListener {
+            playButtonClick()
                 dialogLogout = AlertDialogLogin(
                     requireContext(),
                     layoutInflater,
                     "LOGOUT",
                     "Are You sure You want to logout?",
                     {
+                        playButtonClick()
                         auth.signOut()
                         dialogLogout?.dismiss()
                         findNavController().navigateUp()
                     },
                     {
+                        playButtonClick()
                         dialogLogout?.dismiss()
                     }
                 ).create()
@@ -184,6 +186,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         }
 
         binding.updateList.setOnClickListener {
+            playButtonClick()
             if(listReady.value!!){
                 _noUsers.value = false
                 _listReady.value = false
@@ -196,6 +199,7 @@ class OnlineChooseOpponentFragment : Fragment() {
         }
 
         binding.searchButton.setOnClickListener {
+            playButtonClick()
             if(listReady.value!!){
                 var s = searching.value!!
                 s = !s
@@ -327,8 +331,6 @@ class OnlineChooseOpponentFragment : Fragment() {
     private fun displayList():Runnable = Runnable {
         if(listReady.value!!){
             listHandler.removeCallbacksAndMessages(null)
-
-
             adapter.submitList(getUserList(binding.searchEditText.text.toString()))
         }else{
             listHandler.postDelayed(displayList(),1000)
@@ -357,11 +359,9 @@ class OnlineChooseOpponentFragment : Fragment() {
         dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(!snapshot.exists()){
-
                     createUser(currentUser!!.uid)
                 }
                 else{
-
                     updateTimeStamp(snapshot)
                 }
             }
@@ -407,6 +407,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 dialogMoves?.dismiss()
                 checkInvitations()
                 adapter = OnlineListAdapter(requireContext(), currentUser!!.uid) {
+                    playButtonClick()
                     sendInvitation(it)
                 }
                 binding.recyclerView.adapter = adapter
@@ -592,6 +593,7 @@ class OnlineChooseOpponentFragment : Fragment() {
             endTimeCallBack = {
                 //do nothing
             }, negativeButtonPressed = {
+                playButtonClick()
                 dialogInvitation?.dismiss()
                 val dbRef = dbRefRequest.child(currentUser!!.uid).child("status")
                 dbRef.setValue(PLAY)
@@ -619,6 +621,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 //do nothing
             },
             negativeButtonPressed = {
+                playButtonClick()
                 val dbRef = dbRefRequest.child(currentUser!!.uid)
                 val request1 = FirebaseRequests()
                 request1.status = AVAILABLE
@@ -648,6 +651,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 request1.status = AVAILABLE
                 dbRef.setValue(request1)
             }, negativeButtonPressed = {
+                playButtonClick()
                 val dbRef = dbRefRequest.child(currentUser!!.uid)
                 val request1 = FirebaseRequests()
                 request1.status = AVAILABLE
@@ -658,6 +662,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 dialogInvitation?.dismiss()
             }
         ){
+            playButtonClick()
             val dbRefB = dbRefBattle.child(request.battle!!)
             val battle = FirebaseBattle()
             battle.battleId = request.battle!!
@@ -697,7 +702,7 @@ class OnlineChooseOpponentFragment : Fragment() {
                 dbRef.setValue(request1)
             },
             negativeButtonPressed = {
-
+                playButtonClick()
                 val dbRefMy = dbRefRequest.child(currentUser!!.uid)
                 val requestMy = FirebaseRequests()
                 requestMy.status = AVAILABLE
@@ -719,11 +724,11 @@ class OnlineChooseOpponentFragment : Fragment() {
         dialogMoves = AlertDialogAddMoves(
             requireContext(),
             layoutInflater,
-            {
+            {playButtonClick()
                 dialogMoves?.dismiss()
                 findNavController().navigateUp()
             }){
-
+            playButtonClick()
             if(mRewardedAd!=null){
                 dialogMoves?.dismiss()
                 showAdvertReward()

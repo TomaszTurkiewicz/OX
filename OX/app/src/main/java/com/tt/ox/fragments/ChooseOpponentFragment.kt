@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +26,7 @@ import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
 
 
-class ChooseOpponentFragment : Fragment() {
+class ChooseOpponentFragment : FragmentCoroutine() {
 
     private var _binding: FragmentChooseOpponentBinding? = null
     private val binding get() = _binding!!
@@ -67,8 +66,10 @@ class ChooseOpponentFragment : Fragment() {
 
         adapter = ChooseOpponentAdapter(requireContext(),
             {
+                playButtonClick()
                 gameViewModel.deleteOpponentMultiPlayer(it)
             }){
+            playButtonClick()
             val action = ChooseOpponentFragmentDirections.actionChooseOpponentFragmentToMultiPlayerFragment(it.getId())
             findNavController().navigate(action)
         }
@@ -105,9 +106,11 @@ class ChooseOpponentFragment : Fragment() {
             title = "Opponent name",
             message = "Type opponent name here. Between 2 and 14 characters",
             dismissClick = {
+                playButtonClick()
                 alertDialogAddOpponent?.dismiss()
             },
             saveClick = {
+                playButtonClick()
                 gameViewModel.addNewOpponent(it)
                 alertDialogAddOpponent?.dismiss()
             }
@@ -126,11 +129,13 @@ class ChooseOpponentFragment : Fragment() {
     private fun click() {
         binding.addOpponent.setOnClickListener {
             if(!deletable){
+                playButtonClick()
                 addNewOpponent()
             }
 
         }
         binding.deleteOpponent.setOnClickListener {
+            playButtonClick()
             state = binding.recyclerView.layoutManager?.onSaveInstanceState()
             deletable = !deletable
             adapter.delete(deletable)

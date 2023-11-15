@@ -13,7 +13,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
-import androidx.fragment.app.Fragment
 import com.tt.ox.DARK_MODE_AUTO
 import com.tt.ox.DARK_MODE_OFF
 import com.tt.ox.DARK_MODE_ON
@@ -39,7 +38,7 @@ import com.tt.ox.helpers.Theme
 import kotlinx.coroutines.Runnable
 
 
-class OptionsFragment : Fragment() {
+class OptionsFragment : FragmentCoroutine() {
 
     private var _binding:FragmentOptionsBinding? = null
     private val binding get() = _binding!!
@@ -112,27 +111,33 @@ class OptionsFragment : Fragment() {
 
     private fun clicks(){
         binding.userNameChange.setOnClickListener {
+            playButtonClick()
             changeNameClick()
         }
         binding.darkModeAutoSelector.setOnClickListener {
+            playButtonClick()
             SharedPreferences.saveDarkMode(requireContext(), DARK_MODE_AUTO)
             setDrawables()
         }
         binding.darkModeOnSelector.setOnClickListener {
+            playButtonClick()
             SharedPreferences.saveDarkMode(requireContext(), DARK_MODE_ON)
             setDrawables()
         }
         binding.darkModeOffSelector.setOnClickListener {
+            playButtonClick()
             SharedPreferences.saveDarkMode(requireContext(), DARK_MODE_OFF)
             setDrawables()
         }
         binding.marksRandomSelector.setOnClickListener {
+            playButtonClick()
             SharedPreferences.saveRandomMarks(requireContext(),true)
             displayMarksSelection()
             displayMarks()
             displayControls()
         }
         binding.marksCustomSelector.setOnClickListener {
+            playButtonClick()
             SharedPreferences.saveRandomMarks(requireContext(),false)
             displayMarksSelection()
             displayMarks()
@@ -141,6 +146,7 @@ class OptionsFragment : Fragment() {
 
         binding.swapMarks.setOnClickListener {
             if(controlsEnable){
+                playButtonClick()
                 marks.swapMarks(requireContext())
                 displayMarks()
             }
@@ -148,6 +154,7 @@ class OptionsFragment : Fragment() {
 
         binding.playerLeftArrow.setOnClickListener {
             if(controlsEnable){
+                playButtonClick()
                 marks.decreasePlayerColor(requireContext())
                 displayMarks()
             }
@@ -155,6 +162,7 @@ class OptionsFragment : Fragment() {
 
         binding.playerRightArrow.setOnClickListener {
             if(controlsEnable){
+                playButtonClick()
                 marks.increasePlayerColor(requireContext())
                 displayMarks()
             }
@@ -162,6 +170,7 @@ class OptionsFragment : Fragment() {
 
         binding.opponentLeftArrow.setOnClickListener {
             if(controlsEnable){
+                playButtonClick()
                 marks.decreaseOpponentColor(requireContext())
                 displayMarks()
             }
@@ -169,6 +178,7 @@ class OptionsFragment : Fragment() {
 
         binding.opponentRightArrow.setOnClickListener {
             if(controlsEnable){
+                playButtonClick()
                 marks.increaseOpponentColor(requireContext())
                 displayMarks()
             }
@@ -185,9 +195,11 @@ class OptionsFragment : Fragment() {
             title = "Change Your name",
             message = "Change your name here. Between 2 and 14 characters",
             dismissClick = {
+                playButtonClick()
                 alertDialog?.dismiss()
             },
             saveClick = {
+                playButtonClick()
                 SharedPreferences.saveMainPlayer(requireContext(),it)
                 displayUserName()
                 alertDialog?.dismiss()

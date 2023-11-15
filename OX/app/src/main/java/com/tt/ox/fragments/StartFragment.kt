@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.tt.ox.MainActivity
 import com.tt.ox.OXApplication
 import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.alertDialogs.AlertDialogLogin
@@ -143,11 +144,13 @@ class StartFragment : Fragment() {
             "LOGIN",
             "To play online you have to be logged in. Do You want login?",
             {
+                playButtonClick()
                 val signInIntent = googleSignInClient.signInIntent
                 resultLauncher.launch(signInIntent)
                 dialogLogin?.dismiss()
             },
             {
+                playButtonClick()
                 dialogLogin?.dismiss()
             }
         ).create()
@@ -167,6 +170,7 @@ class StartFragment : Fragment() {
 
             },
             saveClick = {
+                playButtonClick()
                 gameViewModel.addNewOpponent("PHONE")
                 SharedPreferences.saveMainPlayer(requireContext(),it)
                 clicks()
@@ -179,18 +183,22 @@ class StartFragment : Fragment() {
     private fun clicks() {
         binding.let {
             it.singlePlayerButton.setOnClickListener {
+                playButtonClick()
                 val action = StartFragmentDirections.actionStartFragmentToSinglePlayerFragment()
                 findNavController().navigate(action)
             }
             it.multiPlayerButton.setOnClickListener {
+                playButtonClick()
                 val action = StartFragmentDirections.actionStartFragmentToChooseOpponentFragment()
                 findNavController().navigate(action)
             }
             it.optionsButton.setOnClickListener {
+                playButtonClick()
                 val action = StartFragmentDirections.actionStartFragmentToOptionsFragment()
                 findNavController().navigate(action)
             }
             it.onlinePlayerButton.setOnClickListener {
+                playButtonClick()
                 val currentUser = auth.currentUser
                 if(currentUser!=null){
                     val action = StartFragmentDirections.actionStartFragmentToOnlineChooseOpponentFragment()
@@ -200,6 +208,11 @@ class StartFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun playButtonClick(){
+        val activity = activity as MainActivity
+        activity.playButtonClick()
     }
 
     private fun prepareUI() {

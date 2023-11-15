@@ -155,18 +155,21 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
         binding.topLeftField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setTopLeft(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
         }
         binding.topMidField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setTopMid(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
         }
         binding.topRightField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setTopRight(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
@@ -174,18 +177,21 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
         binding.midLeftField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setMidLeft(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
         }
         binding.midMidField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setMidMid(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
         }
         binding.midRightField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setMidRight(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
@@ -193,24 +199,28 @@ class SinglePlayerFragment : FragmentCoroutine() {
 
         binding.bottomLeftField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setBottomLeft(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
         }
         binding.bottomMidField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setBottomMid(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
         }
         binding.bottomRightField.setOnClickListener {
             if(fTurn) {
+                playButtonClick()
                 gameViewModel.setBottomRight(requireContext(),marks)
                 handler.postDelayed(gameLoop,1000)
             }
         }
 
         binding.reset.setOnClickListener {
+            playButtonClick()
             gameViewModel.initialize(false)
             readMarks()
             displayMarks()
@@ -392,6 +402,7 @@ class SinglePlayerFragment : FragmentCoroutine() {
             binding.turn.setImageDrawable(TurnDrawable(requireContext(),turnPointer))
         }
     }
+
     private fun displayMarks(){
             if(marks.opponentMark==X){
                 binding.opponentPlayerMark.setImageDrawable(XDrawable(requireContext(),marks.opponentColor,true))
@@ -434,11 +445,13 @@ class SinglePlayerFragment : FragmentCoroutine() {
                 requireContext(),
                 layoutInflater,
                 {
+                    playButtonClick()
                     addMovesDialog?.dismiss()
                     addMovesDialog = null
                     findNavController().navigateUp()
                 }
             ) {
+                playButtonClick()
                 if(mRewardedAd!=null){
                     addMovesDialog?.dismiss()
                     addMovesDialog = null

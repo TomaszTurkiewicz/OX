@@ -2,6 +2,7 @@ package com.tt.ox.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import com.tt.ox.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,6 +23,11 @@ abstract class FragmentCoroutine : Fragment(), CoroutineScope {
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
+    }
+
+    fun playButtonClick(){
+        val activity = activity as MainActivity
+        activity.playButtonClick()
     }
 
 

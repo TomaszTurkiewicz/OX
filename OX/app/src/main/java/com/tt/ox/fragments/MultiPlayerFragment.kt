@@ -135,45 +135,55 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private fun clicks() {
 
         binding.topLeftField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setTopLeft(requireContext(),marks)
 
         }
         binding.topMidField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setTopMid(requireContext(),marks)
 
         }
         binding.topRightField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setTopRight(requireContext(),marks)
 
         }
 
         binding.midLeftField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setMidLeft(requireContext(),marks)
 
         }
         binding.midMidField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setMidMid(requireContext(),marks)
 
         }
         binding.midRightField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setMidRight(requireContext(),marks)
 
         }
 
         binding.bottomLeftField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setBottomLeft(requireContext(),marks)
 
         }
         binding.bottomMidField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setBottomMid(requireContext(),marks)
 
         }
         binding.bottomRightField.setOnClickListener {
+            playButtonClick()
             gameViewModel.setBottomRight(requireContext(),marks)
 
         }
 
         binding.reset.setOnClickListener {
+            playButtonClick()
             gameViewModel.initialize(false)
             readMarks()
             displayMarks()
@@ -352,11 +362,13 @@ class MultiPlayerFragment : FragmentCoroutine() {
                 requireContext(),
                 layoutInflater,
                 {
+                    playButtonClick()
                     addMovesDialog?.dismiss()
                     addMovesDialog = null
                     findNavController().navigateUp()
                 }
             ) {
+                playButtonClick()
                 if(mRewardedAd!=null){
                     addMovesDialog?.dismiss()
                     addMovesDialog = null

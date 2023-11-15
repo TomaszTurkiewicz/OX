@@ -1,17 +1,19 @@
 package com.tt.ox
 
 import android.content.ContentValues.TAG
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.MobileAds
-import com.google.android.ump.ConsentDebugSettings
-import com.google.android.ump.ConsentForm
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.tt.ox.databinding.ActivityMainBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 const val NOTHING = 0
@@ -52,6 +54,9 @@ class MainActivity : AppCompatActivity() {
     // Use an atomic boolean to initialize the Google Mobile Ads SDK and load ads once.
     private var isMobileAdsInitializeCalled = AtomicBoolean(false)
 
+    private var buttonClickSound0: MediaPlayer? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -60,15 +65,24 @@ class MainActivity : AppCompatActivity() {
         binding.mainActivityLayout.background = BackgroundColorDrawable(this)
 
         requestConsentForm()
+        buttonClickSound0 = MediaPlayer.create(this, R.raw.button_click)
+
     }
+
+    fun playButtonClick() {
+        GlobalScope.launch(Dispatchers.Default) {
+            buttonClickSound0?.start()
+        }
+    }
+
 
     private fun requestConsentForm(){
 
-        //only for testing
-        val debugSettings = ConsentDebugSettings.Builder(this)
-            .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-            .addTestDeviceHashedId("5FB4342F22793F9BF0E1E40F60712E1C")
-            .build()
+//        //only for testing
+//        val debugSettings = ConsentDebugSettings.Builder(this)
+//            .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+//            .addTestDeviceHashedId("5FB4342F22793F9BF0E1E40F60712E1C")
+//            .build()
 
 
         // Set tag for under age of consent. false means users are not under age
@@ -87,20 +101,22 @@ class MainActivity : AppCompatActivity() {
             params,
             {
                 UserMessagingPlatform.loadAndShowConsentFormIfRequired(
-                    this@MainActivity,
-                    ConsentForm.OnConsentFormDismissedListener {
-                            loadAndShowError ->
-                        // Consent gathering failed.
-                        Log.w(TAG, String.format("%s: %s",
+                    this@MainActivity
+                ) { loadAndShowError ->
+                    // Consent gathering failed.
+                    Log.w(
+                        TAG, String.format(
+                            "%s: %s",
                             loadAndShowError?.errorCode,
-                            loadAndShowError?.message))
+                            loadAndShowError?.message
+                        )
+                    )
 
-                        // Consent has been gathered.
-                        if (consentInformation.canRequestAds()) {
-                            initializeMobileAdsSdk()
-                        }
+                    // Consent has been gathered.
+                    if (consentInformation.canRequestAds()) {
+                        initializeMobileAdsSdk()
                     }
-                )
+                }
             },
             {
                     requestConsentError ->
@@ -132,8 +148,9 @@ class MainActivity : AppCompatActivity() {
 }
 /*todo
 *  better buttons and layouts ui
+*  buttons not active change ui (online search, reset and send invitation)
 *  multiplayer give hint to add user if user list empty
-*  settings: (choose marks CURRENT!!!, sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
+*  settings: (sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
 *  sounds?
 *  online show progress bar when checking last activity and downloading users from firebase
  */

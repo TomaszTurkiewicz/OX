@@ -18,7 +18,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -62,7 +61,7 @@ private const val CONTINUE = 0
 private const val WIN = 1
 private const val DRAW = 2
 
-class OnlineBattleFragment : Fragment() {
+class OnlineBattleFragment : FragmentCoroutine() {
     private var _binding:FragmentOnlineBattleBinding? = null
     private val binding get() = _binding!!
     private var unit =0
@@ -358,7 +357,7 @@ class OnlineBattleFragment : Fragment() {
         binding.topLeftField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.topLeft == ""){
-
+                    playButtonClick()
                     onlineBattle.field.topLeft = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("topLeft").setValue(currentUser.uid)
@@ -369,6 +368,7 @@ class OnlineBattleFragment : Fragment() {
         binding.topMidField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.topMid == ""){
+                    playButtonClick()
                     onlineBattle.field.topMid = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("topMid").setValue(currentUser.uid)
@@ -379,6 +379,7 @@ class OnlineBattleFragment : Fragment() {
         binding.topRightField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.topRight == ""){
+                    playButtonClick()
                     onlineBattle.field.topRight = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("topRight").setValue(currentUser.uid)
@@ -390,7 +391,7 @@ class OnlineBattleFragment : Fragment() {
         binding.midLeftField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.midLeft == ""){
-
+                    playButtonClick()
                     onlineBattle.field.midLeft = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("midLeft").setValue(currentUser.uid)
@@ -401,6 +402,7 @@ class OnlineBattleFragment : Fragment() {
         binding.midMidField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.midMid == ""){
+                    playButtonClick()
                     onlineBattle.field.midMid = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("midMid").setValue(currentUser.uid)
@@ -411,7 +413,7 @@ class OnlineBattleFragment : Fragment() {
         binding.midRightField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.midRight == ""){
-
+                    playButtonClick()
                     onlineBattle.field.midRight = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("midRight").setValue(currentUser.uid)
@@ -423,7 +425,7 @@ class OnlineBattleFragment : Fragment() {
         binding.bottomLeftField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.bottomLeft == ""){
-
+                    playButtonClick()
                     onlineBattle.field.bottomLeft = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("bottomLeft").setValue(currentUser.uid)
@@ -434,7 +436,7 @@ class OnlineBattleFragment : Fragment() {
         binding.bottomMidField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.bottomMid == ""){
-
+                    playButtonClick()
                     onlineBattle.field.bottomMid = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("bottomMid").setValue(currentUser.uid)
@@ -445,7 +447,7 @@ class OnlineBattleFragment : Fragment() {
         binding.bottomRightField.setOnClickListener {
             if(myTurn and (play)){
                 if(onlineBattle.field.bottomRight == ""){
-
+                    playButtonClick()
                     onlineBattle.field.bottomRight = currentUser!!.uid
                     checkWinningAndChangeTurn {
                         dbRefBattle!!.child("field").child("bottomRight").setValue(currentUser.uid)
@@ -596,6 +598,7 @@ class OnlineBattleFragment : Fragment() {
                                     user!!.addWins()
                                     userDb.setValue(user)
                                     dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"WIN"){
+                                        playButtonClick()
                                         dialog?.dismiss()
                                         findNavController().navigateUp()
                                     }.create()
@@ -605,6 +608,7 @@ class OnlineBattleFragment : Fragment() {
                                     user.addWins()
                                     userDb.setValue(user)
                                     dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"WIN"){
+                                        playButtonClick()
                                         dialog?.dismiss()
                                         findNavController().navigateUp()
                                     }.create()
@@ -631,6 +635,7 @@ class OnlineBattleFragment : Fragment() {
                 val request = FirebaseRequests()
                 dbRefRequest.child(currentUser.uid).setValue(request)
                 dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"DRAW"){
+                    playButtonClick()
                     dialog?.dismiss()
                     findNavController().navigateUp()
                 }.create()
@@ -679,6 +684,7 @@ class OnlineBattleFragment : Fragment() {
                                     user!!.addLoses()
                                     userDb.setValue(user)
                                     dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"LOSE"){
+                                        playButtonClick()
                                         dialog?.dismiss()
                                         findNavController().navigateUp()
                                     }.create()
@@ -688,6 +694,7 @@ class OnlineBattleFragment : Fragment() {
                                     user.addLoses()
                                     userDb.setValue(user)
                                     dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"LOSE"){
+                                        playButtonClick()
                                         dialog?.dismiss()
                                         findNavController().navigateUp()
                                     }.create()
@@ -713,6 +720,7 @@ class OnlineBattleFragment : Fragment() {
                         val request = FirebaseRequests()
                         dbRefRequest.child(currentUser!!.uid).setValue(request)
                 dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"DRAW"){
+                    playButtonClick()
                     dialog?.dismiss()
                     findNavController().navigateUp()
                 }.create()
@@ -725,6 +733,7 @@ class OnlineBattleFragment : Fragment() {
                 val request = FirebaseRequests()
                 dbRefRequest.child(currentUser!!.uid).setValue(request)
                 dialog = AlertDialogEndGameOnlineBattle(requireContext(),layoutInflater,"OUT OF TIME"){
+                    playButtonClick()
                     dialog?.dismiss()
                     findNavController().navigateUp()
                 }.create()

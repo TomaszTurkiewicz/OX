@@ -107,6 +107,9 @@ class OptionsFragment : FragmentCoroutine() {
         binding.marksRandomTv.text = "RANDOM"
         binding.marksCustomTv.text = "CUSTOM"
         binding.vsTv.text = "VS"
+        binding.soundsLabel.text = "SOUNDS"
+        binding.buttonSoundTv.text = "BUTTONS"
+        binding.effectsSoundTv.text = "EFFECTS"
     }
 
     private fun clicks(){
@@ -264,6 +267,14 @@ class OptionsFragment : FragmentCoroutine() {
         binding.playerRightArrow.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.opponentLeftArrow.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.opponentRightArrow.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+
+        binding.marksDividerLine.layoutParams = ConstraintLayout.LayoutParams(width,(unit*0.05).toInt())
+        binding.soundsLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.8f)
+
+        binding.buttonSoundTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.effectsSoundTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.buttonSoundSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+        binding.effectsSoundSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
     }
 
     private fun setDrawables(){
@@ -287,6 +298,12 @@ class OptionsFragment : FragmentCoroutine() {
         binding.vsTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         displayMarks()
         displayControls()
+        binding.marksDividerLine.setImageDrawable(DividerLine(requireContext()))
+        binding.soundsLabel.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.buttonSoundSelector.background = ChooserBackground(requireContext())
+        binding.effectsSoundSelector.background = ChooserBackground(requireContext())
+        binding.buttonSoundTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.effectsSoundTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
 
     }
 
@@ -297,8 +314,6 @@ class OptionsFragment : FragmentCoroutine() {
         random = SharedPreferences.readRandomMarks(requireContext())
         if(random){
             displayMarksHandler.postDelayed(displayMarksRunnable(),1000)
-        }else{
-
         }
     }
 
@@ -467,6 +482,30 @@ class OptionsFragment : FragmentCoroutine() {
 
         set.connect(binding.opponentRightArrow.id,ConstraintSet.TOP,binding.opponentMark.id,ConstraintSet.BOTTOM,0)
         set.connect(binding.opponentRightArrow.id,ConstraintSet.RIGHT,binding.opponentMark.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.marksDividerLine.id,ConstraintSet.TOP,binding.playerLeftArrow.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.marksDividerLine.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.marksDividerLine.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.soundsLabel.id,ConstraintSet.TOP,binding.marksDividerLine.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.soundsLabel.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.soundsLabel.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.buttonSoundSelector.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,unit)
+        set.connect(binding.buttonSoundSelector.id,ConstraintSet.TOP,binding.soundsLabel.id,ConstraintSet.BOTTOM,unit/2)
+
+        set.connect(binding.effectsSoundSelector.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,unit)
+        set.connect(binding.effectsSoundSelector.id,ConstraintSet.TOP,binding.buttonSoundSelector.id,ConstraintSet.BOTTOM,unit/2)
+
+        set.connect(binding.buttonSoundTv.id, ConstraintSet.LEFT, binding.buttonSoundSelector.id, ConstraintSet.RIGHT,unit/2)
+        set.connect(binding.buttonSoundTv.id, ConstraintSet.TOP, binding.buttonSoundSelector.id, ConstraintSet.TOP,0)
+        set.connect(binding.buttonSoundTv.id, ConstraintSet.BOTTOM, binding.buttonSoundSelector.id, ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.effectsSoundTv.id, ConstraintSet.LEFT, binding.effectsSoundSelector.id, ConstraintSet.RIGHT,unit/2)
+        set.connect(binding.effectsSoundTv.id, ConstraintSet.TOP, binding.effectsSoundSelector.id, ConstraintSet.TOP,0)
+        set.connect(binding.effectsSoundTv.id, ConstraintSet.BOTTOM, binding.effectsSoundSelector.id, ConstraintSet.BOTTOM,0)
+
+
 
         set.applyTo(binding.layout)
     }

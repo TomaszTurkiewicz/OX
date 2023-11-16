@@ -11,6 +11,7 @@ import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.tt.ox.databinding.ActivityMainBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
+import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -73,38 +74,71 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun playButtonClickSound() {
-        GlobalScope.launch(Dispatchers.Default) {
-            buttonClickSound0?.start()
+        val sound = SharedPreferences.readButtonSound(this)
+        if(sound){
+            GlobalScope.launch(Dispatchers.Default) {
+                buttonClickSound0?.start()
+            }
+        }
+    }
+    fun playInvertedButtonClickSound() {
+        val sound = SharedPreferences.readButtonSound(this)
+        if(!sound){
+            GlobalScope.launch(Dispatchers.Default) {
+                buttonClickSound0?.start()
+            }
         }
     }
 
     fun playLoseSound(){
-        loseSound?.stop()
-        loseSound?.release()
-        loseSound = null
-        loseSound = MediaPlayer.create(this,R.raw.lose_sound)
-        GlobalScope.launch(Dispatchers.Default){
-            loseSound?.start()
+        val sound = SharedPreferences.readEffectsSound(this)
+        if (sound) {
+            loseSound?.stop()
+            loseSound?.release()
+            loseSound = null
+            loseSound = MediaPlayer.create(this, R.raw.lose_sound)
+            GlobalScope.launch(Dispatchers.Default) {
+                loseSound?.start()
+            }
         }
     }
 
     fun playDrawSound(){
-        drawSound?.stop()
-        drawSound?.release()
-        drawSound = null
-        drawSound = MediaPlayer.create(this,R.raw.draw_sound)
-        GlobalScope.launch(Dispatchers.Default){
-            drawSound?.start()
+        val sound = SharedPreferences.readEffectsSound(this)
+        if (sound) {
+            drawSound?.stop()
+            drawSound?.release()
+            drawSound = null
+            drawSound = MediaPlayer.create(this, R.raw.draw_sound)
+            GlobalScope.launch(Dispatchers.Default) {
+                drawSound?.start()
+            }
         }
     }
 
     fun playWinSound(){
-        winSound?.stop()
-        winSound?.release()
-        winSound = null
-        winSound = MediaPlayer.create(this,R.raw.win_sound)
-        GlobalScope.launch(Dispatchers.Default){
-            winSound?.start()
+        val sound = SharedPreferences.readEffectsSound(this)
+        if (sound) {
+            winSound?.stop()
+            winSound?.release()
+            winSound = null
+            winSound = MediaPlayer.create(this, R.raw.win_sound)
+            GlobalScope.launch(Dispatchers.Default) {
+                winSound?.start()
+            }
+        }
+    }
+
+    fun playInvertedWinSound(){
+        val sound = SharedPreferences.readEffectsSound(this)
+        if (!sound) {
+            winSound?.stop()
+            winSound?.release()
+            winSound = null
+            winSound = MediaPlayer.create(this, R.raw.win_sound)
+            GlobalScope.launch(Dispatchers.Default) {
+                winSound?.start()
+            }
         }
     }
 

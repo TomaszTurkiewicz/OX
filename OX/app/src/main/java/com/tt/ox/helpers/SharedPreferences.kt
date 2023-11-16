@@ -8,8 +8,8 @@ import com.tt.ox.X
 
 class SharedPreferences {
     companion object {
-        fun saveMainPlayer(context:Context, name:String){
-            context.let {
+        fun saveMainPlayer(context:Context?, name:String){
+            context?.let {
                 val sharedPreferences = it.getSharedPreferences("Player_Name", Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
                 editor.putBoolean("player_name_set_up",true)
@@ -18,26 +18,26 @@ class SharedPreferences {
             }
         }
 
-        fun checkIfPlayerNameSetUp(context:Context):Boolean{
-            var boolean: Boolean
-            context.let {
+        fun checkIfPlayerNameSetUp(context:Context?):Boolean{
+            var boolean = false
+            context?.let {
                 val sharedPreferences = it.getSharedPreferences("Player_Name", Context.MODE_PRIVATE)
                 boolean = sharedPreferences.getBoolean("player_name_set_up",false)
             }
             return boolean
         }
 
-        fun readPlayerName(context:Context):String{
-            var name:String
-            context.let {
+        fun readPlayerName(context:Context?):String{
+            var name = ""
+            context?.let {
                 val sharedPreferences = it.getSharedPreferences("Player_Name", Context.MODE_PRIVATE)
                 name = sharedPreferences.getString("name","").toString()
             }
             return name
         }
 
-        fun saveMoves(context: Context,moves:Int){
-            context.let {
+        fun saveMoves(context: Context?,moves:Int){
+            context?.let {
                 val sharedPreferences = it.getSharedPreferences("Moves",Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
                 editor.putInt("moves",moves)
@@ -45,17 +45,17 @@ class SharedPreferences {
             }
         }
 
-        fun readMoves(context: Context):Int{
-            var moves: Int
-            context.let {
+        fun readMoves(context: Context?):Int{
+            var moves: Int = MOVES
+            context?.let {
                 val sharedPreferences = it.getSharedPreferences("Moves",Context.MODE_PRIVATE)
                 moves = sharedPreferences.getInt("moves", MOVES)
             }
             return moves
         }
 
-        fun saveOnlineMoves(context: Context,moves:Int){
-            context.let {
+        fun saveOnlineMoves(context: Context?,moves:Int){
+            context?.let {
                 val sp = it.getSharedPreferences("OnlineMoves",Context.MODE_PRIVATE)
                 val editor = sp.edit()
                 editor.putInt("online_moves",moves)
@@ -63,18 +63,18 @@ class SharedPreferences {
             }
         }
 
-        fun readOnlineMoves(context: Context):Int{
-            var moves: Int
-            context.let {
+        fun readOnlineMoves(context: Context?):Int{
+            var moves: Int = MOVES
+            context?.let {
                 val sharedPreferences = it.getSharedPreferences("OnlineMoves",Context.MODE_PRIVATE)
                 moves = sharedPreferences.getInt("online_moves", MOVES)
             }
             return moves
         }
 
-        fun readMarks(context: Context):Marks{
+        fun readMarks(context: Context?):Marks{
             val marks = Marks()
-            context.let {
+            context?.let {
                 val sharedPreferences = it.getSharedPreferences("Marks",Context.MODE_PRIVATE)
                 marks.playerMark = sharedPreferences.getInt("playerMark", X)
                 marks.playerColor = sharedPreferences.getInt("playerColor", COLOR_BLUE)
@@ -84,8 +84,8 @@ class SharedPreferences {
             return marks
         }
 
-        fun saveMarks(context: Context, marks:Marks){
-            context.let {
+        fun saveMarks(context: Context?, marks:Marks){
+            context?.let {
                 val sp = it.getSharedPreferences("Marks",Context.MODE_PRIVATE)
                 val editor = sp.edit()
                 editor.putInt("playerMark", marks.playerMark)
@@ -96,17 +96,17 @@ class SharedPreferences {
             }
         }
 
-        fun readRandomMarks(context: Context):Boolean{
-            var random:Boolean
-            context.let {
+        fun readRandomMarks(context: Context?):Boolean{
+            var random = true
+            context?.let {
                 val sp = it.getSharedPreferences("Random",Context.MODE_PRIVATE)
                 random = sp.getBoolean("random",true)
             }
             return random
         }
 
-        fun saveRandomMarks(context: Context, random:Boolean){
-            context.let {
+        fun saveRandomMarks(context: Context?, random:Boolean){
+            context?.let {
                 val sp = it.getSharedPreferences("Random",Context.MODE_PRIVATE)
                 val editor = sp.edit()
                 editor.putBoolean("random",random)
@@ -130,6 +130,41 @@ class SharedPreferences {
                 darkMode = sharedPreferences.getInt("dark_mode", DARK_MODE_AUTO)
             }
             return darkMode
+        }
+
+       fun readButtonSound(context: Context?):Boolean{
+           var sound = true
+           context?.let {
+               val sp = it.getSharedPreferences("SOUNDS",Context.MODE_PRIVATE)
+               sound = sp.getBoolean("button_sound",true)
+           }
+           return sound
+       }
+
+        fun readEffectsSound(context: Context?):Boolean{
+            var sound = true
+            context?.let {
+                val sp = it.getSharedPreferences("SOUNDS",Context.MODE_PRIVATE)
+                sound = sp.getBoolean("effects_sound",true)
+            }
+            return sound
+        }
+
+        fun saveButtonSound(context: Context?,sound:Boolean){
+            context?.let {
+                val sharedPreferences = it.getSharedPreferences("SOUNDS",Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("button_sound",sound)
+                editor.apply()
+            }
+        }
+        fun saveEffectsSound(context: Context?,sound:Boolean){
+            context?.let {
+                val sharedPreferences = it.getSharedPreferences("SOUNDS",Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("effects_sound",sound)
+                editor.apply()
+            }
         }
 
     }

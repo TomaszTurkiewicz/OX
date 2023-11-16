@@ -29,10 +29,19 @@ abstract class FragmentCoroutine : Fragment(), CoroutineScope {
         val activity = activity as MainActivity
         activity.playButtonClickSound()
     }
+    fun playInvertedButtonClick(){
+        val activity = activity as MainActivity
+        activity.playInvertedButtonClickSound()
+    }
 
     fun playWinSound(){
         val activity = activity as MainActivity
         activity.playWinSound()
+    }
+
+    fun playInvertedWinSound(){
+        val activity = activity as MainActivity
+        activity.playInvertedWinSound()
     }
 
     fun playDrawSound(){

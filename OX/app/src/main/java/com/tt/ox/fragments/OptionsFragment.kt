@@ -70,7 +70,21 @@ class OptionsFragment : FragmentCoroutine() {
         displayUserName()
         displayTexts()
         displayMarksSelection()
+        displaySoundsSelectors()
         clicks()
+    }
+
+    private fun displaySoundsSelectors(){
+        binding.buttonSoundSelector.setImageDrawable(null)
+        binding.effectsSoundSelector.setImageDrawable(null)
+        val buttonSound = SharedPreferences.readButtonSound(requireContext())
+        if(buttonSound){
+            binding.buttonSoundSelector.setImageDrawable(ChooserDrawable(requireContext()))
+        }
+        val effectsSound = SharedPreferences.readEffectsSound(requireContext())
+        if(effectsSound){
+            binding.effectsSoundSelector.setImageDrawable(ChooserDrawable(requireContext()))
+        }
     }
 
     private fun displayMarksSelection() {
@@ -185,6 +199,19 @@ class OptionsFragment : FragmentCoroutine() {
                 marks.increaseOpponentColor(requireContext())
                 displayMarks()
             }
+        }
+        binding.buttonSoundSelector.setOnClickListener {
+            playInvertedButtonClick()
+            val sound = SharedPreferences.readButtonSound(requireContext())
+            SharedPreferences.saveButtonSound(requireContext(),!sound)
+            displaySoundsSelectors()
+        }
+        binding.effectsSoundSelector.setOnClickListener {
+            playButtonClick()
+            playInvertedWinSound()
+            val sound = SharedPreferences.readEffectsSound(requireContext())
+            SharedPreferences.saveEffectsSound(requireContext(),!sound)
+            displaySoundsSelectors()
         }
     }
 

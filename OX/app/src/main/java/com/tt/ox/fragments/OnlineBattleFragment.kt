@@ -573,6 +573,7 @@ class OnlineBattleFragment : FragmentCoroutine() {
                 dbRefBattle!!.child("turn").setValue(request!!.opponentId)
             }
             WIN -> {
+                playWinSound()
                 clockHandler.removeCallbacksAndMessages(null)
                 dbRefBattle?.removeEventListener(battleListener!!)
                 play = false

@@ -192,6 +192,7 @@ class MultiPlayerFragment : FragmentCoroutine() {
     private fun updateWins(){
         val winningPerson = gameViewModel.getWiningPerson()
         if (winningPerson == MAIN_PLAYER) {
+            playWinSound()
             gameViewModel.game.value!!.addWin()
             launch {
                 gameViewModel.updateOpponent(

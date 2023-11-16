@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
     private var isMobileAdsInitializeCalled = AtomicBoolean(false)
 
     private var buttonClickSound0: MediaPlayer? = null
+    private var winSound: MediaPlayer? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +73,16 @@ class MainActivity : AppCompatActivity() {
     fun playButtonClick() {
         GlobalScope.launch(Dispatchers.Default) {
             buttonClickSound0?.start()
+        }
+    }
+
+    fun playWinSound(){
+        winSound?.stop()
+        winSound?.release()
+        winSound = null
+        winSound = MediaPlayer.create(this,R.raw.win_sound)
+        GlobalScope.launch(Dispatchers.Default){
+            winSound?.start()
         }
     }
 
@@ -151,6 +162,6 @@ class MainActivity : AppCompatActivity() {
 *  buttons not active change ui (online search, reset and send invitation)
 *  multiplayer give hint to add user if user list empty
 *  settings: (sounds?, clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
-*  sounds?
+*  sounds (button click, win/lose/draw sound, add moves sound) , background music
 *  online show progress bar when checking last activity and downloading users from firebase
  */

@@ -56,6 +56,8 @@ class MainActivity : AppCompatActivity() {
 
     private var buttonClickSound0: MediaPlayer? = null
     private var winSound: MediaPlayer? = null
+    private var loseSound:MediaPlayer? = null
+    private var drawSound:MediaPlayer? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,9 +72,29 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun playButtonClick() {
+    fun playButtonClickSound() {
         GlobalScope.launch(Dispatchers.Default) {
             buttonClickSound0?.start()
+        }
+    }
+
+    fun playLoseSound(){
+        loseSound?.stop()
+        loseSound?.release()
+        loseSound = null
+        loseSound = MediaPlayer.create(this,R.raw.lose_sound)
+        GlobalScope.launch(Dispatchers.Default){
+            loseSound?.start()
+        }
+    }
+
+    fun playDrawSound(){
+        drawSound?.stop()
+        drawSound?.release()
+        drawSound = null
+        drawSound = MediaPlayer.create(this,R.raw.draw_sound)
+        GlobalScope.launch(Dispatchers.Default){
+            drawSound?.start()
         }
     }
 

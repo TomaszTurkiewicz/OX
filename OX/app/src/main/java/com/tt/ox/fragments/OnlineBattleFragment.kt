@@ -628,6 +628,7 @@ class OnlineBattleFragment : FragmentCoroutine() {
                 })
             }
             DRAW -> {
+                playDrawSound()
                 clockHandler.removeCallbacksAndMessages(null)
                 dbRefBattle?.removeEventListener(battleListener!!)
                 displayField()
@@ -663,6 +664,7 @@ class OnlineBattleFragment : FragmentCoroutine() {
                 }
             }
             request!!.opponentId -> {
+                playLoseSound()
                 clockHandler.removeCallbacksAndMessages(null)
                 displayWinningLine()
                 dbRefBattle?.removeEventListener(battleListener!!)
@@ -714,6 +716,7 @@ class OnlineBattleFragment : FragmentCoroutine() {
                 })
             }
             END_DRAW -> {
+                playDrawSound()
                 clockHandler.removeCallbacksAndMessages(null)
                 dbRefBattle?.removeEventListener(battleListener!!)
 

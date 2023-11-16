@@ -190,22 +190,28 @@ class MultiPlayerFragment : FragmentCoroutine() {
         }
     }
     private fun updateWins(){
-        val winningPerson = gameViewModel.getWiningPerson()
-        if (winningPerson == MAIN_PLAYER) {
-            playWinSound()
-            gameViewModel.game.value!!.addWin()
-            launch {
-                gameViewModel.updateOpponent(
-                    gameViewModel.game.value!!.getOpponent()
-                )
-            }
+        when (gameViewModel.getWiningPerson()) {
+            MAIN_PLAYER -> {
+                playWinSound()
+                gameViewModel.game.value!!.addWin()
+                launch {
+                    gameViewModel.updateOpponent(
+                        gameViewModel.game.value!!.getOpponent()
+                    )
+                }
 
-        } else if (winningPerson == OPPONENT) {
-            gameViewModel.game.value!!.addLose()
-            launch {
-                gameViewModel.updateOpponent(
-                    gameViewModel.game.value!!.getOpponent()
-                )
+            }
+            OPPONENT -> {
+                playLoseSound()
+                gameViewModel.game.value!!.addLose()
+                launch {
+                    gameViewModel.updateOpponent(
+                        gameViewModel.game.value!!.getOpponent()
+                    )
+                }
+            }
+            else -> {
+                playDrawSound()
             }
         }
     }

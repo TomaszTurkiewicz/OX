@@ -12,7 +12,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -23,7 +22,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.tt.ox.MainActivity
 import com.tt.ox.OXApplication
 import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.alertDialogs.AlertDialogLogin
@@ -40,7 +38,7 @@ import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
 
 
-class StartFragment : Fragment() {
+class StartFragment : FragmentCoroutine() {
 
     private var _binding: FragmentStartBinding? = null
     private val binding get() = _binding!!
@@ -210,10 +208,10 @@ class StartFragment : Fragment() {
         }
     }
 
-    private fun playButtonClick(){
-        val activity = activity as MainActivity
-        activity.playButtonClick()
-    }
+//    private fun playButtonClick(){
+//        val activity = activity as MainActivity
+//        activity.playButtonClick()
+//    }
 
     private fun prepareUI() {
 

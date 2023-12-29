@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity() {
 *  better buttons and layouts ui
 *  buttons not active change ui (online search, reset and send invitation)
 *  multiplayer give hint to add user if user list empty
-*  settings: (clear statistics?, send game, other games, delete user from firebase if logged in and logged in at least once)
+*  settings: (send game, other games, delete user from firebase if logged in and logged in at least once)
 *  background music
 *  online show progress bar when checking last activity and downloading users from firebase
  */

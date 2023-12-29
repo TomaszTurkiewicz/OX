@@ -633,6 +633,7 @@ class OptionsFragment : FragmentCoroutine() {
         set.connect(binding.clearStats.id, ConstraintSet.LEFT,binding.layout.id, ConstraintSet.LEFT,0)
         set.connect(binding.clearStats.id, ConstraintSet.RIGHT,binding.layout.id, ConstraintSet.RIGHT,0)
         set.connect(binding.clearStats.id, ConstraintSet.TOP,binding.losesText.id, ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.clearStats.id, ConstraintSet.BOTTOM,binding.layout.id, ConstraintSet.BOTTOM,unit/2)
 
 
         set.applyTo(binding.layout)

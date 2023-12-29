@@ -3,6 +3,7 @@ package com.tt.ox.fragments
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.tt.ox.OXApplication
+import com.tt.ox.R
 import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.alertDialogs.AlertDialogLogin
 import com.tt.ox.databinding.FragmentStartBinding
@@ -205,13 +207,19 @@ class StartFragment : FragmentCoroutine() {
                     displayLoginAlertDialogLogin()
                 }
             }
+            it.otherGamesButton.setOnClickListener {
+                val link = getString(R.string.other_games_link)
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            }
+
+            // todo check for new apps!!!
+            // todo change icon for other apps!!!
         }
     }
 
-//    private fun playButtonClick(){
-//        val activity = activity as MainActivity
-//        activity.playButtonClick()
-//    }
+
 
     private fun prepareUI() {
 
@@ -219,14 +227,17 @@ class StartFragment : FragmentCoroutine() {
         binding.singlePlayerButton.layoutParams = ConstraintLayout.LayoutParams(8*unit,3*unit)
         binding.onlinePlayerButton.layoutParams = ConstraintLayout.LayoutParams(8*unit,3*unit)
         binding.optionsButton.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
+        binding.otherGamesButton.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
 
         binding.fragmentStartLayout.background = BackgroundColorDrawable(requireContext())
         binding.singlePlayerButton.background = ButtonBackground(requireContext())
         binding.multiPlayerButton.background = ButtonBackground(requireContext())
         binding.onlinePlayerButton.background = ButtonBackground(requireContext())
         binding.optionsButton.background = ButtonBackground(requireContext())
+        binding.otherGamesButton.background = ButtonBackground(requireContext())
 
         binding.optionsButton.setImageDrawable(SettingButtonDrawable(requireContext()))
+        binding.otherGamesButton.setImageDrawable(SettingButtonDrawable(requireContext()))
         binding.singlePlayerButton.setImageDrawable(SinglePlayerButtonDrawable(requireContext()))
         binding.multiPlayerButton.setImageDrawable(MultiPlayerButtonDrawable(requireContext()))
         binding.onlinePlayerButton.setImageDrawable(OnlinePlayerButtonDrawable(requireContext()))
@@ -242,6 +253,9 @@ class StartFragment : FragmentCoroutine() {
 
         set.connect(binding.optionsButton.id, ConstraintSet.TOP, binding.fragmentStartLayout.id, ConstraintSet.TOP,unit/2)
         set.connect(binding.optionsButton.id, ConstraintSet.RIGHT, binding.fragmentStartLayout.id, ConstraintSet.RIGHT,unit/2)
+
+        set.connect(binding.otherGamesButton.id, ConstraintSet.TOP, binding.fragmentStartLayout.id, ConstraintSet.TOP,unit/2)
+        set.connect(binding.otherGamesButton.id, ConstraintSet.LEFT, binding.fragmentStartLayout.id, ConstraintSet.LEFT,unit/2)
 
         set.connect(binding.singlePlayerButton.id,ConstraintSet.LEFT,binding.fragmentStartLayout.id,ConstraintSet.LEFT,0)
         set.connect(binding.singlePlayerButton.id,ConstraintSet.RIGHT,binding.fragmentStartLayout.id,ConstraintSet.RIGHT,0)

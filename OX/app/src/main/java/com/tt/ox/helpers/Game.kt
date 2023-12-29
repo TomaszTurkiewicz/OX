@@ -37,6 +37,11 @@ class Game(context: Context,private val opponent: Opponent) {
         this.loses += 1
     }
 
+    fun resetStats(){
+        this.wins = 0
+        this.loses = 0
+    }
+
     fun getOpponent():Opponent{
         return Opponent(
             id = opponent.getId(),

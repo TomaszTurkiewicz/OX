@@ -13,11 +13,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
+import androidx.fragment.app.activityViewModels
 import com.tt.ox.DARK_MODE_AUTO
 import com.tt.ox.DARK_MODE_OFF
 import com.tt.ox.DARK_MODE_ON
+import com.tt.ox.OXApplication
 import com.tt.ox.X
 import com.tt.ox.alertDialogs.AlertDialogChangeName
+import com.tt.ox.alertDialogs.AlertDialogResetStats
 import com.tt.ox.databinding.FragmentOptionsBinding
 import com.tt.ox.drawables.ArrowLeftDrawable
 import com.tt.ox.drawables.ArrowRightDrawable
@@ -35,7 +38,10 @@ import com.tt.ox.helpers.Marks
 import com.tt.ox.helpers.ScreenMetricsCompat
 import com.tt.ox.helpers.SharedPreferences
 import com.tt.ox.helpers.Theme
+import com.tt.ox.viewModel.GameViewModel
+import com.tt.ox.viewModel.GameViewModelFactory
 import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.launch
 
 
 class OptionsFragment : FragmentCoroutine() {
@@ -48,6 +54,14 @@ class OptionsFragment : FragmentCoroutine() {
     private var random = false
     private val displayMarksHandler = Handler(Looper.getMainLooper())
     private var controlsEnable = false
+
+    private val gameViewModel: GameViewModel by activityViewModels {
+        GameViewModelFactory(
+            (activity?.application as OXApplication).database.opponentDao()
+        )
+    }
+
+    private var alertDialogReset:AlertDialog? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +86,44 @@ class OptionsFragment : FragmentCoroutine() {
         displayMarksSelection()
         displaySoundsSelectors()
         clicks()
+        initializeStatistics()
+    }
+
+    private fun initializeStatistics() {
+        gameViewModel.getOpponentMultiPlayer(1).observe(this.viewLifecycleOwner){
+            player ->
+            run {
+                gameViewModel.initializeGame(requireContext(),player)
+                binding.winsValue.text = player.getWins().toString()
+                binding.losesValue.text = player.getLoses().toString()
+                binding.clearStats.setOnClickListener {
+                    //todo
+                    if(alertDialogReset==null){
+                        alertDialogReset = AlertDialogResetStats(
+                            requireContext(),
+                            layoutInflater,
+                            {
+                                playButtonClick()
+                                alertDialogReset?.dismiss()
+                                alertDialogReset = null
+                            },
+                            {
+                                playButtonClick()
+                                gameViewModel.game.value!!.resetStats()
+                                launch {
+                                    gameViewModel.updateOpponent(
+                                        gameViewModel.game.value!!.getOpponent()
+                                    )
+                                }
+                                alertDialogReset?.dismiss()
+                                alertDialogReset = null
+                            }
+                        ).create()
+                        alertDialogReset?.show()
+                    }
+                }
+            }
+        }
     }
 
     private fun displaySoundsSelectors(){
@@ -124,6 +176,10 @@ class OptionsFragment : FragmentCoroutine() {
         binding.soundsLabel.text = "SOUNDS"
         binding.buttonSoundTv.text = "BUTTONS"
         binding.effectsSoundTv.text = "EFFECTS"
+        binding.statisticsLabel.text = "STATISTICS"
+        binding.winsText.text = "WINS"
+        binding.losesText.text = "LOSES"
+        binding.clearStats.text = "CLEAR"
     }
 
     private fun clicks(){
@@ -302,6 +358,17 @@ class OptionsFragment : FragmentCoroutine() {
         binding.effectsSoundTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
         binding.buttonSoundSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
         binding.effectsSoundSelector.layoutParams = ConstraintLayout.LayoutParams(unit,unit)
+
+        binding.soundsDividerLine.layoutParams = ConstraintLayout.LayoutParams(width,(unit*0.05).toInt())
+
+        binding.statisticsLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.8f)
+
+        binding.winsText.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.winsValue.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.losesText.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.losesValue.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.clearStats.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit* 0.5f)
+        binding.clearStats.layoutParams = ConstraintLayout.LayoutParams(4*unit,unit)
     }
 
     private fun setDrawables(){
@@ -331,6 +398,17 @@ class OptionsFragment : FragmentCoroutine() {
         binding.effectsSoundSelector.background = ChooserBackground(requireContext())
         binding.buttonSoundTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.effectsSoundTv.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.soundsDividerLine.setImageDrawable(DividerLine(requireContext()))
+
+        binding.statisticsLabel.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+
+        binding.winsText.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.winsValue.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getGreenColor()))
+        binding.losesText.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.losesValue.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getRedColor()))
+
+        binding.clearStats.background = ButtonBackground(requireContext())
+        binding.clearStats.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
 
     }
 
@@ -532,6 +610,29 @@ class OptionsFragment : FragmentCoroutine() {
         set.connect(binding.effectsSoundTv.id, ConstraintSet.TOP, binding.effectsSoundSelector.id, ConstraintSet.TOP,0)
         set.connect(binding.effectsSoundTv.id, ConstraintSet.BOTTOM, binding.effectsSoundSelector.id, ConstraintSet.BOTTOM,0)
 
+        set.connect(binding.soundsDividerLine.id,ConstraintSet.TOP,binding.effectsSoundSelector.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.soundsDividerLine.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.soundsDividerLine.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.statisticsLabel.id,ConstraintSet.TOP,binding.soundsDividerLine.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.statisticsLabel.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.statisticsLabel.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.winsText.id,ConstraintSet.TOP,binding.statisticsLabel.id, ConstraintSet.BOTTOM, unit/2)
+        set.connect(binding.winsText.id,ConstraintSet.LEFT,binding.layout.id, ConstraintSet.LEFT, unit)
+
+        set.connect(binding.losesText.id,ConstraintSet.TOP,binding.winsText.id, ConstraintSet.BOTTOM, unit/2)
+        set.connect(binding.losesText.id,ConstraintSet.LEFT,binding.layout.id, ConstraintSet.LEFT, unit)
+
+        set.connect(binding.winsValue.id, ConstraintSet.BOTTOM, binding.winsText.id, ConstraintSet.BOTTOM,0)
+        set.connect(binding.winsValue.id, ConstraintSet.LEFT, binding.winsText.id, ConstraintSet.RIGHT,unit/2)
+
+        set.connect(binding.losesValue.id, ConstraintSet.BOTTOM, binding.losesText.id, ConstraintSet.BOTTOM,0)
+        set.connect(binding.losesValue.id, ConstraintSet.LEFT, binding.losesText.id, ConstraintSet.RIGHT,unit/2)
+
+        set.connect(binding.clearStats.id, ConstraintSet.LEFT,binding.layout.id, ConstraintSet.LEFT,0)
+        set.connect(binding.clearStats.id, ConstraintSet.RIGHT,binding.layout.id, ConstraintSet.RIGHT,0)
+        set.connect(binding.clearStats.id, ConstraintSet.TOP,binding.losesText.id, ConstraintSet.BOTTOM,unit/2)
 
 
         set.applyTo(binding.layout)

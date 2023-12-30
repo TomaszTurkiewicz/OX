@@ -54,6 +54,7 @@ const val DARK_MODE_AUTO = 0
 const val DARK_MODE_ON = 1
 const val DARK_MODE_OFF = 2
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

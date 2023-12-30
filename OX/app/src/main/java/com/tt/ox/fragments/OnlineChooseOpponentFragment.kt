@@ -45,10 +45,14 @@ import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.EditTextBackground
 import com.tt.ox.drawables.LogoutDrawable
+import com.tt.ox.drawables.ProgressBarBackgroundDrawable
+import com.tt.ox.drawables.ProgressBarDrawable
 import com.tt.ox.drawables.SearchDrawable
 import com.tt.ox.drawables.UpdateListDrawable
 import com.tt.ox.helpers.ACCEPTED
 import com.tt.ox.helpers.AVAILABLE
+import com.tt.ox.helpers.COLOR_BLUE
+import com.tt.ox.helpers.COLOR_RED
 import com.tt.ox.helpers.DateUtils
 import com.tt.ox.helpers.FirebaseBattle
 import com.tt.ox.helpers.FirebaseRequests
@@ -229,8 +233,10 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
     private fun setInfoVisibility(it: Boolean) {
         if(it){
             binding.infoText.visibility = View.GONE
+            binding.progressBar.visibility = View.GONE
         }else{
             binding.infoText.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.VISIBLE
         }
     }
 
@@ -277,6 +283,10 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
         set.connect(binding.searchEditText.id,ConstraintSet.LEFT, binding.layout.id,ConstraintSet.LEFT,0)
         set.connect(binding.searchEditText.id,ConstraintSet.RIGHT, binding.layout.id,ConstraintSet.RIGHT,0)
 
+        set.connect(binding.progressBar.id, ConstraintSet.LEFT, binding.infoText.id,ConstraintSet.LEFT,0)
+        set.connect(binding.progressBar.id, ConstraintSet.RIGHT, binding.infoText.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.progressBar.id, ConstraintSet.TOP, binding.infoText.id,ConstraintSet.BOTTOM,unit)
+
         set.applyTo(binding.layout)
     }
 
@@ -295,6 +305,7 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
         binding.searchEditText.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
 
         binding.searchEditText.background = EditTextBackground(requireContext())
+        binding.progressBar.background = ProgressBarBackgroundDrawable(requireContext())
 
     }
 
@@ -309,6 +320,7 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
         binding.noUsers.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
         binding.searchEditText.layoutParams = ConstraintLayout.LayoutParams(width,buttonSize)
         binding.searchEditText.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())
+        binding.progressBar.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
     }
 
     override fun onResume() {
@@ -436,6 +448,13 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
 
     private fun readListFromFirebaseNew(dates: MutableList<Int>){
         if(currentPosition<datesListSize){
+            val percent:Double = (currentPosition+1).toDouble()/datesListSize.toDouble()
+            try {
+                binding?.progressBar?.setImageDrawable(ProgressBarDrawable(requireContext(),percent, COLOR_RED))
+            }catch (e:Exception){
+                //do nothing
+            }
+
             val dbRef = dbRefRanking.child(dates[currentPosition].toString())
             dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -470,6 +489,13 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
 
     private fun readUsersFromFirebaseNew(filteredIdList: List<FirebaseUserId>){
         if(currentUserPosition<listSize){
+            val percent:Double = (currentUserPosition+1).toDouble()/listSize.toDouble()
+            try {
+                binding?.progressBar?.setImageDrawable(ProgressBarDrawable(requireContext(),percent,
+                    COLOR_BLUE))
+            }catch (e:Exception){
+                //do nothing
+            }
             val dbRef = dbRefUsers.child(filteredIdList[currentUserPosition].userId!!)
             dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {

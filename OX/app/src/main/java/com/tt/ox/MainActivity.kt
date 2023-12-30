@@ -9,8 +9,15 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.tt.ox.databinding.ActivityMainBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
+import com.tt.ox.helpers.GooglePlayApps
+import com.tt.ox.helpers.NewApps
 import com.tt.ox.helpers.SharedPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -59,6 +66,8 @@ class MainActivity : AppCompatActivity() {
     private var winSound: MediaPlayer? = null
     private var loseSound:MediaPlayer? = null
     private var drawSound:MediaPlayer? = null
+    private var googlePlayApps:GooglePlayApps? = null
+    private var apps:NewApps = NewApps()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +80,35 @@ class MainActivity : AppCompatActivity() {
         requestConsentForm()
         buttonClickSound0 = MediaPlayer.create(this, R.raw.button_click)
 
+        apps.setAppsInMemoryInt(SharedPreferences.readNumberOfAppsFromMemory(this))
+        checkAppsInGooglePlay()
+    }
+
+    private fun checkAppsInGooglePlay() {
+        val dbRef = Firebase.database.getReference("GooglePlayApps")
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                googlePlayApps = snapshot.getValue(GooglePlayApps::class.java)
+                googlePlayApps?.let {
+                    apps.setAppsInGooglePlayInt(it)
+                    checkIfNewApp()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // do nothing
+            }
+
+        })
+
+    }
+
+    private fun checkIfNewApp() {
+        val newApp = apps.isNewApp()
+        SharedPreferences.saveNumberOfAppsFromMemory(this,apps.appsInGooglePlay)
+        if(newApp){
+            SharedPreferences.saveNewAppAvailable(this,true)
+        }
     }
 
     fun playButtonClickSound() {

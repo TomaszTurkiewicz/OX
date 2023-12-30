@@ -167,5 +167,41 @@ class SharedPreferences {
             }
         }
 
+
+        fun readNumberOfAppsFromMemory(context:Context?):Int{
+            var numberOfApps = 0
+            context?.let {
+                val sp = context.getSharedPreferences("APPS_IN_MEMORY",Context.MODE_PRIVATE)
+                numberOfApps = sp.getInt("apps_in_memory",0)
+            }
+            return numberOfApps
+        }
+
+        fun saveNumberOfAppsFromMemory(context:Context?, numberOfApps:Int){
+            context?.let {
+                val sp = context.getSharedPreferences("APPS_IN_MEMORY",Context.MODE_PRIVATE)
+                val edit = sp.edit()
+                edit.putInt("apps_in_memory",numberOfApps)
+                edit.apply()
+            }
+        }
+
+        fun saveNewAppAvailable(context:Context?,boolean: Boolean){
+            context?.let {
+                val sp = context.getSharedPreferences("NEW_APP",Context.MODE_PRIVATE)
+                val edit = sp.edit()
+                edit.putBoolean("new_app",boolean)
+                edit.apply()
+            }
+        }
+
+        fun readNewAppAvailable(context:Context?):Boolean{
+            var boolean = false
+            context?.let {
+                val sp = context.getSharedPreferences("NEW_APP",Context.MODE_PRIVATE)
+                boolean = sp.getBoolean("new_app",false)
+            }
+            return boolean
+        }
     }
 }

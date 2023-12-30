@@ -31,6 +31,7 @@ import com.tt.ox.databinding.FragmentStartBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.MultiPlayerButtonDrawable
+import com.tt.ox.drawables.NotificationDotDrawable
 import com.tt.ox.drawables.OnlinePlayerButtonDrawable
 import com.tt.ox.drawables.SettingButtonDrawable
 import com.tt.ox.drawables.SinglePlayerButtonDrawable
@@ -105,6 +106,7 @@ class StartFragment : FragmentCoroutine() {
         val playerNameSetUp = SharedPreferences.checkIfPlayerNameSetUp(requireContext())
         if(playerNameSetUp){
             clicks()
+            checkOtherGames()
         }
         else{
             createAlertDialog()
@@ -174,10 +176,21 @@ class StartFragment : FragmentCoroutine() {
                 gameViewModel.addNewOpponent("PHONE")
                 SharedPreferences.saveMainPlayer(requireContext(),it)
                 clicks()
+                checkOtherGames()
                 alertDialogSetName?.dismiss()
             }
         ).create()
         alertDialogSetName.show()
+    }
+
+    private fun checkOtherGames() {
+        val newAppAvailable = SharedPreferences.readNewAppAvailable(requireContext())
+        if(newAppAvailable){
+            binding.otherGamesNotification.visibility = View.VISIBLE
+        }else{
+            binding.otherGamesNotification.visibility = View.GONE
+        }
+
     }
 
     private fun clicks() {
@@ -208,13 +221,14 @@ class StartFragment : FragmentCoroutine() {
                 }
             }
             it.otherGamesButton.setOnClickListener {
+                SharedPreferences.saveNewAppAvailable(requireContext(),false)
+                binding.otherGamesNotification.visibility = View.GONE
                 val link = getString(R.string.other_games_link)
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }
 
-            // todo check for new apps!!!
             // todo change icon for other apps!!!
         }
     }
@@ -228,6 +242,7 @@ class StartFragment : FragmentCoroutine() {
         binding.onlinePlayerButton.layoutParams = ConstraintLayout.LayoutParams(8*unit,3*unit)
         binding.optionsButton.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
         binding.otherGamesButton.layoutParams = ConstraintLayout.LayoutParams(2*unit,2*unit)
+        binding.otherGamesNotification.layoutParams = ConstraintLayout.LayoutParams(unit/3,unit/3)
 
         binding.fragmentStartLayout.background = BackgroundColorDrawable(requireContext())
         binding.singlePlayerButton.background = ButtonBackground(requireContext())
@@ -241,6 +256,7 @@ class StartFragment : FragmentCoroutine() {
         binding.singlePlayerButton.setImageDrawable(SinglePlayerButtonDrawable(requireContext()))
         binding.multiPlayerButton.setImageDrawable(MultiPlayerButtonDrawable(requireContext()))
         binding.onlinePlayerButton.setImageDrawable(OnlinePlayerButtonDrawable(requireContext()))
+        binding.otherGamesNotification.setImageDrawable(NotificationDotDrawable(requireContext()))
 
         setConstraints()
     }
@@ -274,6 +290,11 @@ class StartFragment : FragmentCoroutine() {
         set.connect(binding.onlinePlayerButton.id,ConstraintSet.TOP,binding.multiPlayerButton.id,ConstraintSet.BOTTOM,
             offset.toInt()
         )
+
+        set.connect(binding.otherGamesNotification.id,ConstraintSet.TOP,binding.otherGamesButton.id,ConstraintSet.TOP,0)
+//        set.connect(binding.otherGamesNotification.id,ConstraintSet.BOTTOM,binding.otherGamesButton.id,ConstraintSet.TOP,0)
+        set.connect(binding.otherGamesNotification.id,ConstraintSet.RIGHT,binding.otherGamesButton.id,ConstraintSet.RIGHT,0)
+//        set.connect(binding.otherGamesNotification.id,ConstraintSet.LEFT,binding.otherGamesButton.id,ConstraintSet.RIGHT,0)
 
         set.applyTo(binding.fragmentStartLayout)
     }

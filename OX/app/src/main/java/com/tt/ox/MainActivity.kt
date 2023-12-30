@@ -256,6 +256,5 @@ class MainActivity : AppCompatActivity() {
 *  better buttons and layouts ui
 *  buttons not active change ui (online search, reset and send invitation)
 *  settings: (delete user from firebase if logged in - do it from online fragment (info maybe additional button next to search))
-*  online show progress bar when checking last activity and downloading users from firebase
 *  app icon !!!
  */

@@ -44,6 +44,7 @@ import com.tt.ox.databinding.FragmentOnlineChooseOpponentBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.EditTextBackground
+import com.tt.ox.drawables.InfoDrawable
 import com.tt.ox.drawables.LogoutDrawable
 import com.tt.ox.drawables.ProgressBarBackgroundDrawable
 import com.tt.ox.drawables.ProgressBarDrawable
@@ -136,6 +137,7 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
         listReady.observe(this.viewLifecycleOwner){
             binding.updateList.setImageDrawable(UpdateListDrawable(requireContext(),it))
             binding.searchButton.setImageDrawable(SearchDrawable(requireContext(),it))
+            binding.info.setImageDrawable(InfoDrawable(requireContext(),it))
             setInfoVisibility(it)
         }
         setUI()
@@ -202,6 +204,16 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
             }
         }
 
+        binding.info.setOnClickListener {
+            playButtonClick()
+            if(listReady.value!!){
+                val action = OnlineChooseOpponentFragmentDirections.actionOnlineChooseOpponentFragmentToOnlineInfoFragment()
+                findNavController().navigate(action)
+            }else{
+                Toast.makeText(requireContext(),"NOT READY YET",Toast.LENGTH_LONG).show()
+            }
+        }
+
         binding.searchButton.setOnClickListener {
             playButtonClick()
             if(listReady.value!!){
@@ -251,33 +263,37 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
         val set = ConstraintSet()
         set.clone(binding.layout)
 
-        set.connect(binding.middleDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
-        set.connect(binding.middleDivider.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
-        set.connect(binding.middleDivider.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
-
-        set.connect(binding.rightDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
-        set.connect(binding.rightDivider.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
-        set.connect(binding.rightDivider.id,ConstraintSet.LEFT,binding.middleDivider.id,ConstraintSet.RIGHT,0)
-
-        set.connect(binding.leftDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
-        set.connect(binding.leftDivider.id,ConstraintSet.RIGHT,binding.middleDivider.id,ConstraintSet.LEFT,0)
-        set.connect(binding.leftDivider.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+//        set.connect(binding.middleDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+//        set.connect(binding.middleDivider.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+//        set.connect(binding.middleDivider.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+//
+//        set.connect(binding.rightDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+//        set.connect(binding.rightDivider.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+//        set.connect(binding.rightDivider.id,ConstraintSet.LEFT,binding.middleDivider.id,ConstraintSet.RIGHT,0)
+//
+//        set.connect(binding.leftDivider.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,0)
+//        set.connect(binding.leftDivider.id,ConstraintSet.RIGHT,binding.middleDivider.id,ConstraintSet.LEFT,0)
+//        set.connect(binding.leftDivider.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
 
         set.connect(binding.logout.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
         set.connect(binding.logout.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
-        set.connect(binding.logout.id,ConstraintSet.RIGHT,binding.leftDivider.id,ConstraintSet.LEFT,0)
+        set.connect(binding.logout.id,ConstraintSet.RIGHT,binding.firstDivider.id,ConstraintSet.LEFT,0)
 
         set.connect(binding.moves.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
-        set.connect(binding.moves.id,ConstraintSet.LEFT,binding.leftDivider.id,ConstraintSet.RIGHT,0)
-        set.connect(binding.moves.id,ConstraintSet.RIGHT,binding.middleDivider.id,ConstraintSet.LEFT,0)
+        set.connect(binding.moves.id,ConstraintSet.LEFT,binding.firstDivider.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.moves.id,ConstraintSet.RIGHT,binding.secondDivider.id,ConstraintSet.LEFT,0)
 
         set.connect(binding.updateList.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
-        set.connect(binding.updateList.id,ConstraintSet.LEFT,binding.middleDivider.id,ConstraintSet.RIGHT,0)
-        set.connect(binding.updateList.id,ConstraintSet.RIGHT,binding.rightDivider.id,ConstraintSet.LEFT,0)
+        set.connect(binding.updateList.id,ConstraintSet.LEFT,binding.secondDivider.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.updateList.id,ConstraintSet.RIGHT,binding.thirdDivider.id,ConstraintSet.LEFT,0)
 
         set.connect(binding.searchButton.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
-        set.connect(binding.searchButton.id,ConstraintSet.LEFT,binding.rightDivider.id,ConstraintSet.RIGHT,0)
-        set.connect(binding.searchButton.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.searchButton.id,ConstraintSet.LEFT,binding.thirdDivider.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.searchButton.id,ConstraintSet.RIGHT,binding.fourthDivider.id,ConstraintSet.LEFT,0)
+
+        set.connect(binding.info.id,ConstraintSet.TOP,binding.layout.id,ConstraintSet.TOP,unit/2)
+        set.connect(binding.info.id,ConstraintSet.LEFT,binding.fourthDivider.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.info.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,unit/2)
 
         set.connect(binding.searchEditText.id,ConstraintSet.TOP,binding.searchButton.id,ConstraintSet.BOTTOM,0)
         set.connect(binding.searchEditText.id,ConstraintSet.LEFT, binding.layout.id,ConstraintSet.LEFT,0)
@@ -296,6 +312,7 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
         binding.logout.background = ButtonBackground(requireContext())
         binding.updateList.background = ButtonBackground(requireContext())
         binding.searchButton.background = ButtonBackground(requireContext())
+        binding.info.background = ButtonBackground(requireContext())
 
         binding.logout.setImageDrawable(LogoutDrawable(requireContext()))
 
@@ -314,6 +331,7 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
         binding.moves.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.searchButton.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.updateList.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
+        binding.info.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.logout.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.moves.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit.toFloat())
         binding.infoText.setTextSize(TypedValue.COMPLEX_UNIT_PX,unit/2.toFloat())

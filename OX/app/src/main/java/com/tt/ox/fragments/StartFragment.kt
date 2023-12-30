@@ -33,6 +33,7 @@ import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.drawables.MultiPlayerButtonDrawable
 import com.tt.ox.drawables.NotificationDotDrawable
 import com.tt.ox.drawables.OnlinePlayerButtonDrawable
+import com.tt.ox.drawables.OtherGamesDrawable
 import com.tt.ox.drawables.SettingButtonDrawable
 import com.tt.ox.drawables.SinglePlayerButtonDrawable
 import com.tt.ox.helpers.ScreenMetricsCompat
@@ -228,8 +229,6 @@ class StartFragment : FragmentCoroutine() {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }
-
-            // todo change icon for other apps!!!
         }
     }
 
@@ -252,7 +251,7 @@ class StartFragment : FragmentCoroutine() {
         binding.otherGamesButton.background = ButtonBackground(requireContext())
 
         binding.optionsButton.setImageDrawable(SettingButtonDrawable(requireContext()))
-        binding.otherGamesButton.setImageDrawable(SettingButtonDrawable(requireContext()))
+        binding.otherGamesButton.setImageDrawable(OtherGamesDrawable(requireContext()))
         binding.singlePlayerButton.setImageDrawable(SinglePlayerButtonDrawable(requireContext()))
         binding.multiPlayerButton.setImageDrawable(MultiPlayerButtonDrawable(requireContext()))
         binding.onlinePlayerButton.setImageDrawable(OnlinePlayerButtonDrawable(requireContext()))

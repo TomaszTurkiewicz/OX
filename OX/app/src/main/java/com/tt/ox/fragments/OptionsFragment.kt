@@ -97,7 +97,6 @@ class OptionsFragment : FragmentCoroutine() {
                 binding.winsValue.text = player.getWins().toString()
                 binding.losesValue.text = player.getLoses().toString()
                 binding.clearStats.setOnClickListener {
-                    //todo
                     if(alertDialogReset==null){
                         alertDialogReset = AlertDialogResetStats(
                             requireContext(),

@@ -10,5 +10,6 @@
     <string name="onlinePlayerRewardedAd">ca-app-pub-6785166837488087/7516597200</string>
 
     <string name="other_games_link">https://play.google.com/store/apps/developer?id=Tomasz+Turkiewicz</string>
+    <string name="add_player">PRESS \"+\" TO ADD NEW PLAYER</string>
 
 </resources>

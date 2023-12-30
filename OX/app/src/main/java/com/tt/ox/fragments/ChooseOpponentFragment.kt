@@ -1,19 +1,23 @@
 package com.tt.ox.fragments
 
 import android.annotation.SuppressLint
+import android.app.ActionBar.LayoutParams
 import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tt.ox.OXApplication
+import com.tt.ox.R
 import com.tt.ox.adapters.ChooseOpponentAdapter
 import com.tt.ox.alertDialogs.AlertDialogChangeName
 import com.tt.ox.databinding.FragmentChooseOpponentBinding
@@ -22,6 +26,7 @@ import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.BinDrawable
 import com.tt.ox.drawables.ButtonBackground
 import com.tt.ox.helpers.ScreenMetricsCompat
+import com.tt.ox.helpers.Theme
 import com.tt.ox.viewModel.GameViewModel
 import com.tt.ox.viewModel.GameViewModelFactory
 
@@ -35,6 +40,7 @@ class ChooseOpponentFragment : FragmentCoroutine() {
     private var deletable = false
     private lateinit var adapter: ChooseOpponentAdapter
     private var width = 0
+    private var listSize = 0
     private val gameViewModel: GameViewModel by activityViewModels {
         GameViewModelFactory(
             (activity?.application as OXApplication).database.opponentDao()
@@ -83,6 +89,19 @@ class ChooseOpponentFragment : FragmentCoroutine() {
         gameViewModel.listOfOpponents.observe(this.viewLifecycleOwner){
             opponent -> opponent.let {list ->
             val filteredList = list.filter{opponent -> opponent.getId() != 1 }
+            //todo check condition if size not 0!!!
+            listSize = filteredList.size
+            checkHint()
+            if(listSize==0){
+                deletable = false
+                playButtonClick()
+                state = binding.recyclerView.layoutManager?.onSaveInstanceState()
+                adapter.delete(deletable)
+                binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
+                binding.recyclerView.adapter = adapter
+                binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
+                binding.deleteOpponent.setImageDrawable(BinDrawable(requireContext(), deletable))
+            }
             state = binding.recyclerView.layoutManager?.onSaveInstanceState()
                 adapter.submitList(filteredList)
                 {
@@ -123,6 +142,7 @@ class ChooseOpponentFragment : FragmentCoroutine() {
         setSizes()
         setDrawables()
         setConstraint()
+        checkHint()
 
     }
 
@@ -135,15 +155,22 @@ class ChooseOpponentFragment : FragmentCoroutine() {
 
         }
         binding.deleteOpponent.setOnClickListener {
-            playButtonClick()
-            state = binding.recyclerView.layoutManager?.onSaveInstanceState()
-            deletable = !deletable
-            adapter.delete(deletable)
-            binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
-            binding.recyclerView.adapter = adapter
-            binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
-            binding.deleteOpponent.setImageDrawable(BinDrawable(requireContext(),deletable))
-
+            if(listSize!=0) {
+                playButtonClick()
+                state = binding.recyclerView.layoutManager?.onSaveInstanceState()
+                deletable = !deletable
+                adapter.delete(deletable)
+                binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
+                binding.recyclerView.adapter = adapter
+                binding.recyclerView.layoutManager?.onRestoreInstanceState(state)
+                binding.deleteOpponent.setImageDrawable(BinDrawable(requireContext(), deletable))
+            }
+        }
+        binding.hint.setOnClickListener {
+            if(listSize==0){
+                playButtonClick()
+                addNewOpponent()
+            }
         }
     }
 
@@ -169,6 +196,12 @@ class ChooseOpponentFragment : FragmentCoroutine() {
         set.connect(binding.recyclerView.id,
             ConstraintSet.BOTTOM,binding.chooseOpponentFragmentLayout.id,
             ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.hint.id,ConstraintSet.LEFT,binding.chooseOpponentFragmentLayout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.hint.id,ConstraintSet.RIGHT,binding.chooseOpponentFragmentLayout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.hint.id,ConstraintSet.TOP,binding.chooseOpponentFragmentLayout.id,ConstraintSet.TOP,0)
+        set.connect(binding.hint.id,ConstraintSet.BOTTOM,binding.chooseOpponentFragmentLayout.id,ConstraintSet.BOTTOM,0)
+
         set.applyTo(binding.chooseOpponentFragmentLayout)
     }
 
@@ -178,6 +211,7 @@ class ChooseOpponentFragment : FragmentCoroutine() {
         binding.deleteOpponent.setImageDrawable(BinDrawable(requireContext(),deletable))
         binding.addOpponent.background = ButtonBackground(requireContext())
         binding.deleteOpponent.background = ButtonBackground(requireContext())
+        binding.hint.text = getString(R.string.add_player)
     }
 
     private fun setSizes() {
@@ -185,6 +219,19 @@ class ChooseOpponentFragment : FragmentCoroutine() {
         binding.addOpponent.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
         binding.deleteOpponent.layoutParams = ConstraintLayout.LayoutParams(buttonSize,buttonSize)
 
+        binding.hint.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit.toFloat())
+        binding.hint.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getAccentColor()))
+
+        binding.hint.layoutParams = ConstraintLayout.LayoutParams((width*0.8).toInt(),LayoutParams.WRAP_CONTENT)
+
+    }
+
+    private fun checkHint(){
+        if(listSize!=0){
+            binding.hint.visibility = View.GONE
+        }else{
+            binding.hint.visibility = View.VISIBLE
+        }
     }
 
 }

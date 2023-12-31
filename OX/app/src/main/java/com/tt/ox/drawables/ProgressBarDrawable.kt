@@ -8,6 +8,7 @@ import android.graphics.PixelFormat
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
+import com.tt.ox.helpers.COLOR_BLUE
 import com.tt.ox.helpers.COLOR_RED
 import com.tt.ox.helpers.Theme
 
@@ -16,7 +17,12 @@ class ProgressBarDrawable (private val context: Context, private val percent:Dou
 
     override fun draw(canvas: Canvas) {
 
-        paint.color = if(color== COLOR_RED) ContextCompat.getColor(context, Theme(context).getRedColor()) else ContextCompat.getColor(context, Theme(context).getBlueColor())
+        paint.color = when(color){
+            COLOR_RED -> ContextCompat.getColor(context, Theme(context).getRedColor())
+            COLOR_BLUE -> ContextCompat.getColor(context, Theme(context).getBlueColor())
+            else -> ContextCompat.getColor(context, Theme(context).getGreenColor())
+        }
+
         paint.strokeWidth = bounds.width()*0.05f
         paint.style = Paint.Style.STROKE
         paint.isAntiAlias=true

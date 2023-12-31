@@ -90,7 +90,6 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
     private var currentPosition = 0
     private lateinit var adapter: OnlineListAdapter
     private val userList:MutableList<com.tt.ox.helpers.FirebaseUser> = mutableListOf()
-    private var loopCounter = 0
     private var listSize = 0
     private var currentUserPosition = 0
     private var dialogInvitation:AlertDialog? = null
@@ -496,7 +495,6 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
 
     private fun readUserListFromFirebaseNew(){
         userList.clear()
-        loopCounter = 0
         _stage.value = FILTERING
         val filteredIdList = idList.filter { id -> id.userId != currentUser!!.uid }
         listSize = filteredIdList.size
@@ -509,8 +507,7 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
         if(currentUserPosition<listSize){
             val percent:Double = (currentUserPosition+1).toDouble()/listSize.toDouble()
             try {
-                binding?.progressBar?.setImageDrawable(ProgressBarDrawable(requireContext(),percent,
-                    COLOR_BLUE))
+                binding?.progressBar?.setImageDrawable(ProgressBarDrawable(requireContext(),percent, COLOR_BLUE))
             }catch (e:Exception){
                 //do nothing
             }

@@ -11,6 +11,8 @@
     <color name="gray_light">#DADADA</color>
     <color name="gray_dark">#707070</color>
     <color name="red">#FF0000</color>
+    <color name="red_background">#FFC4C4</color>
+    <color name="red_background_dark">#3E3636</color>
     <color name="pink">#FF8888</color>
     <color name="red_dark">#9C0000</color>
     <color name="green">#44FF00</color>

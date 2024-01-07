@@ -23,6 +23,7 @@ import com.google.firebase.ktx.Firebase
 import com.tt.ox.adapters.RankingAdapter
 import com.tt.ox.databinding.FragmentOnlineInfoBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
+import com.tt.ox.drawables.ButtonBackgroundWarning
 import com.tt.ox.drawables.ProgressBarBackgroundDrawable
 import com.tt.ox.drawables.ProgressBarDrawable
 import com.tt.ox.drawables.RecyclerViewFrameDrawable
@@ -464,6 +465,8 @@ class OnlineInfoFragment : Fragment() {
     private fun setTexts() {
         binding.rankingTextView.text = "RANKING"
         binding.historyTextView.text = "HISTORY"
+
+        binding.deleteAccount.text = "DELETE ACCOUNT"
     }
 
     private fun setConstraints() {
@@ -491,8 +494,6 @@ class OnlineInfoFragment : Fragment() {
         set.connect(binding.loadingRankingInfoProgressBar.id,ConstraintSet.RIGHT,binding.recyclerRanking.id,ConstraintSet.RIGHT,0)
         set.connect(binding.loadingRankingInfoProgressBar.id,ConstraintSet.BOTTOM,binding.recyclerRanking.id,ConstraintSet.BOTTOM,unit/2)
 
-
-
         set.connect(binding.historyTextView.id,ConstraintSet.TOP,binding.recyclerRanking.id,ConstraintSet.BOTTOM,unit)
         set.connect(binding.historyTextView.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
         set.connect(binding.historyTextView.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
@@ -514,6 +515,10 @@ class OnlineInfoFragment : Fragment() {
         set.connect(binding.loadingHistoryInfoProgressBar.id,ConstraintSet.RIGHT,binding.recyclerHistory.id,ConstraintSet.RIGHT,0)
         set.connect(binding.loadingHistoryInfoProgressBar.id,ConstraintSet.BOTTOM,binding.recyclerHistory.id,ConstraintSet.BOTTOM,unit/2)
 
+        set.connect(binding.deleteAccount.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.deleteAccount.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.deleteAccount.id,ConstraintSet.TOP,binding.historyFrame.id,ConstraintSet.BOTTOM,2*unit)
+
 
         set.applyTo(binding.layout)
 
@@ -533,6 +538,9 @@ class OnlineInfoFragment : Fragment() {
 
         binding.historyFrame.setImageDrawable(RecyclerViewFrameDrawable(requireContext(),frameWidth))
         binding.rankingFrame.setImageDrawable(RecyclerViewFrameDrawable(requireContext(),frameWidth))
+
+        binding.deleteAccount.background = ButtonBackgroundWarning(requireContext())
+        binding.deleteAccount.setTextColor(ContextCompat.getColor(requireContext(),Theme(requireContext()).getRedColor()))
     }
 
     private fun setSizes() {
@@ -547,6 +555,9 @@ class OnlineInfoFragment : Fragment() {
         binding.historyTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit/2).toFloat())
         binding.historyFrame.layoutParams = ConstraintLayout.LayoutParams(rankingFrameWidth,rankingFrameHeight)
         binding.recyclerHistory.layoutParams = ConstraintLayout.LayoutParams(width,rankingHeight)
+
+        binding.deleteAccount.layoutParams = ConstraintLayout.LayoutParams(width,2*unit)
+        binding.deleteAccount.setTextSize(TypedValue.COMPLEX_UNIT_PX, unit.toFloat())
     }
 
 }

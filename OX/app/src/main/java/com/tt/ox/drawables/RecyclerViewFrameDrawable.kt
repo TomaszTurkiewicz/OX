@@ -10,19 +10,21 @@ import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.tt.ox.helpers.Theme
 
-class BackgroundRankingItemDrawable (private val context: Context) : Drawable(){
+class RecyclerViewFrameDrawable (private val context: Context,private val frameWidth:Int) : Drawable(){
     private val paint = Paint()
     override fun draw(canvas: Canvas) {
-        paint.style = Paint.Style.FILL_AND_STROKE
-        paint.strokeWidth = 0f
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = (frameWidth*0.1).toFloat()
         paint.isAntiAlias = true
-        paint.color = ContextCompat.getColor(context, Theme(context).getGreenBackgroundColor())
-        val radius = bounds.width()*0.05f
+        paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
+        val radius = frameWidth.toFloat()
+        val dif = frameWidth*0.5f
 
-
-        val rect = RectF(0f,0f, bounds.width().toFloat(), bounds.height().toFloat())
+        val rect = RectF(dif,dif, bounds.width()-dif,bounds.height()-dif)
 
         canvas.drawRoundRect(rect,radius,radius,paint)
+
+
     }
 
     override fun setAlpha(alpha: Int) {

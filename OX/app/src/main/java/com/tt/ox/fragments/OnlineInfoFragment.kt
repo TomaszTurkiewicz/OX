@@ -25,6 +25,7 @@ import com.tt.ox.databinding.FragmentOnlineInfoBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ProgressBarBackgroundDrawable
 import com.tt.ox.drawables.ProgressBarDrawable
+import com.tt.ox.drawables.RecyclerViewFrameDrawable
 import com.tt.ox.helpers.COLOR_BLUE
 import com.tt.ox.helpers.COLOR_RED
 import com.tt.ox.helpers.DateUtils
@@ -73,14 +74,16 @@ class OnlineInfoFragment : Fragment() {
     private var rankingHeight = 0
     private var rankingFrameWidth = 0
     private var rankingFrameHeight = 0
+    private var frameWidth = 0
 
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         width = (ScreenMetricsCompat().getWindowWidth(requireContext())*0.9).toInt()
         rankingHeight = (width*0.6).toInt()
-        rankingFrameWidth = ScreenMetricsCompat().getWindowWidth(requireContext())
+        rankingFrameWidth = width+(width*0.1).toInt()
         rankingFrameHeight = rankingHeight+(width*0.1).toInt()
+        frameWidth = (width*0.05).toInt()
         unit = ScreenMetricsCompat().getUnit(requireContext())
         auth = Firebase.auth
         currentUser = auth.currentUser
@@ -412,27 +415,27 @@ class OnlineInfoFragment : Fragment() {
 
     private fun prepareHistory() {
         _stageHistory.value = USERS
-            history.clear()
-            val dbRef = dbRefHistory.child(currentUser!!.uid)
-            dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if(snapshot.exists()){
-                        for(child in snapshot.children){
-                            val historyF = child.getValue(FirebaseHistory::class.java)
-                            val id = child.key
-                            val historyWithId = HistoryWithUserId(id!!,historyF!!)
-                            history.add(historyWithId)
-                        }
-                        prepareHistoryList()
+        history.clear()
+        val dbRef = dbRefHistory.child(currentUser!!.uid)
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists()){
+                    for(child in snapshot.children){
+                        val historyF = child.getValue(FirebaseHistory::class.java)
+                        val id = child.key
+                        val historyWithId = HistoryWithUserId(id!!,historyF!!)
+                        history.add(historyWithId)
                     }
-                    else{
-                        _stageHistory.value = NOTHING_TO_SHOW
-                    }
+                    prepareHistoryList()
                 }
-                override fun onCancelled(error: DatabaseError) {
-                    // do nothing
+                else{
+                    _stageHistory.value = NOTHING_TO_SHOW
                 }
-            })
+            }
+            override fun onCancelled(error: DatabaseError) {
+            // do nothing
+            }
+        })
     }
 
 
@@ -527,6 +530,9 @@ class OnlineInfoFragment : Fragment() {
         binding.loadingHistoryInfoProgressBar.background = ProgressBarBackgroundDrawable(requireContext())
         binding.historyTextView.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.recyclerHistory.background = BackgroundColorDrawable(requireContext())
+
+        binding.historyFrame.setImageDrawable(RecyclerViewFrameDrawable(requireContext(),frameWidth))
+        binding.rankingFrame.setImageDrawable(RecyclerViewFrameDrawable(requireContext(),frameWidth))
     }
 
     private fun setSizes() {

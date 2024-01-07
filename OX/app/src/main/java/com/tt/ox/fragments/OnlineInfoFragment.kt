@@ -1,19 +1,31 @@
 package com.tt.ox.fragments
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -21,6 +33,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.tt.ox.adapters.RankingAdapter
+import com.tt.ox.alertDialogs.AlertDialogLogin
 import com.tt.ox.databinding.FragmentOnlineInfoBinding
 import com.tt.ox.drawables.BackgroundColorDrawable
 import com.tt.ox.drawables.ButtonBackgroundWarning
@@ -43,7 +56,7 @@ private const val USERS = 2
 private const val SORTING = 3
 private const val READY = 4
 private const val NOTHING_TO_SHOW = 5
-class OnlineInfoFragment : Fragment() {
+class OnlineInfoFragment : FragmentCoroutine() {
 
 
     private var historyListSize = 0
@@ -61,6 +74,7 @@ class OnlineInfoFragment : Fragment() {
     private val dbRefUsers = Firebase.database.getReference("Users")
     private val dbRefRanking = Firebase.database.getReference("Ranking")
     private val dbRefHistory = Firebase.database.getReference("History")
+    private val dbRefRequests = Firebase.database.getReference("Requests")
     private val idList:MutableList<FirebaseUserId> = mutableListOf()
     private var datesListSize = 0
     private var currentDatePosition = 0
@@ -76,6 +90,9 @@ class OnlineInfoFragment : Fragment() {
     private var rankingFrameWidth = 0
     private var rankingFrameHeight = 0
     private var frameWidth = 0
+    private var alertDialog:AlertDialog? = null
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,7 +106,66 @@ class OnlineInfoFragment : Fragment() {
         auth = Firebase.auth
         currentUser = auth.currentUser
 
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("329182313552-1nrhrejp03ndlhnvff60leaj2p87sk5p.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
 
+        resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
+            if(result.resultCode == Activity.RESULT_OK){
+                val data: Intent? = result.data
+                doSomething(data)
+            }
+        }
+
+
+    }
+
+    private fun firebaseAuthWithGoogle(idToken:String?){
+        val credentials = GoogleAuthProvider.getCredential(idToken,null)
+        auth.signInWithCredential(credentials)
+            .addOnCompleteListener(requireActivity()){ task ->
+                if(task.isSuccessful){
+                    val user = Firebase.auth.currentUser
+                    user?.let {
+                        val dbRefH = dbRefHistory.child(user.uid)
+                        dbRefH.removeValue().addOnCompleteListener {
+                            val dbRefR = dbRefRequests.child(user.uid)
+                            dbRefR.removeValue().addOnCompleteListener {
+                                val dbRefU = dbRefUsers.child(user.uid)
+                                dbRefU.removeValue().addOnCompleteListener {
+                                    user.delete().addOnCompleteListener {
+                                        Toast.makeText(requireContext(),"USER DELETED", Toast.LENGTH_LONG).show()
+                                        findNavController().navigateUp()
+                                    }.addOnFailureListener {
+                                        Toast.makeText(requireContext(),"SOMETHING WENT WRONG TRY ONCE AGAIN LATER", Toast.LENGTH_LONG).show()
+                                    }
+                                }.addOnFailureListener {
+                                    Toast.makeText(requireContext(),"SOMETHING WENT WRONG TRY ONCE AGAIN LATER", Toast.LENGTH_LONG).show()
+                                }
+                            }.addOnFailureListener {
+                                Toast.makeText(requireContext(),"SOMETHING WENT WRONG TRY ONCE AGAIN LATER", Toast.LENGTH_LONG).show()
+                            }
+                        }.addOnFailureListener {
+                            Toast.makeText(requireContext(),"SOMETHING WENT WRONG TRY ONCE AGAIN LATER", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+                else{
+                    Toast.makeText(requireContext(),"SOMETHING WENT WRONG TRY ONCE AGAIN LATER", Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    private fun doSomething(data: Intent?) {
+        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            firebaseAuthWithGoogle(account.idToken)
+        }catch (e: ApiException){
+            Log.w("TAG","Google sign in failed", e)
+        }
     }
 
     private fun checkActivities() {
@@ -460,6 +536,32 @@ class OnlineInfoFragment : Fragment() {
         setTexts()
         setConstraints()
 
+        binding.deleteAccount.setOnClickListener {
+            playButtonClick()
+            displayDeleteAccountAlertDialog()
+        }
+    }
+
+    private fun displayDeleteAccountAlertDialog() {
+        alertDialog = AlertDialogLogin(
+            requireContext(),
+            layoutInflater,
+            "WARNING !!!",
+            true,
+            "Are You sure You want to delete Your account?",
+            {
+                playButtonClick()
+                auth.signOut()
+                val signInIntent = googleSignInClient.signInIntent
+                resultLauncher.launch(signInIntent)
+                alertDialog?.dismiss()
+            },
+            {
+                playButtonClick()
+                alertDialog?.dismiss()
+            }).create()
+        alertDialog?.show()
+
     }
 
     private fun setTexts() {
@@ -518,6 +620,7 @@ class OnlineInfoFragment : Fragment() {
         set.connect(binding.deleteAccount.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
         set.connect(binding.deleteAccount.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
         set.connect(binding.deleteAccount.id,ConstraintSet.TOP,binding.historyFrame.id,ConstraintSet.BOTTOM,2*unit)
+        set.connect(binding.deleteAccount.id,ConstraintSet.BOTTOM,binding.layout.id,ConstraintSet.BOTTOM,unit)
 
 
         set.applyTo(binding.layout)

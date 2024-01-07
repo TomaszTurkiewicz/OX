@@ -18,6 +18,7 @@ class AlertDialogLogin(
     private val context: Context,
     private val layoutInflater: LayoutInflater,
     private val title:String,
+    private val warning:Boolean,
     private val message:String,
     private val positiveClick: () -> Unit,
     private val cancelClick: () -> Unit
@@ -119,7 +120,12 @@ class AlertDialogLogin(
         positiveText: String
     ) {
         alertDialog.alertDialogLogIn.background = AlertDialogBackgroundDrawableColor(context)
-        alertDialog.loginButton.setImageDrawable(ButtonWithTextDrawable(context,positiveText))
+        if(warning){
+            alertDialog.loginButton.setImageDrawable(ButtonWithTextDrawable(context,"DELETE"))
+        }else{
+            alertDialog.loginButton.setImageDrawable(ButtonWithTextDrawable(context,positiveText))
+        }
+
         alertDialog.cancelButton.setImageDrawable(ButtonWithTextDrawable(context,"CANCEL"))
         alertDialog.loginButton.background = ButtonBackground(context)
         alertDialog.cancelButton.background = ButtonBackground(context)
@@ -134,7 +140,12 @@ class AlertDialogLogin(
     }
 
     private fun setAlertDialogColors(alertDialog: AlertDialogLogInBinding) {
-        alertDialog.title.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        if(warning){
+            alertDialog.title.setTextColor(ContextCompat.getColor(context, Theme(context).getRedColor()))
+        }else{
+            alertDialog.title.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+        }
         alertDialog.message.setTextColor(ContextCompat.getColor(context, Theme(context).getAccentColor()))
+
     }
 }

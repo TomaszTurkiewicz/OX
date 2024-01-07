@@ -174,6 +174,7 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
                     requireContext(),
                     layoutInflater,
                     "LOGOUT",
+                    false,
                     "Are You sure You want to logout?",
                     {
                         playButtonClick()
@@ -342,6 +343,7 @@ class OnlineChooseOpponentFragment : FragmentCoroutine() {
 
     override fun onResume() {
         super.onResume()
+        currentUser = auth.currentUser
         if(currentUser!=null) {
             prepareUIAndCheckUserInFirebase()
         }

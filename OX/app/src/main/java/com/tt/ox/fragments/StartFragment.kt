@@ -145,6 +145,7 @@ class StartFragment : FragmentCoroutine() {
             requireContext(),
             layoutInflater,
             "LOGIN",
+            false,
             "To play online you have to be logged in. Do You want login?",
             {
                 playButtonClick()

@@ -40,6 +40,7 @@ class Theme(val context:Context) {
 
     fun getAlertDialogBackgroundColor() = theme.getAlertDialogBackgroundColor()
 
+    fun getGreenBackgroundColor() = theme.getGreenBackgroundColor()
     private open class LightMode{
         open val background = R.color.white
         open val accent = R.color.black
@@ -49,6 +50,11 @@ class Theme(val context:Context) {
         open val gray = R.color.gray
         open val alertDialogBackground = R.color.white
         open val controlsDisable = R.color.gray_light
+        open val greenBackground = R.color.green_background
+
+        open fun getGreenBackgroundColor():Int{
+            return greenBackground
+        }
 
         open fun getControlsDisableColor():Int{
             return controlsDisable
@@ -90,6 +96,11 @@ class Theme(val context:Context) {
         override val gray = R.color.gray
         override val alertDialogBackground = R.color.black_light
         override val controlsDisable = R.color.black_light
+        override val greenBackground = R.color.green_background_dark
+
+        override fun getGreenBackgroundColor(): Int {
+            return greenBackground
+        }
 
         override fun getControlsDisableColor():Int{
             return controlsDisable

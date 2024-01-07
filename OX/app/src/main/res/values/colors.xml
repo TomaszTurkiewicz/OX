@@ -14,6 +14,8 @@
     <color name="pink">#FF8888</color>
     <color name="red_dark">#9C0000</color>
     <color name="green">#44FF00</color>
+    <color name="green_background">#D3FAC5</color>
+    <color name="green_background_dark">#1F291C</color>
     <color name="green_dark">#207700</color>
     <color name="blue">#00A6FF</color>
     <color name="blue_dark">#006195</color>

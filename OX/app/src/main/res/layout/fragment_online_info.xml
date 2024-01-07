@@ -8,31 +8,44 @@
     tools:context=".fragments.OnlineInfoFragment"
     android:id="@+id/layout">
 
+    <TextView
+        android:id="@+id/ranking_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <ImageView
-        android:id="@+id/middle_of_the_screen"
+        android:id="@+id/rankingFrame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        android:background="@color/blue_turn"/>
 
-    <TextView
-        android:id="@+id/loading_info_text_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_ranking"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/middle_of_the_screen"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/loading_ranking_info_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
         android:text="LOADING"/>
 
 
     <ImageView
-        android:id="@+id/loading_info_progress_bar"
+        android:id="@+id/loading_ranking_info_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/middle_of_the_screen"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

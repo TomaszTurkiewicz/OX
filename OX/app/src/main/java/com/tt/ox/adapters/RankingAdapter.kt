@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
@@ -20,7 +21,8 @@ class RankingAdapter(
     private val context: Context,
     private val userId: String,
     private val width: Int,
-    private val height:Int
+    private val height:Int,
+    private val history:Boolean
 ) : ListAdapter<FirebaseUser, RankingAdapter.RankingViewHolder>(DiffCallback){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RankingViewHolder {
@@ -39,6 +41,16 @@ class RankingAdapter(
         holder.name.text = current.userName
         holder.wins.text = current.wins.toString()
         holder.loses.text = current.loses.toString()
+
+        if(history){
+            if(current.id == userId){
+                holder.wins.visibility = View.GONE
+                holder.loses.visibility = View.GONE
+            }else{
+                holder.wins.visibility = View.VISIBLE
+                holder.loses.visibility = View.VISIBLE
+            }
+        }
 
         setSizes(holder)
         setColors(holder)

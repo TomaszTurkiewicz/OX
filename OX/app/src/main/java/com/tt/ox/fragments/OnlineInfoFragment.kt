@@ -40,9 +40,11 @@ private const val ACTIVITIES = 1
 private const val USERS = 2
 private const val SORTING = 3
 private const val READY = 4
+private const val NOTHING_TO_SHOW = 5
 class OnlineInfoFragment : Fragment() {
 
 
+    private var historyListSize = 0
     private var _binding:FragmentOnlineInfoBinding? = null
     private val binding get() = _binding!!
     private var unit = 0
@@ -51,6 +53,8 @@ class OnlineInfoFragment : Fragment() {
     private var currentUser:com.google.firebase.auth.FirebaseUser? = null
     private val _stageRanking = MutableLiveData<Int>()
     private val stageRanking:LiveData<Int> = _stageRanking
+    private val _stageHistory = MutableLiveData<Int>()
+    private val stageHistory:LiveData<Int> = _stageHistory
     private var mainUser:FirebaseUser? = null
     private val dbRefUsers = Firebase.database.getReference("Users")
     private val dbRefRanking = Firebase.database.getReference("Ranking")
@@ -59,10 +63,13 @@ class OnlineInfoFragment : Fragment() {
     private var datesListSize = 0
     private var currentDatePosition = 0
     private val userList:MutableList<com.tt.ox.helpers.FirebaseUser> = mutableListOf()
+    private val historyList:MutableList<com.tt.ox.helpers.FirebaseUser> = mutableListOf()
     private var currentUserPosition = 0
+    private var currentHistoryPosition = 0
     private var userListSize = 0
     private var history:MutableList<HistoryWithUserId> = mutableListOf()
     private lateinit var rankingAdapter: RankingAdapter
+    private lateinit var historyAdapter: RankingAdapter
     private var rankingHeight = 0
     private var rankingFrameWidth = 0
     private var rankingFrameHeight = 0
@@ -79,19 +86,6 @@ class OnlineInfoFragment : Fragment() {
         currentUser = auth.currentUser
 
 
-    }
-
-    private fun prepareStats() {
-        _stageRanking.value = USER
-        val dbRef = dbRefUsers.child(currentUser!!.uid)
-        dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                mainUser = snapshot.getValue(FirebaseUser::class.java)
-                checkActivities()
-            }
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })
     }
 
     private fun checkActivities() {
@@ -144,6 +138,126 @@ class OnlineInfoFragment : Fragment() {
         readAllUsersFromFirebase()
     }
 
+    private fun prepareHistoryList() {
+        if(history.size>0){
+            historyList.clear()
+            historyListSize = history.size
+            currentHistoryPosition = 0
+            readHistoryUsersFromFirebase()
+        }
+        else{
+            _stageHistory.value = NOTHING_TO_SHOW
+        }
+    }
+
+    private fun readHistoryUsersFromFirebase() {
+        if(currentHistoryPosition<historyListSize){
+            val percent:Double = (currentHistoryPosition+1).toDouble()/historyListSize.toDouble()
+            try {
+                binding?.loadingHistoryInfoProgressBar?.setImageDrawable(ProgressBarDrawable(requireContext(), percent, COLOR_BLUE))
+            }catch (e:Exception){
+                // do nothing
+            }
+            val dbRef = dbRefUsers.child(history[currentHistoryPosition].id)
+            dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(snapshot.exists()){
+                        val user = snapshot.getValue(FirebaseUser::class.java)
+                        user!!.wins = history[currentHistoryPosition].history.loses
+                        user.loses = history[currentHistoryPosition].history.wins
+                        historyList.add(user)
+                    }
+                    currentHistoryPosition+=1
+                    readHistoryUsersFromFirebase()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+
+            })
+        }
+        else{
+            val dbRef = dbRefUsers.child(currentUser!!.uid)
+            dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(snapshot.exists()){
+                        val user = snapshot.getValue(FirebaseUser::class.java)
+                        user!!.wins = 0
+                        user.loses = 0
+                        historyList.add(user)
+                    }
+                    sortAndDisplayHistory()
+                }
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
+        }
+    }
+
+    private fun sortAndDisplayHistory() {
+        checkIfFragmentAttached {
+            _stageHistory.value = SORTING
+            sortHistory()
+        }
+
+    }
+
+    private fun sortHistory() {
+        var boolean = false
+        if(historyList.size>1){
+            for(i in 0..<historyList.size-1){
+                val currentDif = historyList[i].wins - historyList[i].loses
+                val nextDif = historyList[i+1].wins - historyList[i+1].loses
+                if(currentDif<nextDif) {
+                    val temp = historyList[i]
+                    historyList[i] = historyList[i+1]
+                    historyList[i+1] = temp
+                    boolean = true
+                }
+                else {
+                    if(currentDif==nextDif){
+                        val currentWins = historyList[i].wins
+                        val nextWins = historyList[i+1].wins
+                        if(currentWins<nextWins){
+                            val temp = historyList[i]
+                            historyList[i] = historyList[i+1]
+                            historyList[i+1] = temp
+                            boolean = true
+                        }
+                    }
+                }
+            }
+            if(boolean){
+                sortHistory()
+            }else{
+                displayHistory()
+            }
+        }
+        else{
+            displayHistory()
+        }
+    }
+
+    private fun displayHistory() {
+        checkIfFragmentAttached {
+            _stageHistory.value = READY
+            historyAdapter = RankingAdapter(requireContext(), currentUser!!.uid, width, rankingHeight / 5, true)
+            binding.recyclerHistory.adapter = historyAdapter
+            binding.recyclerHistory.layoutManager = LinearLayoutManager(this)
+            historyAdapter.submitList(historyList)
+
+            var userPosition = -1
+            for(i in 0..<historyList.size){
+                if(historyList[i].id == currentUser!!.uid){
+                    userPosition = i
+                }
+            }
+            if(userPosition != -1){
+                binding.recyclerHistory.scrollToPosition(userPosition-2)
+            }
+        }
+    }
+
     private fun readAllUsersFromFirebase() {
         if(currentUserPosition<userListSize){
             val percent:Double = (currentUserPosition+1).toDouble()/userListSize.toDouble()
@@ -176,14 +290,7 @@ class OnlineInfoFragment : Fragment() {
     private fun sortAndDisplayRanking() {
         checkIfFragmentAttached {
             _stageRanking.value = SORTING
-            //todo sorting
             sort()
-
-//            _stageRanking.value = READY
-//            rankingAdapter = RankingAdapter(requireContext(), currentUser!!.uid, width, rankingHeight / 5)
-//            binding.recyclerRanking.adapter = rankingAdapter
-//            binding.recyclerRanking.layoutManager = LinearLayoutManager(this)
-//            rankingAdapter.submitList(userList)
         }
     }
 
@@ -226,7 +333,7 @@ class OnlineInfoFragment : Fragment() {
     private fun displayRanking() {
         checkIfFragmentAttached {
             _stageRanking.value = READY
-            rankingAdapter = RankingAdapter(requireContext(), currentUser!!.uid, width, rankingHeight / 5)
+            rankingAdapter = RankingAdapter(requireContext(), currentUser!!.uid, width, rankingHeight / 5, false)
             binding.recyclerRanking.adapter = rankingAdapter
             binding.recyclerRanking.layoutManager = LinearLayoutManager(this)
             rankingAdapter.submitList(userList)
@@ -238,7 +345,7 @@ class OnlineInfoFragment : Fragment() {
                 }
             }
             if(userPosition != -1){
-                binding.recyclerRanking.scrollToPosition(userPosition)
+                binding.recyclerRanking.scrollToPosition(userPosition-2)
             }
         }
     }
@@ -249,33 +356,7 @@ class OnlineInfoFragment : Fragment() {
         }
     }
 
-    private fun readHistoryFromFirebase() {
 
-        history.clear()
-        val dbRef = dbRefHistory.child(currentUser!!.uid)
-        dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists()){
-                    for(child in snapshot.children){
-                        val historyF = child.getValue(FirebaseHistory::class.java)
-                        val id = child.key
-                        val historyWithId = HistoryWithUserId(id!!,historyF!!)
-                       history.add(historyWithId)
-                    }
-                    _stageRanking.value = SORTING
-                }
-                else{
-                    _stageRanking.value = SORTING
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // do nothing
-            }
-
-        })
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -288,8 +369,8 @@ class OnlineInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prepareUI()
-//        prepareStats()
         prepareRanking()
+        prepareHistory()
         stageRanking.observe(this.viewLifecycleOwner){
             if(it== READY){
                 binding.loadingRankingInfoTextView.visibility = View.GONE
@@ -306,7 +387,55 @@ class OnlineInfoFragment : Fragment() {
                 }
             }
         }
+        stageHistory.observe(this.viewLifecycleOwner){
+            if(it== READY){
+                binding.loadingHistoryInfoTextView.visibility = View.GONE
+                binding.loadingHistoryInfoProgressBar.visibility = View.GONE
+            }else if(it == NOTHING_TO_SHOW){
+                binding.loadingHistoryInfoTextView.visibility = View.VISIBLE
+                binding.loadingHistoryInfoProgressBar.visibility = View.GONE
+                binding.loadingHistoryInfoTextView.text = "NOTHING TO SHOW"
+            }
+            else{
+                binding.loadingHistoryInfoTextView.visibility = View.VISIBLE
+                binding.loadingHistoryInfoProgressBar.visibility = View.VISIBLE
+                binding.loadingHistoryInfoTextView.text = when(it){
+                    USER -> "DOWNLOADING YOUR DATA"
+                    ACTIVITIES -> "CHECKING ACTIVE USERS"
+                    USERS -> "DOWNLOADING USERS DATA"
+                    SORTING -> "CREATING RANKING"
+                    else -> "DOING SOMETHING"
+                }
+            }
+        }
     }
+
+    private fun prepareHistory() {
+        _stageHistory.value = USERS
+            history.clear()
+            val dbRef = dbRefHistory.child(currentUser!!.uid)
+            dbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(snapshot.exists()){
+                        for(child in snapshot.children){
+                            val historyF = child.getValue(FirebaseHistory::class.java)
+                            val id = child.key
+                            val historyWithId = HistoryWithUserId(id!!,historyF!!)
+                            history.add(historyWithId)
+                        }
+                        prepareHistoryList()
+                    }
+                    else{
+                        _stageHistory.value = NOTHING_TO_SHOW
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    // do nothing
+                }
+            })
+    }
+
+
 
     private fun prepareRanking() {
         _stageRanking.value = USER
@@ -331,6 +460,7 @@ class OnlineInfoFragment : Fragment() {
 
     private fun setTexts() {
         binding.rankingTextView.text = "RANKING"
+        binding.historyTextView.text = "HISTORY"
     }
 
     private fun setConstraints() {
@@ -341,7 +471,7 @@ class OnlineInfoFragment : Fragment() {
         set.connect(binding.rankingTextView.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
         set.connect(binding.rankingTextView.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
 
-        set.connect(binding.rankingFrame.id,ConstraintSet.TOP, binding.rankingTextView.id,ConstraintSet.BOTTOM,unit/2)
+        set.connect(binding.rankingFrame.id,ConstraintSet.TOP, binding.rankingTextView.id,ConstraintSet.BOTTOM,unit/4)
         set.connect(binding.rankingFrame.id,ConstraintSet.LEFT, binding.layout.id,ConstraintSet.LEFT,0)
         set.connect(binding.rankingFrame.id,ConstraintSet.RIGHT, binding.layout.id,ConstraintSet.RIGHT,0)
 
@@ -360,6 +490,28 @@ class OnlineInfoFragment : Fragment() {
 
 
 
+        set.connect(binding.historyTextView.id,ConstraintSet.TOP,binding.recyclerRanking.id,ConstraintSet.BOTTOM,unit)
+        set.connect(binding.historyTextView.id,ConstraintSet.LEFT,binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.historyTextView.id,ConstraintSet.RIGHT,binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.historyFrame.id,ConstraintSet.TOP, binding.historyTextView.id,ConstraintSet.BOTTOM,unit/4)
+        set.connect(binding.historyFrame.id,ConstraintSet.LEFT, binding.layout.id,ConstraintSet.LEFT,0)
+        set.connect(binding.historyFrame.id,ConstraintSet.RIGHT, binding.layout.id,ConstraintSet.RIGHT,0)
+
+        set.connect(binding.recyclerHistory.id,ConstraintSet.LEFT, binding.historyFrame.id,ConstraintSet.LEFT,0)
+        set.connect(binding.recyclerHistory.id,ConstraintSet.RIGHT, binding.historyFrame.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.recyclerHistory.id,ConstraintSet.TOP, binding.historyFrame.id,ConstraintSet.TOP,0)
+        set.connect(binding.recyclerHistory.id,ConstraintSet.BOTTOM, binding.historyFrame.id,ConstraintSet.BOTTOM,0)
+
+        set.connect(binding.loadingHistoryInfoTextView.id,ConstraintSet.LEFT,binding.recyclerHistory.id,ConstraintSet.LEFT,0)
+        set.connect(binding.loadingHistoryInfoTextView.id,ConstraintSet.RIGHT,binding.recyclerHistory.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.loadingHistoryInfoTextView.id,ConstraintSet.TOP,binding.recyclerHistory.id,ConstraintSet.TOP,unit/2)
+
+        set.connect(binding.loadingHistoryInfoProgressBar.id,ConstraintSet.LEFT,binding.recyclerHistory.id,ConstraintSet.LEFT,0)
+        set.connect(binding.loadingHistoryInfoProgressBar.id,ConstraintSet.RIGHT,binding.recyclerHistory.id,ConstraintSet.RIGHT,0)
+        set.connect(binding.loadingHistoryInfoProgressBar.id,ConstraintSet.BOTTOM,binding.recyclerHistory.id,ConstraintSet.BOTTOM,unit/2)
+
+
         set.applyTo(binding.layout)
 
     }
@@ -370,6 +522,11 @@ class OnlineInfoFragment : Fragment() {
         binding.loadingRankingInfoProgressBar.background = ProgressBarBackgroundDrawable(requireContext())
         binding.rankingTextView.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
         binding.recyclerRanking.background = BackgroundColorDrawable(requireContext())
+
+        binding.loadingHistoryInfoTextView.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.loadingHistoryInfoProgressBar.background = ProgressBarBackgroundDrawable(requireContext())
+        binding.historyTextView.setTextColor(ContextCompat.getColor(requireContext(), Theme(requireContext()).getAccentColor()))
+        binding.recyclerHistory.background = BackgroundColorDrawable(requireContext())
     }
 
     private fun setSizes() {
@@ -378,6 +535,12 @@ class OnlineInfoFragment : Fragment() {
         binding.rankingTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit/2).toFloat())
         binding.rankingFrame.layoutParams = ConstraintLayout.LayoutParams(rankingFrameWidth,rankingFrameHeight)
         binding.recyclerRanking.layoutParams = ConstraintLayout.LayoutParams(width,rankingHeight)
+
+        binding.loadingHistoryInfoTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit/2).toFloat())
+        binding.loadingHistoryInfoProgressBar.layoutParams = ConstraintLayout.LayoutParams(2*unit, 2*unit)
+        binding.historyTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (unit/2).toFloat())
+        binding.historyFrame.layoutParams = ConstraintLayout.LayoutParams(rankingFrameWidth,rankingFrameHeight)
+        binding.recyclerHistory.layoutParams = ConstraintLayout.LayoutParams(width,rankingHeight)
     }
 
 }

@@ -89,7 +89,6 @@ class ChooseOpponentFragment : FragmentCoroutine() {
         gameViewModel.listOfOpponents.observe(this.viewLifecycleOwner){
             opponent -> opponent.let {list ->
             val filteredList = list.filter{opponent -> opponent.getId() != 1 }
-            //todo check condition if size not 0!!!
             listSize = filteredList.size
             checkHint()
             if(listSize==0){

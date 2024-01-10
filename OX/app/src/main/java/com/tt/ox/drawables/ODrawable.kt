@@ -20,7 +20,7 @@ class ODrawable (private val context: Context, private val color:Int, private va
         val middleY = bounds.centerY()
         val radius = bounds.width()/3
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = if(thick) (bounds.width()*0.04).toFloat() else (bounds.width()*0.02).toFloat()
+        paint.strokeWidth = if(thick) (bounds.width()*0.04).toFloat() else (bounds.width()*0.04).toFloat()
         when(color){
             COLOR_BLACK -> paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
             COLOR_RED -> paint.color = ContextCompat.getColor(context, Theme(context).getRedColor())

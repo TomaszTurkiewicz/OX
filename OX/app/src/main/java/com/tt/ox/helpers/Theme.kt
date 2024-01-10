@@ -42,6 +42,8 @@ class Theme(val context:Context) {
 
     fun getGreenBackgroundColor() = theme.getGreenBackgroundColor()
     fun getRedBackgroundColor() = theme.getRedBackgroundColor()
+
+    fun getOrange() = theme.getOrangeColor()
     private open class LightMode{
         open val background = R.color.white
         open val accent = R.color.black
@@ -53,6 +55,11 @@ class Theme(val context:Context) {
         open val controlsDisable = R.color.gray_light
         open val greenBackground = R.color.green_background
         open val redBackground = R.color.red_background
+        open val orange = R.color.orange
+
+        open fun getOrangeColor():Int{
+            return orange
+        }
 
         open fun getRedBackgroundColor():Int{
             return redBackground
@@ -103,7 +110,11 @@ class Theme(val context:Context) {
         override val controlsDisable = R.color.black_light
         override val greenBackground = R.color.green_background_dark
         override val redBackground = R.color.red_background_dark
+        override val orange = R.color.orange_dark
 
+        override fun getOrangeColor(): Int {
+            return orange
+        }
 
         override fun getRedBackgroundColor(): Int {
             return redBackground

@@ -24,7 +24,7 @@ class WinLineDrawable (private val context: Context,
     override fun draw(canvas: Canvas) {
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = (bounds.width()*0.02).toFloat()
-        paint.color = ContextCompat.getColor(context, Theme(context).getRedColor())
+        paint.color = ContextCompat.getColor(context, Theme(context).getOrange())
         paint.isAntiAlias = true
         paint.strokeCap = Paint.Cap.ROUND
 

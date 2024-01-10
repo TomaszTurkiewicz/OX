@@ -48,7 +48,7 @@ const val HARD_GAME = 3
 
 const val MOVES = 10
 
-const val TEST = true
+const val TEST = false
 
 const val DARK_MODE_AUTO = 0
 const val DARK_MODE_ON = 1
@@ -254,7 +254,4 @@ class MainActivity : AppCompatActivity() {
 }
 /*todo
 *  better buttons and layouts ui
-*  buttons not active change ui (online search, reset and send invitation)
-*  settings: (delete user from firebase if logged in - do it from online fragment (info maybe additional button next to search))
-*  app icon !!!
  */

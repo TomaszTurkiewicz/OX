@@ -20,7 +20,7 @@ class XDrawable  (private val context: Context, private val color:Int, private v
     override fun draw(canvas: Canvas) {
         val dif = bounds.width()/6
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = if(thick) (bounds.width()*0.04).toFloat() else (bounds.width()*0.02).toFloat()
+        paint.strokeWidth = if(thick) (bounds.width()*0.04).toFloat() else (bounds.width()*0.04).toFloat()
         when(color){
             COLOR_BLACK -> paint.color = ContextCompat.getColor(context, Theme(context).getAccentColor())
             COLOR_RED -> paint.color = ContextCompat.getColor(context, Theme(context).getRedColor())
